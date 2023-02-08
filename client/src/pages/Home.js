@@ -1,4 +1,9 @@
 import React from "react";
+import styled from "styled-components";
+
+const Header = styled.div`
+  
+`;
 
 function Home() {
   const [data, setData] = React.useState(null);
