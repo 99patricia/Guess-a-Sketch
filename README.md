@@ -1,4 +1,7 @@
 # Guess-a-Sketch
 ECE493 Capstone project
 
-test commit
+Team Member:
+Patricia Zafra :    \
+Kyle Bricker :       \
+Zihan Wang : 1574685  
