@@ -4,7 +4,6 @@ import Button from "./Button.js";
 
 const StyledHeader = styled.div`
     background-color: var(--primary);
-    position: absolute;
     width: 100%;
     top: 0;
     padding: 1.5rem 1.8rem;
