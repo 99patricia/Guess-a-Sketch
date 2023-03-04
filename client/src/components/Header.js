@@ -29,7 +29,7 @@ function Header(props) {
     return (
         <StyledHeader>
             <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
-            <div class="flex">
+            <div className="flex">
                 <Button>Login</Button>
                 <Button>Signup</Button>
             </div>

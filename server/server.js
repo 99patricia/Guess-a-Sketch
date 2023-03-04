@@ -18,9 +18,9 @@ app.get("/api", (req, res) => {
   res.json({ message: "Hello from server!" });
 });
 
-app.get("/chat/:chatId", (req, res) => {
-    res.sendFile(__dirname + "/views/example_index.html");
-});
+// app.get("/chat/:chatId", (req, res) => {
+//     res.sendFile(__dirname + "/views/example_index.html");
+// });
 
 io.on("connection", async (socket) => {
     console.log("a user connected with id: " + socket.id);
