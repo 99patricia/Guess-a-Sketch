@@ -1,5 +1,6 @@
 import express from "express";
 import http from "http";
+import cors from "cors";
 import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,6 +14,8 @@ const __dirname = path.dirname(__filename);
 
 const rooms = io.of("/").adapter.rooms;
 const sids = io.of("/").adapter.sids;
+
+app.use(cors())
 
 app.get("/api", (req, res) => {
   res.json({ message: "Hello from server!" });
