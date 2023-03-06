@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "./Button.js";
+
+import { Button } from "components";
 
 const StyledHeader = styled.div`
     background-color: var(--primary);

@@ -1,13 +1,13 @@
 import React from "react";
-import Header from "../components/Header.js";
 import axios from "axios";
+
+import { Header } from "components";
 
 function Home() {
     const [data, setData] = React.useState(null);
 
     React.useEffect(() => {
-        axios.get("/api")
-            .then((res) => setData(res.data.message));
+        axios.get("/api").then((res) => setData(res.data.message));
     }, []);
 
     return (

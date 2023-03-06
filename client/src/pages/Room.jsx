@@ -1,7 +1,8 @@
 import React from "react";
-import Header from "../components/Header.js";
 import io from "socket.io-client";
 import { useParams } from "react-router-dom";
+
+import { Header } from "components";
 
 const socket = io();
 

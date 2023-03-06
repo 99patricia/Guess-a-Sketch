@@ -1,7 +1,7 @@
 import "./App.css";
-import Home from "./pages/Home";
-import Room from "./pages/Room";
 import { Routes, Route } from "react-router-dom";
+
+import { Home, Room } from "pages";
 
 import axios from "axios";
 
