@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-import { Button, Header, FlexContainer, Form, FormInput } from "components";
+import { Button, Header, Container, Form, FormInput } from "components";
 
 function Home() {
     const [data, setData] = React.useState(null);
@@ -13,7 +13,7 @@ function Home() {
     return (
         <>
             <Header />
-            <FlexContainer>
+            <Container>
                 <Form>
                     <FormInput
                         label="Join a room"
@@ -30,7 +30,7 @@ function Home() {
                         Create a new room
                     </Button>
                 </Form>
-            </FlexContainer>
+            </Container>
         </>
     );
 }

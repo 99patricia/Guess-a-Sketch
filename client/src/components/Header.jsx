@@ -9,6 +9,7 @@ const StyledHeader = styled.div`
     position: absolute;
     top: 0;
     padding: 1.5rem 1.8rem;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     display: flex;
     justify-content: space-between;

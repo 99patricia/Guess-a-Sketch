@@ -6,8 +6,9 @@ const StyledButton = styled.button`
         props.secondary ? "var(--secondary)" : "var(--primary)"};
     color: var(--white);
     padding: 0.8rem 1.2rem;
+    display: block;
     border: 0;
-    border-radius: 0.8rem;
+    border-radius: 0.5rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     font-family: var(--font);
     font-size: 1.1rem;

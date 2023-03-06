@@ -48,15 +48,3 @@ input {
 .flex {
     display: flex;
 }
-
-.flex > div {
-    margin: 1rem;
-}
-
-.row {
-    flex-direction: row;
-}
-
-.center {
-    justify-content: center;
-}

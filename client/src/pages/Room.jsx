@@ -1,54 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 
-import { Canvas, Chat, FlexContainer, Header } from "components";
+import { Canvas, Container, FlexContainer, Header } from "components";
+import { ChatBody, ChatContainer, ChatFooter } from "components/Chat/";
 
 const socket = io();
 
 function Room() {
     const { chatId } = useParams();
+    const [messages, setMessages] = useState([]);
 
     var room = chatId;
     socket.room = room;
     socket.emit("join room", room);
 
-    window.addEventListener("load", () => {
-        var messages = document.getElementById("messages");
-        var form = document.getElementById("form");
-        var input = document.getElementById("input");
-
-        form.addEventListener("submit", function (e) {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit("chat message", input.value);
-                input.value = "";
-            }
+    useEffect(() => {
+        socket.on("chat message", (msg) => {
+            // Append existing message with incoming message
+            setMessages([...messages, msg]);
         });
-
-        socket.on("chat message", function (msg) {
-            var item = document.createElement("li");
-            item.textContent = msg;
-            messages.appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
-        });
-    });
+    }, [messages]);
 
     return (
         <>
             <Header />
-            <FlexContainer>
-                <div className="flex row center">
+            <Container>
+                <FlexContainer>
                     <Canvas></Canvas>
-                    <Chat>
-                        <ul id="messages"></ul>
-                        <form id="form" action="">
-                            <input id="input" autoComplete="off" />
-                            <button>Send</button>
-                        </form>
-                    </Chat>
-                </div>
-            </FlexContainer>
+                    <ChatContainer roomId={room}>
+                        <ChatBody messages={messages} />
+                        <ChatFooter socket={socket} />
+                    </ChatContainer>
+                </FlexContainer>
+            </Container>
         </>
     );
 }

@@ -11,11 +11,11 @@ const StyledLabel = styled.label`
 
 const StyledInput = styled.input`
     padding: 0.7rem 1rem;
-    border-radius: 0.3rem;
+    border-radius: 0.5rem;
     border: 1px solid var(--beige);
     font-size: 1.2rem;
     color: var(--primary);
-    
+
     :focus {
         border: 1px solid var(--primary);
         outline: 0;
@@ -25,7 +25,7 @@ const StyledInput = styled.input`
         color: var(--beige);
     }
 
-    :not(:last-child) {
+    :not(:last-of-type) {
         margin-bottom: 2rem;
     }
 `;
@@ -34,10 +34,7 @@ function FormInput(props) {
     return (
         <>
             <StyledLabel>{props.label}</StyledLabel>
-            <StyledInput
-                placeholder={props.placeholder}
-                type={props.type}
-            ></StyledInput>
+            <StyledInput {...props}></StyledInput>
         </>
     );
 }
