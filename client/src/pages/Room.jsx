@@ -2,7 +2,7 @@ import React from "react";
 import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 
-import { Header } from "components";
+import { Canvas, Chat, FlexContainer, Header } from "components";
 
 const socket = io();
 
@@ -35,16 +35,21 @@ function Room() {
     });
 
     return (
-        <div className="Room">
+        <>
             <Header />
-            <p>ID: {chatId}</p>
-            <h2 id="header"></h2>
-            <ul id="messages"></ul>
-            <form id="form" action="">
-                <input id="input" autoComplete="off" />
-                <button>Send</button>
-            </form>
-        </div>
+            <FlexContainer>
+                <div className="flex row center">
+                    <Canvas></Canvas>
+                    <Chat>
+                        <ul id="messages"></ul>
+                        <form id="form" action="">
+                            <input id="input" autoComplete="off" />
+                            <button>Send</button>
+                        </form>
+                    </Chat>
+                </div>
+            </FlexContainer>
+        </>
     );
 }
 

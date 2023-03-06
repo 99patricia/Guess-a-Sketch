@@ -6,6 +6,7 @@ import { Button } from "components";
 const StyledHeader = styled.div`
     background-color: var(--primary);
     width: 100%;
+    position: absolute;
     top: 0;
     padding: 1.5rem 1.8rem;
 
@@ -22,7 +23,6 @@ const StyledHeader = styled.div`
 const StyledSiteLink = styled.a`
     color: var(--secondary);
     font-size: 2rem;
-    font-weight: 900;
     text-transform: uppercase;
 `;
 
@@ -31,8 +31,8 @@ function Header(props) {
         <StyledHeader>
             <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
             <div className="flex">
-                <Button>Login</Button>
-                <Button>Signup</Button>
+                <Button secondary>Login</Button>
+                <Button secondary>Signup</Button>
             </div>
         </StyledHeader>
     );
