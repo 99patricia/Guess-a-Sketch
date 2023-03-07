@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 
-import { Canvas, Container, FlexContainer, Header } from "components";
-import { ChatBody, ChatContainer, ChatFooter } from "components/Chat/";
+import { Canvas, Chat, Container, FlexContainer, Header } from "components";
 
 const socket = io();
 
 function Room() {
     const { chatId } = useParams();
-    const [messages, setMessages] = useState([]);
+    const username = localStorage.getItem("nickname");
 
     var room = chatId;
     socket.room = room;
     socket.emit("join room", room);
-
-    useEffect(() => {
-        socket.on("chat message", (msg) => {
-            // Append existing message with incoming message
-            setMessages([...messages, msg]);
-        });
-    }, [messages]);
 
     return (
         <>
@@ -28,10 +20,7 @@ function Room() {
             <Container>
                 <FlexContainer>
                     <Canvas></Canvas>
-                    <ChatContainer roomId={room}>
-                        <ChatBody messages={messages} />
-                        <ChatFooter socket={socket} />
-                    </ChatContainer>
+                    <Chat roomId={room} socket={socket} username={username} />
                 </FlexContainer>
             </Container>
         </>

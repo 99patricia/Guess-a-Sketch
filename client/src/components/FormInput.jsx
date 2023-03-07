@@ -15,6 +15,7 @@ const StyledInput = styled.input`
     border: 1px solid var(--beige);
     font-size: 1.2rem;
     color: var(--primary);
+    margin-bottom: 2rem;
 
     :focus {
         border: 1px solid var(--primary);
@@ -25,9 +26,6 @@ const StyledInput = styled.input`
         color: var(--beige);
     }
 
-    :not(:last-of-type) {
-        margin-bottom: 2rem;
-    }
 `;
 
 function FormInput(props) {

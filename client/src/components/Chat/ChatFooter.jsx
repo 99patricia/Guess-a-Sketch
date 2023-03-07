@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { Button, FormInput } from "components";
+import { Button } from "components";
+import FormInput from "components/FormInput";
 
-const StyledChatFooter = styled.form``;
+const StyledChatFooter = styled.form`
+    display: flex;
+    margin: 0.5rem 0;
+`;
+
+const StyledChatInput = styled(FormInput)`
+    font-size: 1rem;
+    margin: 0 0.5rem 0 0;
+`;
 
 function ChatFooter(props) {
     const [message, setMessage] = useState("");
@@ -13,6 +22,7 @@ function ChatFooter(props) {
         if (message.trim()) {
             props.socket.emit("chat message", {
                 message,
+                username: props.username,
                 id: `${props.socket.id}${Math.random()}`,
             });
         }
@@ -21,13 +31,13 @@ function ChatFooter(props) {
 
     return (
         <StyledChatFooter onSubmit={handleSendMessage}>
-            <FormInput
+            <StyledChatInput
                 type="text"
                 placeholder="Enter guess here"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
             />
-            <Button>Send</Button>
+            <Button noShadow>Send</Button>
         </StyledChatFooter>
     );
 }

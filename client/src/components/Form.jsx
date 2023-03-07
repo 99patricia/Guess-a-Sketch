@@ -12,7 +12,7 @@ const StyledForm = styled.form`
 `;
 
 function Form(props) {
-    return <StyledForm props={props}>{props.children}</StyledForm>;
+    return <StyledForm {...props}>{props.children}</StyledForm>;
 }
 
 export default Form;

@@ -15,10 +15,10 @@ const __dirname = path.dirname(__filename);
 const rooms = io.of("/").adapter.rooms;
 const sids = io.of("/").adapter.sids;
 
-app.use(cors())
+app.use(cors());
 
 app.get("/api", (req, res) => {
-  res.json({ message: "Hello from server!" });
+    res.json({ message: "Hello from server!" });
 });
 
 // app.get("/chat/:chatId", (req, res) => {
