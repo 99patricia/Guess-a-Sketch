@@ -19,7 +19,7 @@ function Room() {
             <Header />
             <Container>
                 <FlexContainer>
-                    <Canvas></Canvas>
+                    <Canvas socket={socket}></Canvas>
                     <Chat roomId={room} socket={socket} username={username} />
                 </FlexContainer>
             </Container>

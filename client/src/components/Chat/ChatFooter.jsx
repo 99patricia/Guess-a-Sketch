@@ -15,15 +15,16 @@ const StyledChatInput = styled(FormInput)`
 `;
 
 function ChatFooter(props) {
+    const { socket, username } = { ...props };
     const [message, setMessage] = useState("");
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         if (message.trim()) {
-            props.socket.emit("chat message", {
+            socket.emit("chat message", {
                 message,
-                username: props.username,
-                id: `${props.socket.id}${Math.random()}`,
+                username: username,
+                id: `${socket.id}`,
             });
         }
         setMessage("");

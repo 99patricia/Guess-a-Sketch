@@ -29,16 +29,23 @@ io.on("connection", async (socket) => {
     console.log("a user connected with id: " + socket.id);
 
     socket.on("join room", (room) => {
-        // console.log(socket.id + ' joined room ' + room);
         socket.join(room);
-        console.log(socket.id + "joined room: " + room);
+        console.log(socket.id + " joined room: " + room);
     });
 
     socket.on("chat message", (msg) => {
         for (let room of socket.rooms) {
             if (!(room === socket.id)) {
-                console.log("Room " + room + ": " + msg);
+                console.log("Room " + room + ": " + msg.message);
                 io.to(room).emit("chat message", msg);
+            }
+        }
+    });
+
+    socket.on("draw", (data) => {
+        for (let room of socket.rooms) {
+            if (!(room === socket.id)) {
+                io.to(room).emit("draw", data);
             }
         }
     });

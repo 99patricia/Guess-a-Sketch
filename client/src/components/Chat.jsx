@@ -26,24 +26,25 @@ const StyledRoomCode = styled.div`
 `;
 
 function Chat(props) {
+    const { roomId, socket, username } = { ...props };
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        props.socket.on("chat message", (msg) => {
+        socket.on("chat message", (msg) => {
             // Append existing message with incoming message
             setMessages([...messages, msg]);
         });
-    }, [props.socket, messages]);
+    }, [socket, messages]);
 
     return (
         <StyledChat>
             <StyledRoomCode>
                 Room code:
-                <div className="code">{props.roomId}</div>
+                <div className="code">{roomId}</div>
             </StyledRoomCode>
             <div>
                 <ChatBody messages={messages} />
-                <ChatFooter socket={props.socket} username={props.username} />
+                <ChatFooter socket={socket} username={username} />
             </div>
         </StyledChat>
     );
