@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 
+import { CanvasFooter } from "components/Canvas/";
+
 const StyledCanvasContainer = styled.div`
     background-color: var(--light-beige);
     padding: 1rem;
@@ -11,6 +13,7 @@ const StyledCanvasContainer = styled.div`
 
 const StyledCanvas = styled.canvas`
     background-color: var(--white);
+    vertical-align: bottom;
 `;
 
 function Canvas(props) {
@@ -24,11 +27,12 @@ function Canvas(props) {
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
+        let lastCoord = { x: 0, y: 0 };
 
         // Update the position of the cursor on canvas
         const updateCoords = (e) => {
-            coord.x = e.clientX - canvas.offsetLeft;
-            coord.y = e.clientY - canvas.offsetTop;
+            coord.x = (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
+            coord.y = (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
         };
 
         const draw = (x0, y0, x1, y1, emit) => {
@@ -70,8 +74,10 @@ function Canvas(props) {
             draw(
                 coord.x,
                 coord.y,
-                e.clientX - canvas.offsetLeft,
-                e.clientY - canvas.offsetTop,
+                lastCoord.x ||
+                    (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
+                lastCoord.y ||
+                    (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
                 true
             );
         };
@@ -83,17 +89,28 @@ function Canvas(props) {
             draw(
                 coord.x,
                 coord.y,
-                e.clientX - canvas.offsetLeft,
-                e.clientY - canvas.offsetTop,
+                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
+                (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
                 true
             );
             // Update coordinates as mouse is moving
             updateCoords(e);
+            lastCoord.x =
+                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
+            lastCoord.y =
+                (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
         };
 
+        // Mouse event listeners
         canvas.addEventListener("mousedown", onMouseDown);
         canvas.addEventListener("mouseup", onMouseUp);
+        canvas.addEventListener("mouseout", onMouseUp);
         canvas.addEventListener("mousemove", onMouseMove);
+        // Touch event listeners
+        canvas.addEventListener("touchstart", onMouseDown);
+        canvas.addEventListener("touchend", onMouseUp);
+        canvas.addEventListener("touchcancel", onMouseUp);
+        canvas.addEventListener("touchmove", onMouseMove);
 
         // If we receive coordinates from socket, draw them
         socket.on("draw", (data) => {
@@ -105,9 +122,10 @@ function Canvas(props) {
         <StyledCanvasContainer>
             <StyledCanvas
                 width="500"
-                height="470"
+                height="400"
                 ref={canvasRef}
             ></StyledCanvas>
+            <CanvasFooter canvasRef={canvasRef} socket={socket} />
         </StyledCanvasContainer>
     );
 }

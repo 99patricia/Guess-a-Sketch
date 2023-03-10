@@ -50,6 +50,14 @@ io.on("connection", async (socket) => {
         }
     });
 
+    socket.on("clear-canvas", (data) => {
+        for (let room of socket.rooms) {
+            if (!(room === socket.id)) {
+                io.to(room).emit("clear-canvas", data);
+            }
+        }
+    });
+
     socket.on("disconnect", () => {
         console.log("user disconnected");
     });
