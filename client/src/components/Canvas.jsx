@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 
+import { CanvasFooter } from "components/Canvas/";
+
 const StyledCanvasContainer = styled.div`
     background-color: var(--light-beige);
     padding: 1rem;
@@ -11,6 +13,7 @@ const StyledCanvasContainer = styled.div`
 
 const StyledCanvas = styled.canvas`
     background-color: var(--white);
+    vertical-align: bottom;
 `;
 
 function Canvas(props) {
@@ -105,9 +108,10 @@ function Canvas(props) {
         <StyledCanvasContainer>
             <StyledCanvas
                 width="500"
-                height="470"
+                height="400"
                 ref={canvasRef}
             ></StyledCanvas>
+            <CanvasFooter canvasRef={canvasRef} socket={socket} />
         </StyledCanvasContainer>
     );
 }
