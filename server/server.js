@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 // firestore dependencies
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { addDoc, getDocs, collection } from "firebase/firestore"; 
 
 const firebaseConfig = {
     apiKey: "AIzaSyCfdLDNlu0qvGBkPNfyow-YcbZqhavQbK4",
@@ -42,19 +43,47 @@ app.get("/api", (req, res) => {
     res.json({ message: "Hello from server!" });
 });
 
-// app.get("/chat/:chatId", (req, res) => {
-//     res.sendFile(__dirname + "/views/example_index.html");
-// });
+async function addRoomToDB(room, socket_id) {
+    try {
+        const docRef = await addDoc(collection(db, "rooms"), {
+            room_id: room,
+            text: "this is a game room created by " + socket_id,
+        });
+        console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+
+async function readRoomsFromDB() {
+    const querySnapshot = await getDocs(collection(db, "rooms"));
+    querySnapshot.forEach((doc) => {
+        console.log(`${doc.id} => ${doc.data().text}`);
+    });
+}
 
 io.on("connection", async (socket) => {
     console.log("a user connected with id: " + socket.id);
     var auth = false;
     var currentRoom = socket.id;
     var username = "";
+    var host = false;
 
+    // takes in room_id and tries to create that room
+    // returns ("create-room-fail") if the room already exists
+    // on success the socket will create/join the room and emit
+    // ("create-room-success") back to the client
     socket.on('create-room', (room) => {
         if (io.sockets.adapter.rooms[room]) { // room already exists
-            
+            socket.to(socket.id).emit("create-room-fail", {
+                room,
+                msg: "room already exists",
+            });
+        } else { // create and join room
+            socket.join(room);
+            currentRoom = room;
+            host = true;
+            socket.to(socket.id).emit("create-room-success", room);
         }
     });
 
@@ -62,30 +91,40 @@ io.on("connection", async (socket) => {
     // - if the user already is in a room, the socket will disconnect the user from
     // said room.
     // - if the room does not exist the user will not join the room (not implemented yet)
-    // - on success the socket will emit ("joined-room") back to the client to notify it that
+    // - on success the socket will emit ("join-room-success") back to the client to notify it that
     // it has successfully joined a room
     socket.on("join room", (room) => {
         if (socket.rooms.size>1) { // user is already in a room
             for (let room of socket.rooms) {
                 if (!(room === socket.id)) {
-                    socket.leave(room) // leave other rooms
+                    socket.leave(room); // leave other rooms
                 }
             }
         }
         if (io.sockets.adapter.rooms[room]) { // room exists
-            currentRoom = room;
             socket.join(room);
-            socket.to(socket.id).emit("joined-room", room)
-        } else {
-            console.log("room does not exist")
             currentRoom = room;
+            host = false;
+            socket.to(socket.id).emit("join-room-success", room);
+        } else { // this is still todo, currently the room will be created on join if it does not exist
+            console.log("room does not exist");
             socket.join(room);
-            socket.to(socket.id).emit("joined-room", room)
+            currentRoom = room;
+            host = false;
+            socket.to(socket.id).emit("join-room-success", room);
+            // addRoomToDB(room, socket.id); test to add room values to firebase, not actually needed or used
         }
+        // else { // replace else statement with this code once create-room functionality is implemented on frontend
+        //     console.log("room does not exist");
+        //     socket.to(socket.id).emit("join-room-fail", {
+        //         room,
+        //         msg: "room does not exist",
+        //     });
+        // }
     });
 
     socket.on("leave-room", (room) => {
-        socket.leave(room)
+        socket.leave(room);
     });
 
     socket.on("chat message", (msg) => {
