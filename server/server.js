@@ -139,19 +139,11 @@ io.on("connection", async (socket) => {
     });
 
     socket.on("draw", (data) => {
-        for (let room of socket.rooms) {
-            if (!(room === socket.id)) {
-                io.to(room).emit("draw", data);
-            }
-        }
+        io.to(currentRoom).emit("draw", data);
     });
 
     socket.on("clear-canvas", (data) => {
-        for (let room of socket.rooms) {
-            if (!(room === socket.id)) {
-                io.to(room).emit("clear-canvas", data);
-            }
-        }
+        io.to(currentRoom).emit("clear-canvas", data);
     });
 
     socket.on("disconnect", () => {
