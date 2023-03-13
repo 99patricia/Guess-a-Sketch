@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { socket } from "service/socket";
 import { useNavigate } from "react-router-dom";
 
@@ -6,6 +6,9 @@ import { Button, Header, Container, Form, FormInput } from "components";
 
 function CreateRoomPage() {
     const navigate = useNavigate();
+    const [numberOfPlayers, setNumberOfPlayers] = useState(2); // Default to 2 players
+    const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
+    const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -15,7 +18,17 @@ function CreateRoomPage() {
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
-        socket.emit("create-room", roomId);
+        const room = {
+            roomId,
+            username: localStorage.getItem("nickname") || "guest",
+            numberOfPlayers,
+            drawTime,
+            numberOfRounds,
+        };
+        socket.emit("create-room", room);
+        socket.on("create-room-success", (data) => {
+            console.log(data);
+        })
         navigate(`/room/${roomId}`);
     };
 
@@ -29,6 +42,8 @@ function CreateRoomPage() {
                         placeholder="Number of players"
                         min="2"
                         max="8"
+                        value={numberOfPlayers}
+                        onChange={(e) => setNumberOfPlayers(e.target.value)}
                         type="number"
                     />
                     <FormInput
@@ -36,6 +51,8 @@ function CreateRoomPage() {
                         placeholder="Seconds in each round"
                         min="15"
                         max="120"
+                        value={drawTime}
+                        onChange={(e) => setDrawTime(e.target.value)}
                         type="number"
                     />
                     <FormInput
@@ -43,6 +60,8 @@ function CreateRoomPage() {
                         placeholder="Number of rounds in game"
                         min="2"
                         max="10"
+                        value={numberOfRounds}
+                        onChange={(e) => setNumberOfRounds(e.target.value)}
                         type="number"
                     />
                     <FormInput

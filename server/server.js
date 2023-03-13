@@ -66,26 +66,35 @@ io.on("connection", async (socket) => {
     console.log("A user connected with id: " + socket.id);
     var auth = false;
     var currentRoom = "";
-    var username = "";
     var host = false;
+    var username = ""; // This will be the username of the host
+    var numberOfPlayers = 0;
+    var drawTime = 0;
+    var numberOfRounds = 0;
 
     // takes in room_id and tries to create that room
     // returns ("create-room-fail") if the room already exists
     // on success the socket will create/join the room and emit
     // ("create-room-success") back to the client
     socket.on("create-room", (room) => {
-        if (rooms.has(room)) {
+        if (rooms.has(room.roomId)) {
             // room already exists
-            socket.to(socket.id).emit("create-room-fail", {
-                room,
+            io.to(socket.id).emit("create-room-fail", {
+                roomId: room.roomId,
                 msg: "Room already exists",
             });
         } else {
             // create and join room
-            socket.join(room);
-            currentRoom = room;
+            socket.join(room.roomId);
+
+            currentRoom = room.roomId;
             host = true;
-            socket.to(socket.id).emit("create-room-success", room);
+            username = room.username;
+            numberOfPlayers = room.numberOfPlayers;
+            drawTime = room.drawTime;
+            numberOfRounds = room.numberOfRounds;
+
+            io.to(socket.id).emit("create-room-success", room);
         }
     });
 
@@ -109,7 +118,6 @@ io.on("connection", async (socket) => {
             socket.join(room);
             currentRoom = room;
             host = false;
-            console.log(socket.id);
             io.to(socket.id).emit("join-room-success", room);
         } else {
             console.log("Room does not exist");
