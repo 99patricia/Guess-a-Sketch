@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
+import { CreateRoomPage } from "pages";
 
 function Home() {
     const [roomId, setRoomId] = useState("");
     const [nickname, setNickname] = useState("");
     const navigate = useNavigate();
+
+    const createRoomButtonRef = useRef();
+    const [showCreateRoomPage, setShowCreateRoomPage] = useState(false);
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
@@ -14,11 +18,21 @@ function Home() {
         navigate(`/chat/${roomId}`);
     };
 
-    return (
+    useEffect(() => {
+        const button = createRoomButtonRef.current;
+        button.addEventListener("click", (e) => {
+            e.preventDefault();
+            setShowCreateRoomPage(true);
+        });
+    }, []);
+
+    return showCreateRoomPage ? (
+        <CreateRoomPage />
+    ) : (
         <>
             <Header />
             <Container>
-                <Form onSubmit={handleJoinRoom}>
+                <Form className="flex-form" onSubmit={handleJoinRoom}>
                     <FormInput
                         label="Join a room"
                         placeholder="Enter room code"
@@ -36,9 +50,9 @@ function Home() {
                     <Button column type="submit">
                         Join
                     </Button>
-                    {/* <Button column secondary onclick='location.href="/"'>
+                    <Button column ref={createRoomButtonRef} secondary>
                         Create a new room
-                    </Button> */}
+                    </Button>
                 </Form>
             </Container>
         </>

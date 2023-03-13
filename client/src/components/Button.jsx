@@ -8,6 +8,7 @@ const StyledButton = styled.button`
     font-size: 1.1rem;
     text-transform: uppercase;
     color: var(--white);
+    cursor: pointer;
 
     padding: 0.8rem 1.2rem;
     display: block;
@@ -32,8 +33,12 @@ const StyledButton = styled.button`
     }
 `;
 
-function Button(props) {
-    return <StyledButton {...props}>{props.children}</StyledButton>;
-}
+const Button = React.forwardRef((props, ref) => {
+    return (
+        <StyledButton {...props} ref={ref}>
+            {props.children}
+        </StyledButton>
+    );
+});
 
 export default Button;

@@ -25,14 +25,37 @@ const StyledInput = styled.input`
     ::placeholder {
         color: var(--beige);
     }
+`;
 
+const StyledTextArea = styled.textarea`
+    padding: 0.7rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--beige);
+    font-size: 1.2rem;
+    font-family: var(--font);
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 2rem;
+
+    :focus {
+        border: 1px solid var(--primary);
+        outline: 0;
+    }
+
+    ::placeholder {
+        color: var(--beige);
+    }
 `;
 
 function FormInput(props) {
     return (
         <>
             <StyledLabel>{props.label}</StyledLabel>
-            <StyledInput {...props}></StyledInput>
+            {props.textArea ? (
+                <StyledTextArea {...props}></StyledTextArea>
+            ) : (
+                <StyledInput {...props}></StyledInput>
+            )}
         </>
     );
 }
