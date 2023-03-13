@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
 
 import { ChatBody, ChatFooter } from "components/Chat/";
 
@@ -26,7 +27,7 @@ const StyledRoomCode = styled.div`
 `;
 
 function Chat(props) {
-    const { roomId, socket, username } = { ...props };
+    const { roomId, username } = { ...props };
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -34,7 +35,7 @@ function Chat(props) {
             // Append existing message with incoming message
             setMessages([...messages, msg]);
         });
-    }, [socket, messages]);
+    }, [messages]);
 
     return (
         <StyledChat>
@@ -44,7 +45,7 @@ function Chat(props) {
             </StyledRoomCode>
             <div>
                 <ChatBody messages={messages} />
-                <ChatFooter socket={socket} username={username} />
+                <ChatFooter username={username} />
             </div>
         </StyledChat>
     );

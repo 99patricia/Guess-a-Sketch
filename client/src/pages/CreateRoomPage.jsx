@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
+import { socket } from "service/socket";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
 
 function CreateRoomPage() {
-    const [roomId] = useState("");
-    const [nickname] = useState("");
     const navigate = useNavigate();
+
+    var roomId = "";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let i = 0; i < 4; i++) {
+        roomId += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
-        localStorage.setItem("nickname", nickname);
-        navigate(`/chat/${roomId}`);
+        socket.emit("create-room", roomId);
+        navigate(`/room/${roomId}`);
     };
 
     return (

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
 
 import { Button } from "components";
 import FormInput from "components/FormInput";
@@ -15,7 +16,7 @@ const StyledChatInput = styled(FormInput)`
 `;
 
 function ChatFooter(props) {
-    const { socket, username } = { ...props };
+    const username = props.username;
     const [message, setMessage] = useState("");
 
     const handleSendMessage = (e) => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
 
 import { IconButton } from "components";
 
@@ -12,7 +13,6 @@ const StyledCanvasFooter = styled.div`
 
 function CanvasFooter(props) {
     const canvasRef = props.canvasRef;
-    const socket = props.socket;
     const clearButtonRef = useRef();
 
     useEffect(() => {
@@ -34,7 +34,7 @@ function CanvasFooter(props) {
 
         // If we receive clear-canvas from socket, clear the canvas
         socket.on("clear-canvas", clearCanvas);
-    }, [canvasRef, socket]);
+    }, [canvasRef]);
 
     return (
         <StyledCanvasFooter>
