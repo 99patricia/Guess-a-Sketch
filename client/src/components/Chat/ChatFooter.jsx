@@ -22,7 +22,7 @@ function ChatFooter(props) {
     const handleSendMessage = (e) => {
         e.preventDefault();
         if (message.trim()) {
-            socket.emit("chat message", {
+            socket.emit("chat-message", {
                 message,
                 username: username,
                 id: `${socket.id}`,

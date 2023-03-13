@@ -47,7 +47,7 @@ async function addRoomToDB(room, socket_id) {
     try {
         const docRef = await addDoc(collection(db, "rooms"), {
             room_id: room,
-            text: "this is a game room created by " + socket_id,
+            text: "This is a game room created by " + socket_id,
         });
         console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -63,7 +63,7 @@ async function readRoomsFromDB() {
 }
 
 io.on("connection", async (socket) => {
-    console.log("a user connected with id: " + socket.id);
+    console.log("A user connected with id: " + socket.id);
     var auth = false;
     var currentRoom = "";
     var username = "";
@@ -78,7 +78,7 @@ io.on("connection", async (socket) => {
             // room already exists
             socket.to(socket.id).emit("create-room-fail", {
                 room,
-                msg: "room already exists",
+                msg: "Room already exists",
             });
         } else {
             // create and join room
@@ -92,7 +92,7 @@ io.on("connection", async (socket) => {
     // takes in room_id as an argument and tries to join that room
     // - if the user already is in a room, the socket will disconnect the user from
     // said room.
-    // - if the room does not exist the user will not join the room (not implemented yet)
+    // - if the Room does not exist the user will not join the room (not implemented yet)
     // - on success the socket will emit ("join-room-success") back to the client to notify it that
     // it has successfully joined a room
     socket.on("join-room", (room) => {
@@ -112,10 +112,10 @@ io.on("connection", async (socket) => {
             console.log(socket.id);
             io.to(socket.id).emit("join-room-success", room);
         } else {
-            console.log("room does not exist");
+            console.log("Room does not exist");
             io.to(socket.id).emit("join-room-fail", {
                 room,
-                msg: "room does not exist",
+                msg: "Room does not exist",
             });
         }
     });
@@ -124,11 +124,11 @@ io.on("connection", async (socket) => {
         socket.leave(room);
     });
 
-    socket.on("chat message", (msg) => {
+    socket.on("chat-message", (msg) => {
         console.log(
             "Room " + currentRoom + " - " + msg.username + ": " + msg.message
         );
-        io.to(currentRoom).emit("chat message", msg);
+        io.to(currentRoom).emit("chat-message", msg);
     });
 
     socket.on("draw", (data) => {
@@ -145,17 +145,17 @@ io.on("connection", async (socket) => {
 });
 
 io.of("/").adapter.on("create-room", (room) => {
-    console.log(`room ${room} was created`);
+    console.log(`Room ${room} was created`);
 });
 
 io.of("/").adapter.on("join-room", (room, id) => {
-    console.log(`socket ${id} has joined room ${room}`);
+    console.log(`Socket ${id} has joined room ${room}`);
 });
 
 io.of("/").adapter.on("leave-room", (room, id) => {
-    console.log(`socket ${id} has left room ${room}`);
+    console.log(`Socket ${id} has left room ${room}`);
 });
 
 server.listen(3001, () => {
-    console.log("listening on *:3001");
+    console.log("Listening on *:3001");
 });

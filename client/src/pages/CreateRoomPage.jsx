@@ -8,7 +8,7 @@ function CreateRoomPage() {
     const navigate = useNavigate();
 
     var roomId = "";
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const chars = "abcdefghijklmnopqrstuvwxyz";
     for (let i = 0; i < 4; i++) {
         roomId += chars.charAt(Math.floor(Math.random() * chars.length));
     }

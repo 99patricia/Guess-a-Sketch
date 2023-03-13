@@ -7,6 +7,8 @@
     --white: #ffffff;
     --light-beige: #f3f3ec;
     --beige: #dbd4cc;
+    --error-bg: #fecaca;
+    --error: #dc2626;
     --font: "Nunito", "Helvetica Neue", sans-serif;
     color: var(--primary);
     font-family: var(--font);

@@ -6,10 +6,6 @@ const StyledContainer = styled.div`
     justify-content: center;
     flex-direction: column;
     height: 100%;
-
-    > div {
-        margin: 1rem;
-    }
 `;
 
 function Container(props) {

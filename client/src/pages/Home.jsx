@@ -2,13 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "service/socket";
 
-import { Button, Header, Container, Form, FormInput } from "components";
+import {
+    Button,
+    Header,
+    Container,
+    ErrorMessage,
+    Form,
+    FormInput,
+} from "components";
 import { CreateRoomPage } from "pages";
 
 function Home() {
     const [roomId, setRoomId] = useState("");
     const [nickname, setNickname] = useState("");
-    const [showRoomDoesNotExist, setShowRoomDoesNotExist] = useState("");
+    const [showErrorMessage, setShowErrorMessage] = useState("");
 
     const navigate = useNavigate();
 
@@ -18,15 +25,19 @@ function Home() {
     const handleJoinRoom = (e) => {
         e.preventDefault();
         localStorage.setItem("nickname", nickname);
-
         socket.room = roomId;
-        socket.emit("join-room", roomId);
-        socket.on("join-room-fail", () => {
-            setShowRoomDoesNotExist(true);
-        });
-        socket.on("join-room-success", (roomId) => {
-            navigate(`/room/${roomId}`);
-        });
+
+        if (roomId === "") {
+            setShowErrorMessage("Room code cannot be empty");
+        } else {
+            socket.emit("join-room", roomId);
+            socket.on("join-room-fail", (data) => {
+                setShowErrorMessage(data.msg);
+            });
+            socket.on("join-room-success", (roomId) => {
+                navigate(`/room/${roomId}`);
+            });
+        }
     };
 
     useEffect(() => {
@@ -43,8 +54,13 @@ function Home() {
         <>
             <Header />
             <Container>
-                {showRoomDoesNotExist && <RoomDoesNotExistModal />}
                 <Form className="flex-form" onSubmit={handleJoinRoom}>
+                    {showErrorMessage && (
+                        <ErrorMessage>{showErrorMessage}</ErrorMessage>
+                    )}
+                    {/* {roomId === "" && (
+                        <ErrorMessage>Please enter room code</ErrorMessage>
+                    )} */}
                     <FormInput
                         label="Join a room"
                         placeholder="Enter room code"
@@ -70,13 +86,5 @@ function Home() {
         </>
     );
 }
-
-const RoomDoesNotExistModal = () => {
-    return (
-        <>
-            <div>Room does not exist</div>
-        </>
-    );
-};
 
 export default Home;

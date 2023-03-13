@@ -31,7 +31,7 @@ function Chat(props) {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        socket.on("chat message", (msg) => {
+        socket.on("chat-message", (msg) => {
             // Append existing message with incoming message
             setMessages([...messages, msg]);
         });
