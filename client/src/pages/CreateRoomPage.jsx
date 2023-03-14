@@ -18,9 +18,10 @@ function CreateRoomPage() {
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
+        const username = localStorage.getItem("nickname") || "guest";
         const room = {
             roomId,
-            username: localStorage.getItem("nickname") || "guest",
+            username,
             numberOfPlayers,
             drawTime,
             numberOfRounds,
@@ -28,7 +29,9 @@ function CreateRoomPage() {
         socket.emit("create-room", room);
         socket.on("create-room-success", (data) => {
             console.log(data);
-        })
+        });
+
+        localStorage.setItem("nickname", username);
         navigate(`/room/${roomId}`);
     };
 

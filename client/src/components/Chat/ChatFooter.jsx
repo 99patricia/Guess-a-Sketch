@@ -25,7 +25,7 @@ function ChatFooter(props) {
             socket.emit("chat-message", {
                 message,
                 username: username,
-                id: `${socket.id}`,
+                id: `${socket.id}${Math.random()}`,
             });
         }
         setMessage("");

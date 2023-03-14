@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
@@ -27,6 +27,7 @@ const StyledRoomCode = styled.div`
 `;
 
 function Chat(props) {
+    const chatRef = useRef();
     const { roomId, username } = { ...props };
     const [messages, setMessages] = useState([]);
 
@@ -35,6 +36,10 @@ function Chat(props) {
             // Append existing message with incoming message
             setMessages([...messages, msg]);
         });
+
+        // Scroll to bottom of chat when new message arrives
+        const chatBody = chatRef.current;
+        chatBody.scrollTop = chatBody.scrollHeight;
     }, [messages]);
 
     return (
@@ -43,10 +48,8 @@ function Chat(props) {
                 Room code:
                 <div className="code">{roomId}</div>
             </StyledRoomCode>
-            <div>
-                <ChatBody messages={messages} />
-                <ChatFooter username={username} />
-            </div>
+            <ChatBody ref={chatRef} messages={messages} />
+            <ChatFooter username={username} />
         </StyledChat>
     );
 }
