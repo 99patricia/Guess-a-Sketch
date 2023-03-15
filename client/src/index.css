@@ -7,6 +7,8 @@
     --white: #ffffff;
     --light-beige: #f3f3ec;
     --beige: #dbd4cc;
+    --error-bg: #fecaca;
+    --error: #dc2626;
     --font: "Nunito", "Helvetica Neue", sans-serif;
     color: var(--primary);
     font-family: var(--font);
@@ -48,4 +50,36 @@ input {
 
 .flex {
     display: flex;
+}
+
+.flex-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-form {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 200px 1fr;
+}
+
+.grid-form > label {
+    grid-column: 1/2;
+    margin-bottom: 1rem;
+}
+
+.grid-form > input,
+.grid-form > textarea {
+    width: 300px;
+    margin-bottom: 1rem;
+}
+
+.grid-form > button {
+    margin-top: 1rem;
+}
+
+.grid-form > input,
+.grid-form > textarea,
+.grid-form > button {
+    grid-column: 2/3;
 }

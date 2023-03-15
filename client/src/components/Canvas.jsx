@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
 
 import { CanvasFooter } from "components/Canvas/";
 
@@ -17,7 +18,6 @@ const StyledCanvas = styled.canvas`
 `;
 
 function Canvas(props) {
-    const { socket } = { ...props };
     const canvasRef = useRef();
 
     useEffect(() => {
@@ -116,7 +116,7 @@ function Canvas(props) {
         socket.on("draw", (data) => {
             draw(data.x0, data.y0, data.x1, data.y1);
         });
-    }, [socket]);
+    }, []);
 
     return (
         <StyledCanvasContainer>
@@ -125,7 +125,7 @@ function Canvas(props) {
                 height="400"
                 ref={canvasRef}
             ></StyledCanvas>
-            <CanvasFooter canvasRef={canvasRef} socket={socket} />
+            <CanvasFooter canvasRef={canvasRef} />
         </StyledCanvasContainer>
     );
 }
