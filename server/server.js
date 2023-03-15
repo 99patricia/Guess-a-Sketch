@@ -105,14 +105,14 @@ io.on("connection", async (socket) => {
     // - on success the socket will emit ("join-room-success") back to the client to notify it that
     // it has successfully joined a room
     socket.on("join-room", (room) => {
-        // if (socket.rooms.size > 1) {
-        //     // user is already in a room
-        //     for (let room of socket.rooms) {
-        //         if (!(room === socket.id)) {
-        //             socket.leave(room); // leave other rooms
-        //         }
-        //     }
-        // }
+        if (socket.rooms.size > 1) {
+            // user is already in a room
+            for (let room of socket.rooms) {
+                if (!(room === socket.id)) {
+                    socket.leave(room); // leave other rooms
+                }
+            }
+        }
         if (rooms.has(room)) {
             // room exists
             socket.join(room);
