@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { useMediaQuery } from "react-responsive";
+import { MediaQuery } from "service/mediaQuery";
 
 import { Button, IconButton } from "components";
 
@@ -50,10 +50,7 @@ const StyledNavMenu = styled.div`
 function Header(props) {
     const navButtonRef = useRef();
     const [showNavMenu, setShowNavMenu] = useState(false);
-    const isBigScreen = useMediaQuery({
-        query: "(min-width: 769px)",
-    });
-    const isTabletOrMobile = useMediaQuery({ query: "(max-width: 768px)" });
+    const { isBigScreen, isTabletOrMobile } = MediaQuery();
 
     useEffect(() => {
         const navButton = navButtonRef.current;

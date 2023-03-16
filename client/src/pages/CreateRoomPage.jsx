@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { socket } from "service/socket";
+import { MediaQuery } from "service/mediaQuery";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
 
 function CreateRoomPage() {
     const navigate = useNavigate();
+
     const [numberOfPlayers, setNumberOfPlayers] = useState(2); // Default to 2 players
     const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
+    const { isBigScreen } = MediaQuery();
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -39,7 +42,10 @@ function CreateRoomPage() {
         <>
             <Header />
             <Container>
-                <Form className="grid-form" onSubmit={handleJoinRoom}>
+                <Form
+                    className={`${isBigScreen ? "grid-form" : ""}`}
+                    onSubmit={handleJoinRoom}
+                >
                     <FormInput
                         label="Players"
                         placeholder="Number of players"
@@ -72,7 +78,7 @@ function CreateRoomPage() {
                         label="Custom words"
                         placeholder="Define any custom words here separated by a , (comma)"
                     />
-                    <Button column type="submit">
+                    <Button fullWidth column type="submit">
                         Create
                     </Button>
                 </Form>

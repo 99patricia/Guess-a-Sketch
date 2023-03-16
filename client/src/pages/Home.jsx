@@ -58,9 +58,6 @@ function Home() {
                     {showErrorMessage && (
                         <ErrorMessage>{showErrorMessage}</ErrorMessage>
                     )}
-                    {/* {roomId === "" && (
-                        <ErrorMessage>Please enter room code</ErrorMessage>
-                    )} */}
                     <FormInput
                         label="Join a room"
                         placeholder="Enter room code"
@@ -75,10 +72,15 @@ function Home() {
                         onChange={(e) => setNickname(e.target.value)}
                         value={nickname}
                     ></FormInput>
-                    <Button column type="submit">
+                    <Button column fullWidth type="submit">
                         Join
                     </Button>
-                    <Button column ref={createRoomButtonRef} secondary>
+                    <Button
+                        column
+                        fullWidth
+                        ref={createRoomButtonRef}
+                        secondary
+                    >
                         Create a new room
                     </Button>
                 </Form>

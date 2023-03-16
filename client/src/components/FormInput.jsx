@@ -16,6 +16,11 @@ const StyledInput = styled.input`
     font-size: 1.2rem;
     color: var(--primary);
     margin-bottom: 2rem;
+    width: 100%;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 
     :focus {
         border: 1px solid var(--primary);
@@ -36,6 +41,11 @@ const StyledTextArea = styled.textarea`
     font-weight: 900;
     color: var(--primary);
     margin-bottom: 2rem;
+    width: 100%;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 
     :focus {
         border: 1px solid var(--primary);
