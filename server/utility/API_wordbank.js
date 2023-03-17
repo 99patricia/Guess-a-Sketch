@@ -3,11 +3,24 @@ import { doc, collection, query, where, addDoc, getDoc,getDocs, setDoc, updateDo
 
 ///////////////////////////// getWordBankNames /////////////////////////////
 async function getWordBankNames(app, db) {
-    app.get('/wordbank', async (req, res) => {
+    app.get('/wordbank/:user_id', async (req, res) => {
         try {
-            const wordBankCollection = collection(db, 'wordBank');
-            const wordBankSnapshot = await getDocs(wordBankCollection);
-            const wordBankNames = wordBankSnapshot.docs.map(doc => doc.id);
+
+            const user_id = req.params.user_id;
+
+            const wordQuery = query(
+              collection(db, 'wordBank'),
+              where('user_id', 'in', [user_id, "GLOBAL"])
+            );
+
+            const [wordSnapshot] = await Promise.all([
+              getDocs(wordQuery)
+            ]);
+
+            const wordBankNames = wordSnapshot.docs.map(doc => {
+              const wordBankData = doc.data();
+              return wordBankData.bankname + '__' + wordBankData.user_id;
+            });
 
             res.status(200).json(wordBankNames);
         } catch (error) {
@@ -20,7 +33,7 @@ async function getWordBankNames(app, db) {
 
 ///////////////////////////// getWordBankContent /////////////////////////////
 async function getWordBankContent(app, db) {
-    app.get('/wordbank/:name_wordbank', async (req, res) => {
+    app.get('/wordbankcontent/:name_wordbank', async (req, res) => {
       try {
         const name_wordbank = req.params.name_wordbank;
   
@@ -45,13 +58,15 @@ async function getWordBankContent(app, db) {
 
 ///////////////////////////// createWordBank /////////////////////////////
 async function createWordBank(app, db) {
-    app.post('/wordbank/:name_wordbank', async (req, res) => {
+    app.post('/wordbank/:name_wordbank/:user_id', async (req, res) => {
       try {
         const name_wordbank = req.params.name_wordbank;
-        const bankname = req.body['bankname'];
+        const user_id = req.params.user_id;
+
+        const bankname = name_wordbank;
         const words = req.body['words'];
   
-        const wordBankDocRef = doc(db, 'wordBank', name_wordbank);
+        const wordBankDocRef = doc(db, 'wordBank', name_wordbank +"__"+ user_id);
         
         // Check if the document already exists
         const snapshot = await getDoc(wordBankDocRef);
@@ -61,7 +76,7 @@ async function createWordBank(app, db) {
         }
         
         // If the document doesn't exist, create a new one
-        const wordBankData = { bankname, words };
+        const wordBankData = { bankname, words ,user_id};
         await setDoc(wordBankDocRef, wordBankData);
         res.status(200).json({ message: 'Word bank created successfully' });
       } catch (error) {
