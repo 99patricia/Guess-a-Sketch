@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { socket } from "service/socket";
-import { MediaQuery } from "service/mediaQuery";
+import { Desktop } from "service/mediaQueries";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
 
 function CreateRoomPage() {
     const navigate = useNavigate();
+    const isDesktop = Desktop();
 
     const [numberOfPlayers, setNumberOfPlayers] = useState(2); // Default to 2 players
     const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
-    const { isBigScreen } = MediaQuery();
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -43,7 +43,7 @@ function CreateRoomPage() {
             <Header />
             <Container>
                 <Form
-                    className={`${isBigScreen ? "grid-form" : ""}`}
+                    className={`${isDesktop ? "grid-form" : ""}`}
                     onSubmit={handleJoinRoom}
                 >
                     <FormInput

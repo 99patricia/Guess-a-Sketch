@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { MediaQuery } from "service/mediaQuery";
+import { Desktop } from "service/mediaQueries";
 
 import { Button, IconButton } from "components";
 
@@ -12,6 +12,7 @@ const StyledHeader = styled.div`
     padding: 1.5rem 1.8rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -31,41 +32,38 @@ const StyledSiteLink = styled.a`
 const StyledHeaderMobile = styled(StyledHeader)`
     display: grid;
     grid-template-columns: 1fr 3fr 1fr;
-    padding: 0;
-    padding-top: 2rem;
+    padding: 3rem 0 0;
+    position: relative;
+    z-index: 2;
 `;
 
 const StyledNavMenu = styled.div`
-    padding: 1rem;
-    margin-top: 72px;
-    position: absolute;
     width: 100%;
-    background-color: var(--light-beige);
+    box-sizing: border-box;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
 
-    > li {
+    transform: ${(props) =>
+        props.showNavMenu ? "translateY(0)" : "translateY(-100%)"};
+    transition: all 0.1s linear;
+
+    > a {
+        text-transform: uppercase;
+        color: var(--primary);
         display: block;
+        padding: 1rem 1.2rem;
+        background-color: var(--light-beige);
     }
 `;
 
 function Header(props) {
-    const navButtonRef = useRef();
     const [showNavMenu, setShowNavMenu] = useState(false);
-    const { isBigScreen, isTabletOrMobile } = MediaQuery();
-
-    useEffect(() => {
-        const navButton = navButtonRef.current;
-
-        if (isTabletOrMobile) {
-            navButton.addEventListener("click", () => {
-                setShowNavMenu(!showNavMenu);
-            });
-        }
-    }, [showNavMenu, isTabletOrMobile]);
+    const isDesktop = Desktop();
 
     return (
         <>
-            {showNavMenu && <NavMenu />}
-            {isBigScreen && (
+            {isDesktop ? (
                 <StyledHeader>
                     <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
                     <div className="flex">
@@ -73,30 +71,31 @@ function Header(props) {
                         <Button secondary>Signup</Button>
                     </div>
                 </StyledHeader>
-            )}
-            {isTabletOrMobile && (
-                <StyledHeaderMobile>
-                    <IconButton
-                        iconClassName="bi-list"
-                        noBackground
-                        ref={navButtonRef}
+            ) : (
+                <>
+                    <StyledHeaderMobile>
+                        <IconButton
+                            iconClassName="bi-list"
+                            noBackground
+                            onClick={() => setShowNavMenu(!showNavMenu)}
+                        />
+                        <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
+                    </StyledHeaderMobile>
+                    <NavMenu
+                        showNavMenu={showNavMenu}
+                        setShowNavMenu={setShowNavMenu}
                     />
-                    <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
-                </StyledHeaderMobile>
+                </>
             )}
         </>
     );
 }
 
-function NavMenu() {
+function NavMenu(props) {
     return (
-        <StyledNavMenu>
-            <li>
-                <a href="/">Login</a>
-            </li>
-            <li>
-                <a href="/">Signup</a>
-            </li>
+        <StyledNavMenu showNavMenu={props.showNavMenu}>
+            <a href="/">Login</a>
+            <a href="/">Signup</a>
         </StyledNavMenu>
     );
 }
