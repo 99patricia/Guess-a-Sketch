@@ -2,13 +2,20 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import { Server } from "socket.io";
-import path from "path";
-import { fileURLToPath } from "url";
 
-// firestore dependencies
+import {
+    friendRequest,
+    market,
+    userProfile,
+    users,
+    wordbank,
+} from "./routes/index.js";
+
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { addDoc, getDocs, collection } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
+const PORT = process.env.PORT || 3001;
 
 const firebaseConfig = {
     apiKey: "AIzaSyCfdLDNlu0qvGBkPNfyow-YcbZqhavQbK4",
@@ -22,49 +29,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const firestoreApp = initializeApp(firebaseConfig);
-// const firestoreAnalytics = getAnalytics(firestoreApp);
-
-// Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(firestoreApp);
+const auth = getAuth(firestoreApp);
 
+// Initialize app
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const rooms = io.of("/").adapter.rooms;
-const sids = io.of("/").adapter.sids;
-
+app.use(express.json());
 app.use(cors());
 
-app.get("/api", (req, res) => {
-    res.json({ message: "Hello from server!" });
-});
-
-async function addRoomToDB(room, socket_id) {
-    try {
-        const docRef = await addDoc(collection(db, "rooms"), {
-            room_id: room,
-            text: "This is a game room created by " + socket_id,
-        });
-        console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-        console.error("Error adding document: ", e);
-    }
-}
-
-async function readRoomsFromDB() {
-    const querySnapshot = await getDocs(collection(db, "rooms"));
-    querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data().text}`);
-    });
-}
+// Socket functions
+const rooms = io.of("/").adapter.rooms;
 
 io.on("connection", async (socket) => {
     console.log("A user connected with id: " + socket.id);
-    var auth = false;
     var currentRoom = "";
     var host = false;
     var username = ""; // This will be the username of the host
@@ -164,6 +143,12 @@ io.of("/").adapter.on("leave-room", (room, id) => {
     console.log(`Socket ${id} has left room ${room}`);
 });
 
-server.listen(3001, () => {
-    console.log("Listening on *:3001");
+server.listen(PORT, () => {
+    console.log(`Server started listening on port ${PORT}`);
+
+    friendRequest(app, db);
+    market(app, db);
+    userProfile(app, db);
+    users(app, db, auth);
+    wordbank(app, db);
 });
