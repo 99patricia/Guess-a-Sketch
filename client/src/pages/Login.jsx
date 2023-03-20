@@ -25,6 +25,7 @@ function Login() {
             password,
         };
         const options = {
+            withCredentials: true,
             headers: { "Content-Type": "application/json" },
         };
 
@@ -32,9 +33,7 @@ function Login() {
             .post("/login", body, options)
             .then((res) => {
                 setShowErrorMessage("");
-                const token = res.data.token;
                 const username = res.data.data.username;
-                localStorage.setItem("token", token);
                 localStorage.setItem("username", username);
 
                 navigate("/");

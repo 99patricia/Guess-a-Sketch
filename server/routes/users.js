@@ -114,9 +114,11 @@ async function login(app, db, auth) {
                     const user = userCredential.user;
                     // Handle the signed-in user, e.g., retrieve user data from Firestore
                     const docRef = doc(db, "users", user.uid);
-                    // Create token
-                    var token = "";
-                    if (user) user.getIdToken().then((tk) => (token = tk));
+                    // Set token cookie
+                    if (user)
+                        user.getIdToken().then((tk) => {
+                            res.cookie("token", tk);
+                        });
 
                     getDoc(docRef)
                         .then((docsnap) => {
@@ -126,7 +128,6 @@ async function login(app, db, auth) {
                                 res.status(200).json({
                                     message: `User ${userData.username} successfully logged in`,
                                     data: userData,
-                                    token,
                                 });
                             } else {
                                 console.log("No user data available");
