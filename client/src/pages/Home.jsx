@@ -30,7 +30,12 @@ function Home() {
         if (roomId === "") {
             setShowErrorMessage("Room code cannot be empty");
         } else {
-            socket.emit("join-room", roomId);
+            const username = localStorage.getItem("nickname") || "guest";
+            const room = {
+                roomId,
+                username,
+            };
+            socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {
                 setShowErrorMessage(data.msg);
             });
