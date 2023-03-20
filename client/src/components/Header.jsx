@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "components";
 
@@ -28,12 +29,18 @@ const StyledSiteLink = styled.a`
 `;
 
 function Header(props) {
+    const navigate = useNavigate();
+
     return (
         <StyledHeader>
             <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
             <div className="flex">
-                <Button secondary>Login</Button>
-                <Button secondary>Signup</Button>
+                <Button onClick={() => navigate("/login")} secondary>
+                    Login
+                </Button>
+                <Button onClick={() => navigate("/signup")} secondary>
+                    Signup
+                </Button>
             </div>
         </StyledHeader>
     );

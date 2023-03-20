@@ -58,9 +58,6 @@ function Home() {
                     {showErrorMessage && (
                         <ErrorMessage>{showErrorMessage}</ErrorMessage>
                     )}
-                    {/* {roomId === "" && (
-                        <ErrorMessage>Please enter room code</ErrorMessage>
-                    )} */}
                     <FormInput
                         label="Join a room"
                         placeholder="Enter room code"
