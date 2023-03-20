@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
     Button,
@@ -15,6 +15,8 @@ function Login() {
     const [showErrorMessage, setShowErrorMessage] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const navigate = useNavigate();
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -34,6 +36,8 @@ function Login() {
                 const username = res.data.data.username;
                 localStorage.setItem("token", token);
                 localStorage.setItem("username", username);
+
+                navigate("/");
             })
             .catch((err) => {
                 setShowErrorMessage(err.response.data.error);
