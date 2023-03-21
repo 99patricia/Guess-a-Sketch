@@ -149,6 +149,14 @@ async function login(app, db, auth) {
     });
 }
 
+///////////////////////////// logout  /////////////////////////////
+async function logout(app) {
+    app.post("/logout", async (req, res) => {
+        res.clearCookie("token");
+        res.status(200).json("User logged out: token cleared.");
+    });
+}
+
 ///////////////////////////// changePassword  /////////////////////////////
 async function changePassword(app, auth) {
     app.post("/changePassword", async (req, res) => {
@@ -233,6 +241,7 @@ async function deleteFriend(app, db) {
 export function init(app, db, auth) {
     register(app, db, auth);
     login(app, db, auth);
+    logout(app);
     changePassword(app, auth);
     getUserById(app, db);
     deleteFriend(app, db);
