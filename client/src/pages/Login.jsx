@@ -64,6 +64,7 @@ function Login() {
                         type="password"
                         onChange={(e) => setPassword(e.target.value)}
                     ></FormInput>
+                    <Link to="/changePassword">Forgot your password?</Link>
                     <Button column type="submit">
                         Login
                     </Button>
