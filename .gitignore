@@ -1,3 +1,6 @@
+# Private keys
+server/secrets
+
 # Logs
 logs
 *.log

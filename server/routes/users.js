@@ -10,11 +10,12 @@ import {
     sendEmailVerification,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
-    getAuth,
 } from "firebase/auth";
 
+import { auth, adminAuth, db } from "../service/firebase.js";
+
 ///////////////////////////// register new user /////////////////////////////
-async function register(app, db, auth) {
+async function register(app) {
     app.post("/register", async (req, res) => {
         try {
             // Extract user data from request body
@@ -102,7 +103,7 @@ async function register(app, db, auth) {
 }
 
 ///////////////////////////// login  /////////////////////////////
-async function login(app, db, auth) {
+async function login(app) {
     app.post("/login", async (req, res) => {
         try {
             const email = req.body["email"];
@@ -138,6 +139,7 @@ async function login(app, db, auth) {
                         });
                 })
                 .catch((error) => {
+                    console.error(error);
                     res.status(401).json({
                         error: "Invalid username or password",
                     });
@@ -152,13 +154,23 @@ async function login(app, db, auth) {
 ///////////////////////////// logout  /////////////////////////////
 async function logout(app) {
     app.post("/logout", async (req, res) => {
+        const token = req.cookies.token || "";
+        adminAuth
+            .verifyIdToken(token, true /** checkRevoked */)
+            .then((decodedToken) => {
+                const uid = decodedToken.uid;
+                console.log(uid);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
         res.clearCookie("token");
         res.status(200).json("User logged out: token cleared.");
     });
 }
 
 ///////////////////////////// changePassword  /////////////////////////////
-async function changePassword(app, auth) {
+async function changePassword(app) {
     app.post("/changePassword", async (req, res) => {
         try {
             const email = req.body["email"];
@@ -182,7 +194,7 @@ async function changePassword(app, auth) {
 }
 
 ///////////////////////////// getUserById  /////////////////////////////
-async function getUserById(app, db) {
+async function getUserById(app) {
     app.get("/users/:id", async (req, res) => {
         try {
             const userId = req.params.id;
@@ -210,7 +222,7 @@ async function getUserById(app, db) {
     });
 }
 
-async function deleteFriend(app, db) {
+async function deleteFriend(app) {
     app.delete("/deletefriends/:user_id/:friend_id", async (req, res) => {
         try {
             const user_id = req.params.user_id;
@@ -238,11 +250,11 @@ async function deleteFriend(app, db) {
     });
 }
 
-export function init(app, db, auth) {
-    register(app, db, auth);
-    login(app, db, auth);
+export function init(app) {
+    register(app);
+    login(app);
     logout(app);
-    changePassword(app, auth);
-    getUserById(app, db);
-    deleteFriend(app, db);
+    changePassword(app);
+    getUserById(app);
+    deleteFriend(app);
 }

@@ -23,6 +23,7 @@ function Login() {
         const body = {
             email,
             password,
+            returnSecureToken: true,
         };
         const options = {
             withCredentials: true,
