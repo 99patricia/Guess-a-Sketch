@@ -22,7 +22,7 @@ async function register(app) {
             const email = req.body["email"];
             const username = req.body["username"];
             const password = req.body["password"];
-            const avatar = req.body["avatar"];
+            // const avatar = req.body["avatar"];
 
             //firebase auth method to create user with email and password
             const userCredential = await createUserWithEmailAndPassword(
@@ -35,7 +35,10 @@ async function register(app) {
             try {
                 // send email verification
                 await sendEmailVerification(user).then(() => {
-                    console.log("Email verification sent!");
+                    console.log(`Email verification sent to ${email}`);
+                    res.status(200).json({
+                        message: `Email verification sent to ${email}. Please check your inbox and follow the link to verify your account.`,
+                    });
                 });
 
                 // timeout
@@ -66,7 +69,7 @@ async function register(app) {
                     id: user.uid,
                     email: req.body["email"],
                     username: req.body["username"],
-                    avatar: req.body["avatar"],
+                    // avatar: req.body["avatar"],
                     friendList: [],
                 };
 
@@ -79,7 +82,7 @@ async function register(app) {
                     win: 0,
                     loss: 0,
                     currency: 0,
-                    avatar: req.body["avatar"],
+                    // avatar: req.body["avatar"],
                     inventory: [],
                 };
 
