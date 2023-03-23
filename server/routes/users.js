@@ -154,6 +154,8 @@ async function login(app) {
 ///////////////////////////// logout  /////////////////////////////
 async function logout(app) {
     app.post("/logout", async (req, res) => {
+        // Not actually needed for logout, but we'll need to verify session tokens
+        // in other api calls that require authenticated users
         const token = req.cookies.token || "";
         adminAuth
             .verifyIdToken(token, true /** checkRevoked */)
@@ -164,6 +166,8 @@ async function logout(app) {
             .catch((error) => {
                 console.error(error);
             });
+
+        // Clear the session token on logout
         res.clearCookie("token");
         res.status(200).json("User logged out: token cleared.");
     });

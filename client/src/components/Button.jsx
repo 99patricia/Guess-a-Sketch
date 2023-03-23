@@ -26,10 +26,9 @@ const StyledButton = styled.button`
         background-color: ${(props) =>
             props.secondary ? "var(--primary)" : "var(--secondary)"};
     }
-
+    
     :not(:last-child) {
-        margin-right: ${(props) => (props.column ? "0" : "1rem")};
-        margin-bottom: ${(props) => (props.column ? "1rem" : "0")};
+        margin: ${(props) => (props.column ? "1rem 0" : "0 1rem")};
     }
 `;
 

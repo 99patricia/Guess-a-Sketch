@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import { CustomLink } from "components";
 
 import {
     Button,
@@ -64,11 +66,13 @@ function Login() {
                         type="password"
                         onChange={(e) => setPassword(e.target.value)}
                     ></FormInput>
-                    <Link to="/changePassword">Forgot your password?</Link>
+                    <CustomLink to="/changePassword">
+                        Forgot your password?
+                    </CustomLink>
                     <Button column type="submit">
                         Login
                     </Button>
-                    <Link to="/">Login as guest</Link>
+                    <CustomLink to="/">Login as guest</CustomLink>
                 </Form>
             </Container>
         </>
