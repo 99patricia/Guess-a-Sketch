@@ -5,7 +5,8 @@ import { Canvas, Chat, Container, FlexContainer, Header } from "components";
 
 function Room() {
     const { roomId } = useParams();
-    const username = localStorage.getItem("nickname");
+    const username =
+        localStorage.getItem("username") || localStorage.getItem("nickname");
 
     return (
         <>
