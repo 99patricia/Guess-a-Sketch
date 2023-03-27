@@ -24,7 +24,8 @@ function CanvasFooter(props) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         };
 
-        const handleClearCanvas = () => {
+        const handleClearCanvas = (e) => {
+            e.preventDefault();
             clearCanvas();
             // Tell socket to clear the canvas
             socket.emit("clear-canvas");

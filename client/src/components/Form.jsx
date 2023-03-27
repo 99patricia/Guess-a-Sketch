@@ -6,7 +6,7 @@ const StyledForm = styled.form`
     padding: 2rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 1.5rem;
-    margin: 0 auto;
+    margin: 0 auto 100px;
 `;
 
 function Form(props) {
