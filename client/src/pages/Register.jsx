@@ -1,17 +1,24 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
-import { CustomLink } from "components";
+import styled from "styled-components";
 
 import {
     Button,
     Header,
     Container,
+    CustomLink,
     ErrorMessage,
     Form,
     FormInput,
 } from "components";
+
+const StyledMessage = styled.div`
+    background-color: var(--light-beige);
+    padding: 2rem;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 1.5rem;
+    margin: 0 auto;
+`;
 
 function Register() {
     const [errorMessage, setErrorMessage] = useState("");
@@ -20,8 +27,6 @@ function Register() {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
-    const navigate = useNavigate();
 
     const handleRegister = (e) => {
         e.preventDefault();
@@ -52,7 +57,7 @@ function Register() {
             <Header />
             <Container>
                 {message ? (
-                    <p>{message}</p>
+                    <StyledMessage>{message}</StyledMessage>
                 ) : (
                     <>
                         <Form className="grid-form" onSubmit={handleRegister}>
