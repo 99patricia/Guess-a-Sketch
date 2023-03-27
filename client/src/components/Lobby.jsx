@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 import { Button } from "components";
 
-import default_user_image from '../img/default_user.png'
+import default_user_image from '../images/default_user.png'
 
 const LobbyContainer = styled.div`
     background-color: var(--light-beige);
@@ -18,7 +17,6 @@ const LobbyContainer = styled.div`
 
 const UserCardList = styled.div`
     display: grid;
-    // grid-template-columns: repeat(auto-fill,minmax(8rem, 1fr));
     grid-template-columns: repeat(auto-fill,minmax(8rem, 1fr));
     grid-template-rows: repeat(auto-fill,8rem);
     grid-gap: 1rem;
@@ -26,8 +24,8 @@ const UserCardList = styled.div`
     height: 100%;
     overflow: auto;
 
-    border-radius: 10px;
-    border: 2px solid var(--primary);
+    border-radius: 1rem;
+    // border: 2px solid var(--primary);
 `;
 
 const UserCard = styled.div`
@@ -42,7 +40,14 @@ const UserCard = styled.div`
 
 const UserImage = styled.img`
     display: block;
-    // width: 100%;
+    border-radius: 50%;
+    overflow: auto;
+
+    border: 2px solid var(--primary);
+`;
+
+const ThisUserImage = styled.img`
+    display: block;
     border-radius: 50%;
     overflow: auto;
 
@@ -60,50 +65,45 @@ const LobbyFooter = styled.div`
 
 
 function Lobby(props) {
-    const { roomId, this_username } = { ...props };
-    const [players, setPlayers] = useState([]);
-    const [isHost, setHost]= useState(false);
+    const { this_username, players, isHost } = { ...props };
 
-    socket.emit("get-players-data")
-
-    useEffect(() => {
-        socket.on("players-data", (data) => {
-            setPlayers(data);
-            if (players?.length > 0) {
-                setHost(players.find(player => player.username === this_username).isHost);
-            }
-        });
-    }, [players, isHost]);
+    socket.emit("get-players-data");
 
     function startGame() {
         socket.emit("start-game");
     }
 
     if (!players) {
-        // const room = {
-        //     roomId,
-        //     'username': this_username,
-        // }
-        // socket.emit("join-room", room);
-        return
+        return (
+            <LobbyContainer>
+                <h3>
+                    No players...
+                </h3>
+            </LobbyContainer>
+        )
     }
     return (
         <LobbyContainer>
             <UserCardList>
                 {players.map(({username, isHost}) => (
                     <UserCard key={username}>
-                        <UserImage src={default_user_image} />
                         {username === this_username && 
-                            <h3 style={{margin: '5px'}}>
-                                {isHost && <p style={{margin: '0', color: 'var(--secondary)'}}>{username} (Host)</p>}
-                                {!isHost && <p style={{margin: '0', color: 'var(--secondary)'}}>{username}</p>}
+                            <>
+                            <ThisUserImage src={default_user_image} />
+                            <h3 style={{ margin: '5px' }}>
+                                {isHost && <p style={{ margin: '0', color: 'var(--secondary)' }}>{username} (host)</p>}
+                                {!isHost && <p style={{ margin: '0', color: 'var(--secondary)' }}>{username}</p>}
                             </h3>
+                            </>
                         }
                         {username !== this_username &&
+                            <>
+                            <UserImage src={default_user_image} />
                             <h3 style={{margin: '5px'}}>
-                                {isHost && <p style={{margin: '0', color: 'var(--primary)'}}>{username} (Host)</p>}
+                                {isHost && <p style={{margin: '0', color: 'var(--primary)'}}>{username} (host)</p>}
                                 {!isHost && <p style={{margin: '0', color: 'var(--primary)'}}>{username}</p>}
                             </h3>
+                            </>
                         }
                     </UserCard>
                 ))}

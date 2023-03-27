@@ -9,7 +9,7 @@ const StyledFlexContainer = styled.div`
     margin-top: 100px;
 
     > div {
-        margin: 1rem;
+        margin: 0.5rem;
     }
 `;
 

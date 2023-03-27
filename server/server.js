@@ -57,6 +57,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             'score': 0,
             'hasGuessed': false,
         }], // stores username of players
+        'listGuessed': [],
         'currentTurn': '',
         'currentRound': 0,
         'gameOver': false,
@@ -76,6 +77,12 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             let player = this.players.find(player => player.username == username);
             let index = this.players.indexOf(player);
             if (index > -1) {
+                if (this.players.length === 1) {
+                    const index = games.indexOf(this);
+                    games.splice(index, 1);
+                    this.gameOver = true;
+                    return;
+                }
                 this.players.splice(index,1);
                 if (this.currentTurn == username) {
                     this.nextTurn();
@@ -83,24 +90,16 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             }
         },
         'startGame': function() {
-            let gameData = {
-                'players': this.players,
-                'host': this.host,
-                'maxNumPlayers': this.maxNumPlayers,
-                'drawTime': this.drawTime,
-                'numberOfRounds': this.numberOfRounds,
-                'currentRound': this.currentRound,
-                'currentTurn': this.currentTurn,
-            }
-            io.to(this.roomId).emit("game-start", (gameData));
+            this.sendGameData();
 
             this.currentTurn = this.players[0].username;
             this.currentRound = 1;
             this.currentWord = this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
+
             this.startTurn();
         },
         'startTurn': async function () {
-            console.log(this);
+            // console.log(this);
             console.log("it is "+this.currentTurn+"'s turn, and the word is "+this.currentWord);
             // send word to the current drawing player
             io.to(this.players.find(player => player.username == this.currentTurn).socketId).emit("turn-start", this.currentWord);
@@ -114,18 +113,25 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                     clearInterval(gameTimer);
                     if (currentPlayer) {
                         io.to(currentPlayer.socketId).emit("turn-end");
+                        game.sendGameData();
                     }
+                    timeleft=0;
                     game.nextTurn();
                 }
-                io.to(game.roomId).emit("timer", timeleft.toString());
-                console.log(timeleft);
+                else if (game.listGuessed) {
+                    if (game.listGuessed.length == game.players.length-1) {
+                        timeleft = 0;
+                    }
+                }
+                io.to(game.roomId).emit("timer", (timeleft.toString()));
+                game.sendGameData();
                 timeleft -= 1;
             }, 1000);
         },
         'nextTurn': function() {
             io.to(this.roomId).emit("clear-canvas");
-            let currentPlayer = this.players.find(player => player.username == this.currentTurn);
-            let index = this.players.indexOf(currentPlayer) + 1;
+            const currentPlayer = this.players.find(player => player.username == this.currentTurn);
+            const index = this.players.indexOf(currentPlayer) + 1;
             if (index >= this.players.length) { // next round or end of game
                 this.currentRound += 1;
                 if (this.currentRound > numberOfRounds) { // end of game
@@ -146,13 +152,26 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             this.players.map(function(x) { // set all players hasGuessed to false so that they may earn points again
                 x.hasGuessed = false;
             });
+            this.listGuessed = [];
             // select new word
             this.currentWord = this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
             this.startTurn();
         },
-        'addPoints': function(username, points) {
-            this.players.find(player => player.username == username).score += points;
-        }
+        'addPoints': function(username) {
+            this.players.find(player => player.username == username).score += 50;
+        },
+        'sendGameData': function() {
+            const gameData = {
+                'players': this.players,
+                'host': this.host,
+                'maxNumPlayers': this.maxNumPlayers,
+                'drawTime': this.drawTime,
+                'numberOfRounds': this.numberOfRounds,
+                'currentRound': this.currentRound,
+                'currentTurn': this.currentTurn,
+            }
+            io.to(this.roomId).emit("game-start", (gameData));
+        },
     };
     return game;
 }
@@ -215,7 +234,15 @@ io.on("connection", async (socket) => {
         }
         if (rooms.has(room.roomId)) {
             game = games.find(game => game.roomId == room.roomId);
-            if (game.players.length >= game.maxNumPlayers) { // game is full
+            console.log(game);
+            if (game.gameOver) {
+                io.to(socket.id).emit("join-room-fail", {
+                    room,
+                    msg: "Game is over",
+                });
+                return;
+            }
+            else if (game.players.length >= game.maxNumPlayers) { // game is full
                 io.to(socket.id).emit("join-room-fail", {
                     room,
                     msg: "Room is full",
@@ -281,8 +308,14 @@ io.on("connection", async (socket) => {
         let canGuess = ((!game.gameOver) && (game.currentRound > 0)) && ((player.hasGuessed == false) && !(game.currentTurn == username));
         if (canGuess) {
             if (msg.message.toLowerCase() == game.currentWord.toLowerCase()) { // current word is guessed
-                game.addPoints(username, 50); // add 50 points as a placeholder
+                game.addPoints(username);
                 player.hasGuessed = true;
+                game.listGuessed.push(username);
+                io.to(currentRoom).emit("chat-message", {
+                    "message": " has guessed the word!",
+                    username: username,
+                    id: `${socket.id}${Math.random()}`,
+                });
             }
         }
     });
