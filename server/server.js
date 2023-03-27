@@ -44,7 +44,7 @@ const rooms = io.of("/").adapter.rooms;
 const games = [];
 
 function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRounds) {
-    var game = {
+    let game = {
         'roomId': roomId,
         'host': host, // username of host
         'maxNumPlayers': numberOfPlayers,
@@ -52,11 +52,12 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
         'numberOfRounds': numberOfRounds,
         'players': [{
             'username': host,
+            'isHost': true,
             socketId,
             'score': 0,
             'hasGuessed': false,
         }], // stores username of players
-        'currentTurn': host,
+        'currentTurn': '',
         'currentRound': 0,
         'gameOver': false,
         'wordBank': ['banana', 'peach', 'orange'],
@@ -64,6 +65,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
         'addPlayer': function(username, socketId) {
             let player = {
                 'username': username,
+                'isHost': false,
                 socketId,
                 'score': 0,
                 'hasGuessed': false,
@@ -81,6 +83,17 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             }
         },
         'startGame': function() {
+            let gameData = {
+                'players': this.players,
+                'host': this.host,
+                'maxNumPlayers': this.maxNumPlayers,
+                'drawTime': this.drawTime,
+                'numberOfRounds': this.numberOfRounds,
+                'currentRound': this.currentRound,
+                'currentTurn': this.currentTurn,
+            }
+            io.to(this.roomId).emit("game-start", (gameData));
+
             this.currentTurn = this.players[0].username;
             this.currentRound = 1;
             this.currentWord = this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
@@ -93,12 +106,15 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             io.to(this.players.find(player => player.username == this.currentTurn).socketId).emit("turn-start", this.currentWord);
 
             // maybe create async function to manage the timer
-            var game = this;
-            var timeleft = this.drawTime;
-            var gameTimer = setInterval(function() {
+            let game = this;
+            let timeleft = this.drawTime;
+            let currentPlayer = game.players.find(player => player.username == game.currentTurn);
+            let gameTimer = setInterval(function() {
                 if(timeleft <= 0){
                     clearInterval(gameTimer);
-                    io.to(game.players.find(player => player.username == game.currentTurn).socketId).emit("turn-end");
+                    if (currentPlayer) {
+                        io.to(currentPlayer.socketId).emit("turn-end");
+                    }
                     game.nextTurn();
                 }
                 io.to(game.roomId).emit("timer", timeleft.toString());
@@ -119,7 +135,11 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                     return;
                 }
                 // new round
-                this.currentTurn = this.players[0].username;
+                if (this.players.length > 0) {
+                    this.currentTurn = this.players[0].username;
+                } else {
+                    return
+                }
             } else {
                 this.currentTurn = this.players[index].username;
             }
@@ -140,14 +160,11 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
 // Socket functions
 io.on("connection", async (socket) => {
     console.log("A user connected with id: " + socket.id);
-    var currentRoom = "";
-    var host;
-    var username = ""; // This will be the username of the host
-    var player = {};
-    // var numberOfPlayers = 0;
-    // var drawTime = 0;
-    // var numberOfRounds = 0;
-    var game = {};
+    let currentRoom = "";
+    let host;
+    let username = ""; // This will be the username of the host
+    let player = {};
+    let game = {};
 
     // takes in room_id and tries to create that room
     // returns ("create-room-fail") if the room already exists
@@ -177,6 +194,7 @@ io.on("connection", async (socket) => {
             player = game.players.find(player => player.username == username);
 
             io.to(socket.id).emit("create-room-success", room);
+            io.to(socket.id).emit("players-data", game.players);
         }
     });
 
@@ -214,8 +232,6 @@ io.on("connection", async (socket) => {
 
             player = game.players.find(player => player.username == username);
 
-            game.startGame(); // ---------------------- this is temporary for testing --------------------------
-
             io.to(room.roomId).emit("chat-message", {
                 "message": "has joined the game.",
                 username: username,
@@ -223,6 +239,7 @@ io.on("connection", async (socket) => {
             });
 
             io.to(socket.id).emit("join-room-success", room.roomId);
+            io.to(room.roomId).emit("players-data", game.players);
         } else {
             // console.log("Room does not exist");
             io.to(socket.id).emit("join-room-fail", {
@@ -245,6 +262,11 @@ io.on("connection", async (socket) => {
             currentRoom = "";
             host = false;
         }
+        io.to(room).emit("players-data", game.players);
+    });
+
+    socket.on("get-players-data", (data) => {
+        io.to(socket.id).emit("players-data", game.players);
     });
 
     socket.on("start-game", data => {
@@ -286,6 +308,7 @@ io.on("connection", async (socket) => {
         if (Object.keys(game).length > 0) {
             game.removePlayer(username);
         }
+        io.to(currentRoom).emit("players-data", game.players);
     });
 });
 

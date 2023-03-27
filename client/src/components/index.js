@@ -8,3 +8,4 @@ export { default as Form } from "./Form";
 export { default as FormInput } from "./FormInput";
 export { default as Header } from "./Header";
 export { default as IconButton } from "./IconButton";
+export { default as Lobby } from "./Lobby"
