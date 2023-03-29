@@ -25,7 +25,9 @@ const StyledCanvas = styled.canvas`
 
 const Canvas = React.forwardRef((props, ref) => {
     const canvasRef = ref;
-    const { timeLeft, currentTurn, isDrawing, word, sendToSocket } = { ...props };
+    const { timeLeft, currentTurn, isDrawing, word, sendToSocket } = {
+        ...props,
+    };
 
     useEffect(() => {
         var drawing = false;
@@ -60,14 +62,12 @@ const Canvas = React.forwardRef((props, ref) => {
             ctx.closePath();
 
             if (emit) {
-                const w = canvas.width;
-                const h = canvas.height;
                 // Emit the coords
                 socket.emit("draw", {
-                    x0: x0 / w,
-                    x1: x1 / w,
-                    y0: y0 / h,
-                    y1: y1 / h,
+                    x0: x0,
+                    x1: x1,
+                    y0: y0,
+                    y1: y1,
                 });
             } else return;
         };
@@ -138,7 +138,14 @@ const Canvas = React.forwardRef((props, ref) => {
             width={props.width}
             noContainer={props.noContainer}
         >
-            <CanvasHeader timeLeft={timeLeft} currentTurn={currentTurn} isDrawing={isDrawing} word={word} />
+            {sendToSocket && (
+                <CanvasHeader
+                    timeLeft={timeLeft}
+                    currentTurn={currentTurn}
+                    isDrawing={isDrawing}
+                    word={word}
+                />
+            )}
             <StyledCanvas
                 width={props.width || "500"}
                 height={props.height || "400"}

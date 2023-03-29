@@ -35,7 +35,7 @@ function CanvasFooter(props) {
 
         // If we receive clear-canvas from socket, clear the canvas
         if (sendToSocket) socket.on("clear-canvas", clearCanvas);
-    }, [canvasRef]);
+    }, [canvasRef, sendToSocket]);
 
     return (
         <StyledCanvasFooter>
