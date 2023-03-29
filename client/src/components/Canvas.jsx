@@ -1,15 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { CanvasFooter } from "components/Canvas/";
 
 const StyledCanvasContainer = styled.div`
-    background-color: var(--light-beige);
-    padding: 1rem;
-    border-radius: 1rem;
-    width: 500px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    width: ${(props) => (props.width ? props.width + "px" : "500px")};
+
+    ${(props) =>
+        !props.noContainer &&
+        `
+        background-color: var(--light-beige);
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  `}
 `;
 
 const StyledCanvas = styled.canvas`
@@ -125,13 +130,16 @@ const Canvas = React.forwardRef((props, ref) => {
                 draw(data.x0, data.y0, data.x1, data.y1);
             });
         }
-    }, []);
+    }, [canvasRef, sendToSocket]);
 
     return (
-        <StyledCanvasContainer>
+        <StyledCanvasContainer
+            width={props.width}
+            noContainer={props.noContainer}
+        >
             <StyledCanvas
-                width="500"
-                height="400"
+                width={props.width || "500"}
+                height={props.height || "400"}
                 ref={canvasRef}
             ></StyledCanvas>
             <CanvasFooter canvasRef={canvasRef} sendToSocket={sendToSocket} />

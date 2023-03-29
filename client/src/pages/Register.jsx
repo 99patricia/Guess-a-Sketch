@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
+import { StyledLabel } from "components/FormInput";
 import {
     Button,
     Canvas,
@@ -19,14 +20,6 @@ const StyledMessage = styled.div`
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 1.5rem;
     margin: 0 auto;
-`;
-
-const StyledAvatarCanvasContainer = styled.div`
-    margin: 0 auto;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 1.6rem;
-    line-height: 2rem;
 `;
 
 function Register() {
@@ -47,8 +40,13 @@ function Register() {
 
         submitButton.addEventListener("click", (e) => {
             e.preventDefault();
+
+            // Save the avatar image data to store in database
+            const ctx = canvas.getContext("2d");
+            ctx.globalCompositeOperation = "destination-over";
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             setAvatar(canvas.toDataURL("image/png"));
-            handleRegister(e);
         });
     }, []);
 
@@ -89,10 +87,13 @@ function Register() {
                             {errorMessage && (
                                 <ErrorMessage>{errorMessage}</ErrorMessage>
                             )}
-                            <StyledAvatarCanvasContainer>
-                                Draw your avatar here!
-                                <Canvas ref={canvasRef} />
-                            </StyledAvatarCanvasContainer>
+                            <StyledLabel>Avatar</StyledLabel>
+                            <Canvas
+                                ref={canvasRef}
+                                width={334}
+                                height={300}
+                                noContainer
+                            />
                             <FormInput
                                 label="E-mail"
                                 placeholder="Enter e-mail"
@@ -111,7 +112,13 @@ function Register() {
                                 type="password"
                                 onChange={(e) => setPassword(e.target.value)}
                             ></FormInput>
-                            <Button ref={submitButtonRef}>Submit</Button>
+                            <Button
+                                column
+                                onClick={handleRegister}
+                                ref={submitButtonRef}
+                            >
+                                Submit
+                            </Button>
                             <CustomLink to="/login">
                                 Already have an account? Sign in
                             </CustomLink>
