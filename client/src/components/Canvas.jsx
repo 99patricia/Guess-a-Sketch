@@ -2,11 +2,12 @@ import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
-import { CanvasFooter } from "components/Canvas/";
+import { CanvasFooter, CanvasHeader } from "components/Canvas/";
 
 const StyledCanvasContainer = styled.div`
     background-color: var(--light-beige);
     padding: 1rem;
+    padding-top: 0.25rem;
     border-radius: 1rem;
     width: 500px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
@@ -18,6 +19,8 @@ const StyledCanvas = styled.canvas`
 `;
 
 function Canvas(props) {
+    const { timeLeft, currentTurn, isDrawing, word } = { ...props };
+
     const canvasRef = useRef();
 
     useEffect(() => {
@@ -120,6 +123,7 @@ function Canvas(props) {
 
     return (
         <StyledCanvasContainer>
+            <CanvasHeader timeLeft={timeLeft} currentTurn={currentTurn} isDrawing={isDrawing} word={word} />
             <StyledCanvas
                 width="500"
                 height="400"
