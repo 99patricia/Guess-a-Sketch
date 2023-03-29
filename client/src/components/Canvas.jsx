@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
-import { CanvasFooter } from "components/Canvas/";
+import { CanvasFooter, CanvasHeader } from "components/Canvas/";
 
 const StyledCanvasContainer = styled.div`
     width: ${(props) => (props.width ? props.width + "px" : "500px")};
@@ -13,6 +13,7 @@ const StyledCanvasContainer = styled.div`
         background-color: var(--light-beige);
         border-radius: 1rem;
         padding: 1rem;
+        padding-top: 0.25rem;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   `}
 `;
@@ -24,7 +25,7 @@ const StyledCanvas = styled.canvas`
 
 const Canvas = React.forwardRef((props, ref) => {
     const canvasRef = ref;
-    const sendToSocket = props.sendToSocket;
+    const { timeLeft, currentTurn, isDrawing, word, sendToSocket } = { ...props };
 
     useEffect(() => {
         var drawing = false;
@@ -137,6 +138,7 @@ const Canvas = React.forwardRef((props, ref) => {
             width={props.width}
             noContainer={props.noContainer}
         >
+            <CanvasHeader timeLeft={timeLeft} currentTurn={currentTurn} isDrawing={isDrawing} word={word} />
             <StyledCanvas
                 width={props.width || "500"}
                 height={props.height || "400"}
