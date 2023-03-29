@@ -6,7 +6,7 @@ import { socket } from "service/socket";
 
 function Room() {
     const { roomId } = useParams();
-    const username = localStorage.getItem("nickname");
+    const username = localStorage.getItem("username") || localStorage.getItem("nickname");
     
     const [players, setPlayers] = useState([]);
     const [isHost, setHost]= useState(false);

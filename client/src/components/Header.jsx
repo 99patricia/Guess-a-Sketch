@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "components";
 
@@ -28,12 +30,39 @@ const StyledSiteLink = styled.a`
 `;
 
 function Header(props) {
+    const [isLoggedIn, setIsLoggedIn] = useState(
+        document.cookie.includes("token")
+    );
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await axios
+            .post("/logout", {}, { withCredentials: true })
+            .then((res) => {
+                localStorage.clear();
+                setIsLoggedIn(false);
+                navigate("/");
+            });
+    };
+
     return (
         <StyledHeader>
             <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
             <div className="flex">
-                <Button secondary>Login</Button>
-                <Button secondary>Signup</Button>
+                {isLoggedIn ? (
+                    <Button onClick={handleLogout} secondary>
+                        Logout
+                    </Button>
+                ) : (
+                    <>
+                        <Button onClick={() => navigate("/login")} secondary>
+                            Login
+                        </Button>
+                        <Button onClick={() => navigate("/signup")} secondary>
+                            Signup
+                        </Button>
+                    </>
+                )}
             </div>
         </StyledHeader>
     );

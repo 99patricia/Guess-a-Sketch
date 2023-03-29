@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 
 import {
@@ -11,33 +12,20 @@ import {
     wordbank,
 } from "./routes/index.js";
 
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-
 const PORT = process.env.PORT || 3001;
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCfdLDNlu0qvGBkPNfyow-YcbZqhavQbK4",
-    authDomain: "ece493-capstone.firebaseapp.com",
-    projectId: "ece493-capstone",
-    storageBucket: "ece493-capstone.appspot.com",
-    messagingSenderId: "388992282247",
-    appId: "1:388992282247:web:637b6e6d917685772b5222",
-    measurementId: "G-ESJEZ56XLP",
-};
-
-// Initialize Firebase
-const firestoreApp = initializeApp(firebaseConfig);
-const db = getFirestore(firestoreApp);
-const auth = getAuth(firestoreApp);
 
 // Initialize app
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const corsOptions = {
+    origin: "http://localhost:3000",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+};
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors(corsOptions));
 
 // Socket variables
 const rooms = io.of("/").adapter.rooms;
@@ -360,9 +348,9 @@ io.of("/").adapter.on("leave-room", (room, id) => {
 server.listen(PORT, () => {
     console.log(`Server started listening on port ${PORT}`);
 
-    friendRequest(app, db);
-    market(app, db);
-    userProfile(app, db);
-    users(app, db, auth);
-    wordbank(app, db);
+    friendRequest(app);
+    market(app);
+    userProfile(app);
+    users(app);
+    wordbank(app);
 });

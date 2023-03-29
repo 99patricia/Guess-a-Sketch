@@ -15,7 +15,7 @@ const StyledInput = styled.input`
     border: 1px solid var(--beige);
     font-size: 1.2rem;
     color: var(--primary);
-    margin-bottom: 2rem;
+    margin: 1rem 0;
 
     :focus {
         border: 1px solid var(--primary);

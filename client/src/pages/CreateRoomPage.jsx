@@ -18,7 +18,7 @@ function CreateRoomPage() {
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
-        const username = localStorage.getItem("nickname") || "guest";
+        const username = localStorage.getItem("username") || "guest";
         const room = {
             roomId,
             username,
@@ -31,7 +31,6 @@ function CreateRoomPage() {
             console.log(data);
         });
 
-        localStorage.setItem("nickname", username);
         navigate(`/room/${roomId}`);
     };
 
