@@ -58,7 +58,7 @@ function Header(props) {
                         <Button onClick={() => navigate("/login")} secondary>
                             Login
                         </Button>
-                        <Button onClick={() => navigate("/signup")} secondary>
+                        <Button onClick={() => navigate("/register")} secondary>
                             Signup
                         </Button>
                     </>

@@ -22,7 +22,7 @@ async function register(app) {
             const email = req.body["email"];
             const username = req.body["username"];
             const password = req.body["password"];
-            const avatar = req.body["avatar"];
+            // const avatar = req.body["avatar"];
 
             //firebase auth method to create user with email and password
             const userCredential = await createUserWithEmailAndPassword(
@@ -35,7 +35,10 @@ async function register(app) {
             try {
                 // send email verification
                 await sendEmailVerification(user).then(() => {
-                    console.log("Email verification sent!");
+                    console.log(`Email verification sent to ${email}`);
+                    res.status(200).json({
+                        message: `Email verification sent to ${email}. Please check your inbox and follow the link to verify your account.`,
+                    });
                 });
 
                 // timeout
@@ -49,52 +52,57 @@ async function register(app) {
                     await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before checking again
                 }
 
-                // User did not verify their email within the timeout period, delete the user and inform the client
+                // User did not verify their email within the timeout period, delete the user
                 if (!user.emailVerified) {
-                    await user.delete();
-                    res.status(500).json({
-                        error: "Failed to verify email within timeout period",
-                    });
+                    try {
+                        await adminAuth.deleteUser(user.uid).then(() => {
+                            console.log(`User with uid ${user.uid} removed.`);
+                        });
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    try {
+                        const user_json = {
+                            id: user.uid,
+                            email,
+                            username,
+                            // avatar: req.body["avatar"],
+                            friendList: [],
+                        };
+
+                        // Add user info to Firestore with <uid>
+                        await setDoc(
+                            doc(db, "users", user.uid),
+                            user_json
+                        ).then(() => {
+                            console.log(
+                                `User with username ${user.username} created.`
+                            );
+                        });
+
+                        const user_profile = {
+                            id: user.uid,
+                            username,
+                            win: 0,
+                            loss: 0,
+                            currency: 0,
+                            // avatar: req.body["avatar"],
+                            inventory: [],
+                        };
+
+                        await setDoc(
+                            doc(db, "profiles", user.uid),
+                            user_profile
+                        );
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ error: "Failed to create new user" });
             }
-
-            try {
-                const user_json = {
-                    id: user.uid,
-                    email: req.body["email"],
-                    username: req.body["username"],
-                    avatar: req.body["avatar"],
-                    friendList: [],
-                };
-
-                // Add user info to Firestore with <uid>
-                await setDoc(doc(db, "users", user.uid), user_json);
-
-                const user_profile = {
-                    id: user.uid,
-                    username: req.body["username"],
-                    win: 0,
-                    loss: 0,
-                    currency: 0,
-                    avatar: req.body["avatar"],
-                    inventory: [],
-                };
-
-                await setDoc(doc(db, "profiles", user.uid), user_profile);
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({
-                    error: "Failed to store new user into database",
-                });
-            }
-
-            // response successfuly and passback user's uid
-            res.status(201).json({
-                message: `Created new user with ID: ${username}`,
-            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "Wrong user input or exist email" });

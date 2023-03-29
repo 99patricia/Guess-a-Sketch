@@ -79,6 +79,8 @@ input {
 
 .grid-form > input,
 .grid-form > textarea,
-.grid-form > button {
+.grid-form > button,
+.grid-form > div,
+.grid-form > a {
     grid-column: 2/3;
 }
