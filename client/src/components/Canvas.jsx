@@ -17,13 +17,15 @@ const StyledCanvas = styled.canvas`
     vertical-align: bottom;
 `;
 
-function Canvas(props) {
-    const canvasRef = useRef();
+const Canvas = React.forwardRef((props, ref) => {
+    const canvasRef = ref;
+    const sendToSocket = props.sendToSocket;
 
     useEffect(() => {
         var drawing = false;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
+        const mainWindow = document.querySelector("html");
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -36,6 +38,8 @@ function Canvas(props) {
         };
 
         const draw = (x0, y0, x1, y1, emit) => {
+            y0 = y0 + mainWindow.scrollTop;
+            y1 = y1 + mainWindow.scrollTop;
             ctx.beginPath();
             // Size and colour of pen
             ctx.lineCap = "round";
@@ -49,14 +53,17 @@ function Canvas(props) {
             ctx.stroke();
             ctx.closePath();
 
-            if (!emit) return;
-            // Emit the coords
-            socket.emit("draw", {
-                x0: x0,
-                x1: x1,
-                y0: y0,
-                y1: y1,
-            });
+            if (emit) {
+                const w = canvas.width;
+                const h = canvas.height;
+                // Emit the coords
+                socket.emit("draw", {
+                    x0: x0 / w,
+                    x1: x1 / w,
+                    y0: y0 / h,
+                    y1: y1 / h,
+                });
+            } else return;
         };
 
         const onMouseDown = (e) => {
@@ -78,7 +85,7 @@ function Canvas(props) {
                     (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
                 lastCoord.y ||
                     (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
-                true
+                sendToSocket
             );
         };
 
@@ -91,7 +98,7 @@ function Canvas(props) {
                 coord.y,
                 (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
                 (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
-                true
+                sendToSocket
             );
             // Update coordinates as mouse is moving
             updateCoords(e);
@@ -113,9 +120,11 @@ function Canvas(props) {
         canvas.addEventListener("touchmove", onMouseMove);
 
         // If we receive coordinates from socket, draw them
-        socket.on("draw", (data) => {
-            draw(data.x0, data.y0, data.x1, data.y1);
-        });
+        if (sendToSocket) {
+            socket.on("draw", (data) => {
+                draw(data.x0, data.y0, data.x1, data.y1);
+            });
+        }
     }, []);
 
     return (
@@ -125,9 +134,9 @@ function Canvas(props) {
                 height="400"
                 ref={canvasRef}
             ></StyledCanvas>
-            <CanvasFooter canvasRef={canvasRef} />
+            <CanvasFooter canvasRef={canvasRef} sendToSocket={sendToSocket} />
         </StyledCanvasContainer>
     );
-}
+});
 
 export default Canvas;

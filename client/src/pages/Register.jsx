@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
 import {
     Button,
+    Canvas,
     Header,
     Container,
     CustomLink,
@@ -20,13 +21,36 @@ const StyledMessage = styled.div`
     margin: 0 auto;
 `;
 
+const StyledAvatarCanvasContainer = styled.div`
+    margin: 0 auto;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.6rem;
+    line-height: 2rem;
+`;
+
 function Register() {
+    const canvasRef = useRef();
+    const submitButtonRef = useRef();
+
     const [errorMessage, setErrorMessage] = useState("");
     const [message, setMessage] = useState();
 
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [avatar, setAvatar] = useState("");
+
+    useEffect(() => {
+        const submitButton = submitButtonRef.current;
+        const canvas = canvasRef.current;
+
+        submitButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            setAvatar(canvas.toDataURL("image/png"));
+            handleRegister(e);
+        });
+    }, []);
 
     const handleRegister = (e) => {
         e.preventDefault();
@@ -34,6 +58,7 @@ function Register() {
             email,
             username,
             password,
+            avatar,
             returnSecureToken: true,
         };
         const options = {
@@ -60,10 +85,14 @@ function Register() {
                     <StyledMessage>{message}</StyledMessage>
                 ) : (
                     <>
-                        <Form className="grid-form" onSubmit={handleRegister}>
+                        <Form className="grid-form">
                             {errorMessage && (
                                 <ErrorMessage>{errorMessage}</ErrorMessage>
                             )}
+                            <StyledAvatarCanvasContainer>
+                                Draw your avatar here!
+                                <Canvas ref={canvasRef} />
+                            </StyledAvatarCanvasContainer>
                             <FormInput
                                 label="E-mail"
                                 placeholder="Enter e-mail"
@@ -82,9 +111,7 @@ function Register() {
                                 type="password"
                                 onChange={(e) => setPassword(e.target.value)}
                             ></FormInput>
-                            <Button column type="submit">
-                                Sign up
-                            </Button>
+                            <Button ref={submitButtonRef}>Submit</Button>
                             <CustomLink to="/login">
                                 Already have an account? Sign in
                             </CustomLink>

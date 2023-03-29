@@ -22,7 +22,7 @@ async function register(app) {
             const email = req.body["email"];
             const username = req.body["username"];
             const password = req.body["password"];
-            // const avatar = req.body["avatar"];
+            const avatar = req.body["avatar"];
 
             //firebase auth method to create user with email and password
             const userCredential = await createUserWithEmailAndPassword(
@@ -67,7 +67,7 @@ async function register(app) {
                             id: user.uid,
                             email,
                             username,
-                            // avatar: req.body["avatar"],
+                            avatar,
                             friendList: [],
                         };
 
@@ -87,7 +87,7 @@ async function register(app) {
                             win: 0,
                             loss: 0,
                             currency: 0,
-                            // avatar: req.body["avatar"],
+                            avatar,
                             inventory: [],
                         };
 

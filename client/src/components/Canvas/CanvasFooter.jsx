@@ -12,7 +12,7 @@ const StyledCanvasFooter = styled.div`
 `;
 
 function CanvasFooter(props) {
-    const canvasRef = props.canvasRef;
+    const { canvasRef, sendToSocket } = { ...props };
     const clearButtonRef = useRef();
 
     useEffect(() => {
@@ -28,13 +28,13 @@ function CanvasFooter(props) {
             e.preventDefault();
             clearCanvas();
             // Tell socket to clear the canvas
-            socket.emit("clear-canvas");
+            if (sendToSocket) socket.emit("clear-canvas");
         };
 
         clearButton.addEventListener("click", handleClearCanvas);
 
         // If we receive clear-canvas from socket, clear the canvas
-        socket.on("clear-canvas", clearCanvas);
+        if (sendToSocket) socket.on("clear-canvas", clearCanvas);
     }, [canvasRef]);
 
     return (
