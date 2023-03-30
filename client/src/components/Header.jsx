@@ -3,7 +3,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-import { Button } from "components";
+import { Button, SideDrawer } from "components";
 
 const StyledHeader = styled.div`
     background-color: var(--primary);
@@ -48,25 +48,34 @@ function Header(props) {
     };
 
     return (
-        <StyledHeader>
-            <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
-            <div className="flex">
-                {isLoggedIn ? (
-                    <Button onClick={handleLogout} secondary>
-                        Logout
-                    </Button>
-                ) : (
-                    <>
-                        <Button onClick={() => navigate("/login")} secondary>
-                            Login
+        <>
+            <StyledHeader>
+                <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
+                <div className="flex">
+                    {isLoggedIn ? (
+                        <Button onClick={handleLogout} secondary>
+                            Logout
                         </Button>
-                        <Button onClick={() => navigate("/register")} secondary>
-                            Signup
-                        </Button>
-                    </>
-                )}
-            </div>
-        </StyledHeader>
+                    ) : (
+                        <>
+                            <Button
+                                onClick={() => navigate("/login")}
+                                secondary
+                            >
+                                Login
+                            </Button>
+                            <Button
+                                onClick={() => navigate("/register")}
+                                secondary
+                            >
+                                Signup
+                            </Button>
+                        </>
+                    )}
+                </div>
+            </StyledHeader>
+            {isLoggedIn && <SideDrawer />}
+        </>
     );
 }
 

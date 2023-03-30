@@ -40,7 +40,7 @@ function GuestLogin() {
 
     const handleGuestLogin = (e) => {
         e.preventDefault();
-        if (nickname == "") {
+        if (nickname === "") {
             setErrorMessage("Please enter a nickname");
         } else {
             sessionStorage.setItem("guestLoggedIn", true);

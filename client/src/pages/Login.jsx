@@ -37,7 +37,10 @@ function Login() {
             .then((res) => {
                 setShowErrorMessage("");
                 const username = res.data.data.username;
+                const uid = res.data.data.id;
+
                 localStorage.setItem("username", username);
+                localStorage.setItem("uid", uid);
 
                 navigate("/");
             })

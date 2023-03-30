@@ -13,7 +13,9 @@ axios.defaults.headers.post["Content-Type"] =
 
 function App() {
     const guestLoggedIn = sessionStorage.getItem("guestLoggedIn");
-    if (!guestLoggedIn) {
+    const userLoggedIn = document.cookie.includes("token");
+
+    if (!guestLoggedIn && !userLoggedIn) {
         window.onbeforeunload = () => localStorage.clear();
     }
 
