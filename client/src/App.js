@@ -12,6 +12,11 @@ axios.defaults.headers.post["Content-Type"] =
     "application/x-www-form-urlencoded";
 
 function App() {
+    const guestLoggedIn = sessionStorage.getItem("guestLoggedIn");
+    if (!guestLoggedIn) {
+        window.onbeforeunload = () => localStorage.clear();
+    }
+
     return (
         <Routes>
             <Route exact path="/" element={<Home />} />

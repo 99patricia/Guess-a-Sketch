@@ -43,7 +43,7 @@ function GuestLogin() {
         if (nickname == "") {
             setErrorMessage("Please enter a nickname");
         } else {
-            console.log("Hi");
+            sessionStorage.setItem("guestLoggedIn", true);
             localStorage.setItem("username", nickname);
             localStorage.setItem("guestAvatar", avatar);
             navigate("/");
