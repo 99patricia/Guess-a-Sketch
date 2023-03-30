@@ -72,7 +72,7 @@ function Login() {
                     <Button column type="submit">
                         Login
                     </Button>
-                    <CustomLink to="/">Login as guest</CustomLink>
+                    <CustomLink to="/guestLogin">Login as guest</CustomLink>
                 </Form>
             </Container>
         </>

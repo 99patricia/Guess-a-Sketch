@@ -1,7 +1,7 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 
-import { ChangePassword, Home, Login, Register, Room } from "pages";
+import { ChangePassword, GuestLogin, Home, Login, Register, Room } from "pages";
 
 import axios from "axios";
 
@@ -16,6 +16,7 @@ function App() {
         <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/login" element={<Login />} />
+            <Route exact path="/guestLogin" element={<GuestLogin />} />
             <Route exact path="/changePassword" element={<ChangePassword />} />
             <Route exact path="/register" element={<Register />} />
             <Route exact path="/room/:roomId" element={<Room />} />
