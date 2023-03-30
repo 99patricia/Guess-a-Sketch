@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import IconButton from "./IconButton";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import { useUserData } from "hooks";
 
 const StyledSideDrawer = styled.div`
     background-color: var(--primary-dark);
@@ -27,23 +27,7 @@ const StyledAvatar = styled.img`
 
 function SideDrawer(props) {
     const [open, setOpen] = useState(false);
-    const [userData, setUserData] = useState({});
-
-    const loggedInAsGuest = sessionStorage.getItem("guestLoggedIn");
-    const uid = localStorage.getItem("uid");
-
-    useEffect(() => {
-        if (uid) {
-            axios.get(`/users/${uid}`).then((res) => {
-                setUserData(res.data);
-            });
-        } else if (loggedInAsGuest) {
-            const nickname = localStorage.getItem("username");
-            const guestAvatar = localStorage.getItem("guestAvatar");
-
-            setUserData({ username: nickname, avatar: guestAvatar });
-        }
-    }, [uid, loggedInAsGuest]);
+    const userData = useUserData();
 
     return (
         <>
