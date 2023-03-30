@@ -35,6 +35,8 @@ function Header(props) {
     const [isLoggedIn, setIsLoggedIn] = useState(
         document.cookie.includes("token")
     );
+    const loggedInAsGuest = sessionStorage.getItem("guestLoggedIn");
+
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -74,7 +76,7 @@ function Header(props) {
                     )}
                 </div>
             </StyledHeader>
-            {isLoggedIn && <SideDrawer />}
+            {(isLoggedIn || loggedInAsGuest) && <SideDrawer />}
         </>
     );
 }
