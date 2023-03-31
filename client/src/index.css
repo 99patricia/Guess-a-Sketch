@@ -53,6 +53,10 @@ input {
     display: flex;
 }
 
+.flex.column {
+    flex-direction: column;
+}
+
 .float-right {
     float: right;
     margin-top: 1rem;
