@@ -44,8 +44,8 @@ function GuestLogin() {
             setErrorMessage("Please enter a nickname");
         } else {
             sessionStorage.setItem("guestLoggedIn", true);
-            localStorage.setItem("username", nickname);
-            localStorage.setItem("guestAvatar", avatar);
+            sessionStorage.setItem("username", nickname);
+            sessionStorage.setItem("guestAvatar", avatar);
             navigate("/");
         }
     };

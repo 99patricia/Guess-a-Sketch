@@ -8,15 +8,16 @@ import { Button, SideDrawer } from "components";
 const StyledHeader = styled.div`
     background-color: var(--primary);
     width: 100%;
+    height: 100px;
     position: -webkit-sticky;
     position: sticky;
     top: 0;
     margin-bottom: 100px;
-    padding: 1.5rem 1.8rem;
+    padding: 0 1.8rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     text-align: center;
 
@@ -39,26 +40,12 @@ function Header(props) {
 
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        await axios
-            .post("/logout", {}, { withCredentials: true })
-            .then((res) => {
-                localStorage.clear();
-                setIsLoggedIn(false);
-                navigate("/");
-            });
-    };
-
     return (
         <>
             <StyledHeader>
                 <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
                 <div className="flex">
-                    {isLoggedIn ? (
-                        <Button onClick={handleLogout} secondary>
-                            Logout
-                        </Button>
-                    ) : (
+                    {!isLoggedIn && (
                         <>
                             <Button
                                 onClick={() => navigate("/login")}

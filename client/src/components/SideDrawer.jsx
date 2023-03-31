@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import IconButton from "./IconButton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserData } from "hooks";
+import axios from "axios";
+
+const StyledNavButton = styled(IconButton)`
+    background-color: transparent;
+    position: fixed;
+    top: 30px;
+`;
 
 const StyledSideDrawer = styled.div`
-    background-color: var(--primary-dark);
+    background-color: var(--light-beige);
     height: 100vh;
     padding: 2rem;
     position: absolute;
@@ -27,14 +34,30 @@ const StyledAvatar = styled.img`
 
 function SideDrawer(props) {
     const [open, setOpen] = useState(false);
-    const userData = useUserData();
+    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        if (isLoggedIn) {
+            await axios
+                .post("/logout", {}, { withCredentials: true })
+                .then(() => {
+                    localStorage.clear();
+                    navigate("/login");
+                });
+        } else if (loggedInAsGuest) {
+            localStorage.clear();
+            sessionStorage.clear();
+            navigate("/login");
+        }
+    };
 
     return (
         <>
-            <IconButton
-                iconClassName="bi-list"
+            <StyledNavButton
+                iconClassName={open ? "bi-x-lg" : "bi-list"}
                 onClick={() => setOpen(!open)}
-            ></IconButton>
+            />
 
             <StyledSideDrawer open={open}>
                 {userData && (
@@ -46,7 +69,9 @@ function SideDrawer(props) {
                 <Link to="/">Home</Link>
                 <Link to="/">Join a game</Link>
                 <Link to="/">Create a room</Link>
-                <Link to="/">Logout</Link>
+                <Link to="/" onClick={handleLogout}>
+                    Logout
+                </Link>
             </StyledSideDrawer>
         </>
     );

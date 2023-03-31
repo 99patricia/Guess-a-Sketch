@@ -3,7 +3,7 @@ import axios from "axios";
 
 function useUserData() {
     const [userData, setUserData] = useState({});
-
+    const isLoggedIn = document.cookie.includes("token");
     const loggedInAsGuest = sessionStorage.getItem("guestLoggedIn");
     const uid = localStorage.getItem("uid");
 
@@ -13,14 +13,15 @@ function useUserData() {
                 setUserData(res.data);
             });
         } else if (loggedInAsGuest) {
-            const nickname = localStorage.getItem("username");
-            const guestAvatar = localStorage.getItem("guestAvatar");
+            const nickname = sessionStorage.getItem("username");
+            const guestAvatar = sessionStorage.getItem("guestAvatar");
+            localStorage.setItem("username", nickname);
 
             setUserData({ username: nickname, avatar: guestAvatar });
         }
     }, [uid, loggedInAsGuest]);
 
-    return userData;
+    return { isLoggedIn, loggedInAsGuest, userData };
 }
 
 export default useUserData;

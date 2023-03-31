@@ -67,7 +67,7 @@ const LobbyFooter = styled.div`
 
 function Lobby(props) {
     const { this_username, players, isHost } = { ...props };
-    const userData = useUserData();
+    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     socket.emit("get-players-data");
 
