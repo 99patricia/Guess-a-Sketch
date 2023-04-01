@@ -8,8 +8,10 @@ import { Button } from "components";
 const StyledHeader = styled.div`
     background-color: var(--primary);
     width: 100%;
-    position: absolute;
+    position: -webkit-sticky;
+    position: sticky;
     top: 0;
+    margin-bottom: 100px;
     padding: 1.5rem 1.8rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
@@ -58,7 +60,7 @@ function Header(props) {
                         <Button onClick={() => navigate("/login")} secondary>
                             Login
                         </Button>
-                        <Button onClick={() => navigate("/signup")} secondary>
+                        <Button onClick={() => navigate("/register")} secondary>
                             Signup
                         </Button>
                     </>

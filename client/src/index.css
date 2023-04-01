@@ -52,6 +52,11 @@ input {
     display: flex;
 }
 
+.float-right {
+    float: right;
+    margin-top: 1rem;
+}
+
 .flex-form {
     display: flex;
     flex-direction: column;
@@ -79,6 +84,8 @@ input {
 
 .grid-form > input,
 .grid-form > textarea,
-.grid-form > button {
+.grid-form > button,
+.grid-form > div,
+.grid-form > a {
     grid-column: 2/3;
 }

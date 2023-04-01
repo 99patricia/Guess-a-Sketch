@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const StyledLabel = styled.label`
+export const StyledLabel = styled.label`
     text-align: center;
     text-transform: uppercase;
     font-size: 1.5rem;

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Canvas, Chat, Container, FlexContainer, Header, Lobby, Scoreboard } from "components";
 import { socket } from "service/socket";
 
 function Room() {
+    const canvasRef = useRef();
     const { roomId } = useParams();
     const username = localStorage.getItem("username") || localStorage.getItem("nickname");
     
@@ -45,7 +46,6 @@ function Room() {
 
 
     }, [players, isHost, isDrawing, gameStart, gameData, timeLeft, username, word]);
-
     return (
         <>
             <Header />
@@ -54,7 +54,7 @@ function Room() {
                     {gameStart && 
                         <>
                         <Scoreboard this_username={username} gameData={gameData} isHost={isHost} />
-                        <Canvas timeLeft={timeLeft} currentTurn={gameData.currentTurn} isDrawing={isDrawing} word={word} />
+                        <Canvas ref={canvasRef} timeLeft={timeLeft} currentTurn={gameData.currentTurn} isDrawing={isDrawing} word={word} sendToSocket/>
                         </>
                     }
                     {!gameStart && 

@@ -1,16 +1,21 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { CanvasFooter, CanvasHeader } from "components/Canvas/";
 
 const StyledCanvasContainer = styled.div`
-    background-color: var(--light-beige);
-    padding: 1rem;
-    padding-top: 0.25rem;
-    border-radius: 1rem;
-    width: 500px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    width: ${(props) => (props.width ? props.width + "px" : "500px")};
+
+    ${(props) =>
+        !props.noContainer &&
+        `
+        background-color: var(--light-beige);
+        border-radius: 1rem;
+        padding: 1rem;
+        padding-top: 0.25rem;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  `}
 `;
 
 const StyledCanvas = styled.canvas`
@@ -18,15 +23,17 @@ const StyledCanvas = styled.canvas`
     vertical-align: bottom;
 `;
 
-function Canvas(props) {
-    const { timeLeft, currentTurn, isDrawing, word } = { ...props };
-
-    const canvasRef = useRef();
+const Canvas = React.forwardRef((props, ref) => {
+    const canvasRef = ref;
+    const { timeLeft, currentTurn, isDrawing, word, sendToSocket } = {
+        ...props,
+    };
 
     useEffect(() => {
         var drawing = false;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
+        const mainWindow = document.querySelector("html");
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -39,6 +46,8 @@ function Canvas(props) {
         };
 
         const draw = (x0, y0, x1, y1, emit) => {
+            y0 = y0 + mainWindow.scrollTop;
+            y1 = y1 + mainWindow.scrollTop;
             ctx.beginPath();
             // Size and colour of pen
             ctx.lineCap = "round";
@@ -52,14 +61,15 @@ function Canvas(props) {
             ctx.stroke();
             ctx.closePath();
 
-            if (!emit) return;
-            // Emit the coords
-            socket.emit("draw", {
-                x0: x0,
-                x1: x1,
-                y0: y0,
-                y1: y1,
-            });
+            if (emit) {
+                // Emit the coords
+                socket.emit("draw", {
+                    x0: x0,
+                    x1: x1,
+                    y0: y0,
+                    y1: y1,
+                });
+            } else return;
         };
 
         const onMouseDown = (e) => {
@@ -81,7 +91,7 @@ function Canvas(props) {
                     (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
                 lastCoord.y ||
                     (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
-                true
+                sendToSocket
             );
         };
 
@@ -94,7 +104,7 @@ function Canvas(props) {
                 coord.y,
                 (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
                 (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
-                true
+                sendToSocket
             );
             // Update coordinates as mouse is moving
             updateCoords(e);
@@ -116,22 +126,34 @@ function Canvas(props) {
         canvas.addEventListener("touchmove", onMouseMove);
 
         // If we receive coordinates from socket, draw them
-        socket.on("draw", (data) => {
-            draw(data.x0, data.y0, data.x1, data.y1);
-        });
-    }, []);
+        if (sendToSocket) {
+            socket.on("draw", (data) => {
+                draw(data.x0, data.y0, data.x1, data.y1);
+            });
+        }
+    }, [canvasRef, sendToSocket]);
 
     return (
-        <StyledCanvasContainer>
-            <CanvasHeader timeLeft={timeLeft} currentTurn={currentTurn} isDrawing={isDrawing} word={word} />
+        <StyledCanvasContainer
+            width={props.width}
+            noContainer={props.noContainer}
+        >
+            {sendToSocket && (
+                <CanvasHeader
+                    timeLeft={timeLeft}
+                    currentTurn={currentTurn}
+                    isDrawing={isDrawing}
+                    word={word}
+                />
+            )}
             <StyledCanvas
-                width="500"
-                height="400"
+                width={props.width || "500"}
+                height={props.height || "400"}
                 ref={canvasRef}
             ></StyledCanvas>
-            <CanvasFooter canvasRef={canvasRef} />
+            <CanvasFooter canvasRef={canvasRef} sendToSocket={sendToSocket} />
         </StyledCanvasContainer>
     );
-}
+});
 
 export default Canvas;
