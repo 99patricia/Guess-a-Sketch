@@ -25,7 +25,7 @@ const StyledCanvas = styled.canvas`
 
 const Canvas = React.forwardRef((props, ref) => {
     const canvasRef = ref;
-    const { timeLeft, currentTurn, isDrawing, word, sendToSocket } = {
+    const { timeLeft, gameData, isDrawing, word, sendToSocket } = {
         ...props,
     };
 
@@ -141,7 +141,7 @@ const Canvas = React.forwardRef((props, ref) => {
             {sendToSocket && (
                 <CanvasHeader
                     timeLeft={timeLeft}
-                    currentTurn={currentTurn}
+                    gameData={gameData}
                     isDrawing={isDrawing}
                     word={word}
                 />

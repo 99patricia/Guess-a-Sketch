@@ -60,7 +60,9 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                 'hasGuessed': false,
             };
             this.players.push(player);
-            this.sendGameData();
+            if (this.currentTurn !== '') {
+                this.sendGameData();
+            }
         },
         'removePlayer': function(username) {
             let player = this.players.find(player => player.username == username);
@@ -99,6 +101,11 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             let timeleft = this.drawTime;
             let currentPlayer = game.players.find(player => player.username == game.currentTurn);
             this.sendGameData();
+            io.to(this.roomId).emit("chat-message", {
+                "message": "It is "+currentPlayer.username+"'s turn to draw...",
+                username: "GAME",
+                id: `${currentPlayer.socketId}${Math.random()}`,
+            });
             let gameTimer = setInterval(function() {
                 if(timeleft <= 0){
                     clearInterval(gameTimer);
@@ -128,6 +135,11 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                     this.gameOver = true;
                     console.log("game over");
                     io.to(this.roomId).emit("game-over");
+                    io.to(this.roomId).emit("chat-message", {
+                        "message": "Game over.",
+                        username: "GAME",
+                        id: `${currentPlayer.socketId}${Math.random()}`,
+                    });
                     return;
                 }
                 // new round
@@ -251,8 +263,8 @@ io.on("connection", async (socket) => {
             player = game.players.find(player => player.username == username);
 
             io.to(room.roomId).emit("chat-message", {
-                "message": "has joined the game.",
-                username: username,
+                "message": username+" has joined the game.",
+                username: "GAME",
                 id: `${socket.id}${Math.random()}`,
             });
 
@@ -270,8 +282,8 @@ io.on("connection", async (socket) => {
     socket.on("leave-room", (room) => {
         socket.leave(room);
         io.to(room).emit("chat-message", {
-            "message": "has left the game.",
-            username: username,
+            "message": username+" has left the game.",
+            username: "GAME",
             id: `${socket.id}${Math.random()}`,
         });
         if (Object.keys(game).length > 0) {
@@ -295,7 +307,7 @@ io.on("connection", async (socket) => {
 
     socket.on("chat-message", (msg) => {
         // console.log("Room " + currentRoom + " - " + msg.username + ": " + msg.message);
-        io.to(currentRoom).emit("chat-message", msg);
+        // io.to(currentRoom).emit("chat-message", msg);
         let canGuess = ((!game.gameOver) && (game.currentRound > 0)) && ((player.hasGuessed == false) && !(game.currentTurn == username));
         if (canGuess) {
             if (msg.message.toLowerCase() == game.currentWord.toLowerCase()) { // current word is guessed
@@ -303,8 +315,8 @@ io.on("connection", async (socket) => {
                 player.hasGuessed = true;
                 game.listGuessed.push(username);
                 io.to(currentRoom).emit("chat-message", {
-                    "message": " has guessed the word!",
-                    username: username,
+                    "message": username + " has guessed the word!",
+                    username: "GAME",
                     id: `${socket.id}${Math.random()}`,
                 });
                 return;
@@ -326,8 +338,8 @@ io.on("connection", async (socket) => {
     socket.on("disconnect", () => {
         socket.leave(currentRoom);
         io.to(currentRoom).emit("chat-message", {
-            "message": "has left the game.",
-            username: username,
+            "message": username+" has left the game.",
+            username: "GAME",
             id: `${socket.id}${Math.random()}`,
         });
         console.log(socket.id + " with username " + username + " disconnected");

@@ -54,7 +54,7 @@ function Room() {
                     {gameStart && 
                         <>
                         <Scoreboard this_username={username} gameData={gameData} isHost={isHost} />
-                        <Canvas ref={canvasRef} timeLeft={timeLeft} currentTurn={gameData.currentTurn} isDrawing={isDrawing} word={word} sendToSocket/>
+                        <Canvas ref={canvasRef} timeLeft={timeLeft} gameData={gameData} isDrawing={isDrawing} word={word} sendToSocket/>
                         </>
                     }
                     {!gameStart && 
