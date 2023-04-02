@@ -11,3 +11,4 @@ export { default as Header } from "./Header";
 export { default as IconButton } from "./IconButton";
 export { default as Lobby } from "./Lobby";
 export { default as Scoreboard } from "./Scoreboard";
+export { default as SideDrawer } from "./SideDrawer";

@@ -3,6 +3,7 @@
 
 :root {
     --primary: #294b8a;
+    --primary-dark: #153060;
     --secondary: #f36326;
     --white: #ffffff;
     --light-beige: #f3f3ec;
@@ -50,6 +51,10 @@ input {
 
 .flex {
     display: flex;
+}
+
+.flex.column {
+    flex-direction: column;
 }
 
 .float-right {

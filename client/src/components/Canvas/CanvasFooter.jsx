@@ -7,6 +7,7 @@ import { IconButton } from "components";
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
     padding: 1rem;
+    margin-bottom: 1rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
 `;
