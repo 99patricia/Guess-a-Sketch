@@ -21,6 +21,8 @@ const StyledCanvasContainer = styled.div`
 const StyledCanvas = styled.canvas`
     background-color: var(--white);
     vertical-align: bottom;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
 `;
 
 const Canvas = React.forwardRef((props, ref) => {

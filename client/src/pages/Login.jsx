@@ -37,7 +37,10 @@ function Login() {
             .then((res) => {
                 setShowErrorMessage("");
                 const username = res.data.data.username;
+                const uid = res.data.data.id;
+
                 localStorage.setItem("username", username);
+                localStorage.setItem("uid", uid);
 
                 navigate("/");
             })
@@ -72,7 +75,7 @@ function Login() {
                     <Button column type="submit">
                         Login
                     </Button>
-                    <CustomLink to="/">Login as guest</CustomLink>
+                    <CustomLink to="/guestLogin">Login as guest</CustomLink>
                 </Form>
             </Container>
         </>

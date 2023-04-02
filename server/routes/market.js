@@ -5,10 +5,13 @@ import {
     getDoc,
     getDocs,
     updateDoc,
+    deleteDoc,
 } from "firebase/firestore";
 
+import { db } from "../service/firebase.js";
+
 ///////////////////////////// createPerk  /////////////////////////////
-async function createPerk(app, db) {
+async function createPerk(app) {
     app.post("/perks", async (req, res) => {
         try {
             const perkname = req.body["perkname"];
@@ -43,7 +46,7 @@ async function createPerk(app, db) {
 }
 
 ///////////////////////////// getPerk  /////////////////////////////
-async function getPerk(app, db) {
+async function getPerk(app) {
     app.get("/perks/:perk_id", async (req, res) => {
         try {
             const perk_id = req.params.perk_id;
@@ -69,7 +72,7 @@ async function getPerk(app, db) {
 }
 
 ///////////////////////////// getAllPerks  /////////////////////////////
-async function getAllPerks(app, db) {
+async function getAllPerks(app) {
     app.get("/perks", async (req, res) => {
         try {
             // Get all perk documents from Firestore
@@ -88,7 +91,7 @@ async function getAllPerks(app, db) {
 }
 
 ///////////////////////////// purchasePerk  /////////////////////////////
-async function purchasePerk(app, db) {
+async function purchasePerk(app) {
     app.post("/purchase/:user_id/:perk_id", async (req, res) => {
         try {
             const user_id = req.params.user_id;
@@ -140,9 +143,40 @@ async function purchasePerk(app, db) {
     });
 }
 
-export function init(app, db) {
-    createPerk(app, db),
-        getPerk(app, db),
-        getAllPerks(app, db),
-        purchasePerk(app, db);
+///////////////////////////// deletePerk  /////////////////////////////
+async function deletePerk(app) {
+    app.delete("/perks/:perk_id", async (req, res) => {
+        try {
+            const perk_id = req.params.perk_id;
+
+            // Get the reference to the document to be deleted
+            const perkDocRef = doc(db, "perks", perk_id);
+
+            // Check if the document exists before deleting
+            const perkDocSnapshot = await getDoc(perkDocRef);
+            if (!perkDocSnapshot.exists()) {
+                throw new Error("Perk document not found");
+            }
+
+            // Delete the document
+            await deleteDoc(perkDocRef);
+
+            res.status(200).json({
+                message: "Perk deleted successfully",
+                perk_id: perk_id,
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to delete perk" });
+        }
+    });
+}
+
+
+export function init(app) {
+    createPerk(app),
+        getPerk(app),
+        getAllPerks(app),
+        purchasePerk(app),
+        deletePerk(app);
 }

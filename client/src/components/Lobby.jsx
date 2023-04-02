@@ -1,8 +1,11 @@
+import React from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
+
+import { useUserData } from "hooks";
 import { Button } from "components";
 
-import default_user_image from '../images/default_user.png'
+import default_user_image from "../images/default_user.png";
 
 const LobbyContainer = styled.div`
     background-color: var(--light-beige);
@@ -17,8 +20,8 @@ const LobbyContainer = styled.div`
 
 const UserCardList = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(8rem, 1fr));
-    grid-template-rows: repeat(auto-fill,8rem);
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    grid-template-rows: repeat(auto-fill, 8rem);
     grid-gap: 1rem;
     padding: 0.25rem;
     height: 100%;
@@ -57,15 +60,14 @@ const ThisUserImage = styled.img`
 const LobbyFooter = styled.div`
     margin-top: 2px;
     display: flex;
-    alignItems: center;
-    justifyContent: center;
+    alignitems: center;
+    justifycontent: center;
     text-align: center;
 `;
 
-
-
 function Lobby(props) {
     const { this_username, players, isHost } = { ...props };
+    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     socket.emit("get-players-data");
 
@@ -76,47 +78,85 @@ function Lobby(props) {
     if (!players) {
         return (
             <LobbyContainer>
-                <h3>
-                    No players...
-                </h3>
+                <h3>No players...</h3>
             </LobbyContainer>
-        )
+        );
     }
     return (
         <LobbyContainer>
             <UserCardList>
-                {players.map(({username, isHost}) => (
+                {players.map(({ username, isHost }) => (
                     <UserCard key={username}>
-                        {username === this_username && 
+                        {username === userData.username && (
                             <>
-                            <ThisUserImage src={default_user_image} />
-                            <h3 style={{ margin: '5px' }}>
-                                {isHost && <p style={{ margin: '0', color: 'var(--secondary)' }}>{username} (host)</p>}
-                                {!isHost && <p style={{ margin: '0', color: 'var(--secondary)' }}>{username}</p>}
-                            </h3>
+                                <ThisUserImage src={userData.avatar} />
+                                <h3 style={{ margin: "5px" }}>
+                                    {isHost && (
+                                        <p
+                                            style={{
+                                                margin: "0",
+                                                color: "var(--secondary)",
+                                            }}
+                                        >
+                                            {username} (host)
+                                        </p>
+                                    )}
+                                    {!isHost && (
+                                        <p
+                                            style={{
+                                                margin: "0",
+                                                color: "var(--secondary)",
+                                            }}
+                                        >
+                                            {username}
+                                        </p>
+                                    )}
+                                </h3>
                             </>
-                        }
-                        {username !== this_username &&
+                        )}
+                        {username !== this_username && (
                             <>
-                            <UserImage src={default_user_image} />
-                            <h3 style={{margin: '5px'}}>
-                                {isHost && <p style={{margin: '0', color: 'var(--primary)'}}>{username} (host)</p>}
-                                {!isHost && <p style={{margin: '0', color: 'var(--primary)'}}>{username}</p>}
-                            </h3>
+                                <UserImage src={default_user_image} />
+                                <h3 style={{ margin: "5px" }}>
+                                    {isHost && (
+                                        <p
+                                            style={{
+                                                margin: "0",
+                                                color: "var(--primary)",
+                                            }}
+                                        >
+                                            {username} (host)
+                                        </p>
+                                    )}
+                                    {!isHost && (
+                                        <p
+                                            style={{
+                                                margin: "0",
+                                                color: "var(--primary)",
+                                            }}
+                                        >
+                                            {username}
+                                        </p>
+                                    )}
+                                </h3>
                             </>
-                        }
+                        )}
                     </UserCard>
                 ))}
             </UserCardList>
             <LobbyFooter>
-                {isHost && 
-                    <Button style={{display: 'block', margin: 'auto'}} noShadow onClick={startGame}>
+                {isHost && (
+                    <Button
+                        style={{ display: "block", margin: "auto" }}
+                        noShadow
+                        onClick={startGame}
+                    >
                         Start
                     </Button>
-                }
+                )}
             </LobbyFooter>
         </LobbyContainer>
     );
 }
 
-export default Lobby
+export default Lobby;

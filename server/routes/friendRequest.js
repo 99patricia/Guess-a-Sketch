@@ -11,8 +11,12 @@ import {
     arrayUnion,
 } from "firebase/firestore";
 
+import {
+    db
+} from "../service/firebase.js";
+
 ///////////////////////////// handleFriendRequest  /////////////////////////////
-async function handleFriendRequest(app, db) {
+async function handleFriendRequest(app) {
     app.post("/friend_request", async (req, res) => {
         try {
             // Extract friend request data from request body
@@ -36,7 +40,9 @@ async function handleFriendRequest(app, db) {
             const receiverSnapshot = await getDoc(receiverDocRef);
 
             if (!senderSnapshot.exists() || !receiverSnapshot.exists()) {
-                res.status(400).json({ error: "User not found" });
+                res.status(400).json({
+                    error: "User not found"
+                });
                 return;
             }
 
@@ -44,7 +50,9 @@ async function handleFriendRequest(app, db) {
                 senderSnapshot.data().friendList.includes(recipient_id) ||
                 receiverSnapshot.data().friendList.includes(sender_id)
             ) {
-                res.status(400).json({ error: "User are already friends" });
+                res.status(400).json({
+                    error: "User are already friends"
+                });
                 return;
             }
 
@@ -59,7 +67,9 @@ async function handleFriendRequest(app, db) {
             friendRequestData.request_id = request_id;
 
             // Update the friend request document with the generated request_id
-            await updateDoc(requestDocRef, { request_id });
+            await updateDoc(requestDocRef, {
+                request_id
+            });
 
             res.status(200).json({
                 message: `Friend request with ID: ${request_id} has been created.`,
@@ -67,13 +77,15 @@ async function handleFriendRequest(app, db) {
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Failed to handle friend request" });
+            res.status(500).json({
+                error: "Failed to handle friend request"
+            });
         }
     });
 }
 
 ///////////////////////////// getFriendRequests Only for Receiver /////////////////////////////
-async function getFriendRequests(app, db) {
+async function getFriendRequests(app) {
     app.get("/friend_requests/:id", async (req, res) => {
         try {
             // Extract the user_id from the request query parameters
@@ -105,10 +117,10 @@ async function getFriendRequests(app, db) {
 
             // TODO: sender request we don't use that?
             /*
-        senderSnapshot.forEach((doc) => {
-          friendRequests.push(doc.data());
-        });
-        */
+            senderSnapshot.forEach((doc) => {
+                friendRequests.push(doc.data());
+            });
+            */
             recipientSnapshot.forEach((doc) => {
                 friendRequests.push(doc.data());
             });
@@ -125,7 +137,7 @@ async function getFriendRequests(app, db) {
 }
 
 ///////////////////////////// acceptFriendRequest /////////////////////////////
-async function acceptFriendRequest(app, db) {
+async function acceptFriendRequest(app) {
     app.post("/friend_request/accept", async (req, res) => {
         try {
             const request_id = req.body["request_id"];
@@ -134,7 +146,9 @@ async function acceptFriendRequest(app, db) {
 
             // Update the friend request status in Firestore
             const requestDocRef = doc(db, "friendRequests", request_id);
-            await updateDoc(requestDocRef, { status: "accepted" });
+            await updateDoc(requestDocRef, {
+                status: "accepted"
+            });
 
             // Update the friends list of both users in Firestore
             const senderDocRef = doc(db, "users", sender_id);
@@ -152,33 +166,39 @@ async function acceptFriendRequest(app, db) {
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Failed to accept friend request" });
+            res.status(500).json({
+                error: "Failed to accept friend request"
+            });
         }
     });
 }
 
 ///////////////////////////// rejectFriendRequest /////////////////////////////
-async function rejectFriendRequest(app, db) {
+async function rejectFriendRequest(app) {
     app.post("/friend_request/reject", async (req, res) => {
         try {
             const request_id = req.body["request_id"];
 
             // Update the friend request status in Firestore
             const requestDocRef = doc(db, "friendRequests", request_id);
-            await updateDoc(requestDocRef, { status: "rejected" });
+            await updateDoc(requestDocRef, {
+                status: "rejected"
+            });
 
             res.status(200).json({
                 message: `Friend request with ID: ${request_id} has been rejected.`,
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Failed to reject friend request" });
+            res.status(500).json({
+                error: "Failed to reject friend request"
+            });
         }
     });
 }
 
 ///////////////////////////// deleteFriendRequest /////////////////////////////
-async function deleteFriendRequest(app, db) {
+async function deleteFriendRequest(app) {
     app.post("/friend_request/delete", async (req, res) => {
         try {
             const request_id = req.body["request_id"];
@@ -192,15 +212,17 @@ async function deleteFriendRequest(app, db) {
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Failed to delete friend request" });
+            res.status(500).json({
+                error: "Failed to delete friend request"
+            });
         }
     });
 }
 
-export function init(app, db) {
-    handleFriendRequest(app, db),
-        getFriendRequests(app, db),
-        acceptFriendRequest(app, db),
-        rejectFriendRequest(app, db),
-        deleteFriendRequest(app, db);
+export function init(app) {
+    handleFriendRequest(app),
+        getFriendRequests(app),
+        acceptFriendRequest(app),
+        rejectFriendRequest(app),
+        deleteFriendRequest(app);
 }

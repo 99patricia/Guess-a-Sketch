@@ -6,15 +6,18 @@ import {
     getDoc,
     getDocs,
     setDoc,
+    deleteDoc,
 } from "firebase/firestore";
 
+import { db } from "../service/firebase.js";
+
 ///////////////////////////// getWordBankNames /////////////////////////////
-async function getWordBankNames(app, db) {
+async function getWordBankNames(app) {
     app.get("/wordbank/:user_id", async (req, res) => {
         try {
             const user_id = req.params.user_id;
 
-            const wordQuery = query(
+            const wordQuery = query(    
                 collection(db, "wordBank"),
                 where("user_id", "in", [user_id, "GLOBAL"])
             );
@@ -35,7 +38,7 @@ async function getWordBankNames(app, db) {
 }
 
 ///////////////////////////// getWordBankContent /////////////////////////////
-async function getWordBankContent(app, db) {
+async function getWordBankContent(app) {
     app.get("/wordbankcontent/:name_wordbank", async (req, res) => {
         try {
             const name_wordbank = req.params.name_wordbank;
@@ -60,7 +63,7 @@ async function getWordBankContent(app, db) {
 }
 
 ///////////////////////////// createWordBank /////////////////////////////
-async function createWordBank(app, db) {
+async function createWordBank(app) {
     app.post("/wordbank/:name_wordbank/:user_id", async (req, res) => {
         try {
             const name_wordbank = req.params.name_wordbank;
@@ -93,8 +96,41 @@ async function createWordBank(app, db) {
     });
 }
 
-export function init(app, db) {
-    getWordBankNames(app, db),
-        getWordBankContent(app, db),
-        createWordBank(app, db);
+async function deleteWordBank(app) {
+
+    // Example function to delete a word bank
+    app.delete("/wordbank/:name_wordbank/:user_id", async (req, res) => {
+        try {
+            const name_wordbank = req.params.name_wordbank;
+            const user_id = req.params.user_id;
+
+            const wordBankDocRef = doc(
+                db,
+                "wordBank",
+                name_wordbank + "__" + user_id
+            );
+
+            // Check if the document exists
+            const snapshot = await getDoc(wordBankDocRef);
+            if (!snapshot.exists()) {
+                res.status(404).json({ error: "Word bank not found" });
+                return;
+            }
+
+            // If the document exists, delete it
+            await deleteDoc(wordBankDocRef);
+            res.status(200).json({ message: "Word bank deleted successfully" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to delete word bank" });
+        }
+    });
+}
+
+export function init(app) {
+    getWordBankNames(app),
+        getWordBankContent(app),
+        deleteWordBank(app),
+        createWordBank(app);
+
 }

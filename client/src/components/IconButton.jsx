@@ -9,6 +9,8 @@ const StyledIconButton = styled.button`
     height: 40px;
     font-size: 1.5rem;
     cursor: pointer;
+    z-index: 3;
+    position: relative;
 `;
 
 const IconButton = React.forwardRef((props, ref) => {

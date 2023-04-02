@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-import { Button } from "components";
+import { SideDrawer } from "components";
+import { useUserData } from "hooks";
 
 const StyledHeader = styled.div`
     background-color: var(--primary);
     width: 100%;
+    height: 100px;
     position: -webkit-sticky;
     position: sticky;
     top: 0;
     margin-bottom: 100px;
-    padding: 1.5rem 1.8rem;
+    padding: 0 1.8rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     text-align: center;
 
@@ -32,41 +32,14 @@ const StyledSiteLink = styled.a`
 `;
 
 function Header(props) {
-    const [isLoggedIn, setIsLoggedIn] = useState(
-        document.cookie.includes("token")
-    );
-    const navigate = useNavigate();
-
-    const handleLogout = async () => {
-        await axios
-            .post("/logout", {}, { withCredentials: true })
-            .then((res) => {
-                localStorage.clear();
-                setIsLoggedIn(false);
-                navigate("/");
-            });
-    };
-
+    const { isLoggedIn, loggedInAsGuest } = useUserData();
     return (
-        <StyledHeader>
-            <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
-            <div className="flex">
-                {isLoggedIn ? (
-                    <Button onClick={handleLogout} secondary>
-                        Logout
-                    </Button>
-                ) : (
-                    <>
-                        <Button onClick={() => navigate("/login")} secondary>
-                            Login
-                        </Button>
-                        <Button onClick={() => navigate("/register")} secondary>
-                            Signup
-                        </Button>
-                    </>
-                )}
-            </div>
-        </StyledHeader>
+        <>
+            <StyledHeader>
+                <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
+            </StyledHeader>
+            {(isLoggedIn || loggedInAsGuest) && <SideDrawer />}
+        </>
     );
 }
 

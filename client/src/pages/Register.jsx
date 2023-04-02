@@ -92,7 +92,7 @@ function Register() {
                                 ref={canvasRef}
                                 isDrawing={true}
                                 width={334}
-                                height={300}
+                                height={334}
                                 noContainer
                             />
                             <FormInput
