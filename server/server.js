@@ -227,6 +227,7 @@ io.on("connection", async (socket) => {
     // - on success the socket will emit ("join-room-success") back to the client to notify it that
     // it has successfully joined a room
     socket.on("join-room", (room) => {
+        let roomId = room.roomId.toLowerCase();
         if (socket.rooms.size > 1) {
             // user is already in a room
             for (let room of socket.rooms) {
@@ -235,8 +236,8 @@ io.on("connection", async (socket) => {
                 }
             }
         }
-        if (rooms.has(room.roomId)) {
-            game = games.find(game => game.roomId == room.roomId);
+        if (rooms.has(roomId)) {
+            game = games.find(game => game.roomId == roomId);
             if (game.gameOver) {
                 io.to(socket.id).emit("join-room-fail", {
                     room,
@@ -252,23 +253,23 @@ io.on("connection", async (socket) => {
                 return;
             }
             // room exists
-            socket.join(room.roomId);
+            socket.join(roomId);
 
-            currentRoom = room.roomId;
+            currentRoom = roomId;
             host = false;
             username = room.username;
             game.addPlayer(room.username, socket.id);
 
             player = game.players.find(player => player.username == username);
 
-            io.to(room.roomId).emit("chat-message", {
+            io.to(roomId).emit("chat-message", {
                 "message": username+" has joined the game.",
                 username: "GAME",
                 id: `${socket.id}${Math.random()}`,
             });
 
             io.to(socket.id).emit("join-room-success", room.roomId);
-            io.to(room.roomId).emit("players-data", game.players);
+            io.to(roomId).emit("players-data", game.players);
         } else {
             // console.log("Room does not exist");
             io.to(socket.id).emit("join-room-fail", {
