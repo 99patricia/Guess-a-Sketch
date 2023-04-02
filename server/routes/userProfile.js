@@ -1,7 +1,8 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../service/firebase.js";
 
 ///////////////////////////// getUserProfile /////////////////////////////
-async function getUserProfile(app, db) {
+async function getUserProfile(app) {
     app.get("/profile/:id", async (req, res) => {
         try {
             const id = req.params.id;
@@ -25,7 +26,7 @@ async function getUserProfile(app, db) {
 
 ///////////////////////////// upsertUserProfile /////////////////////////////
 // Here only updated the currency, which can be modified later
-async function upsertUserProfile(app, db) {
+async function upsertUserProfile(app) {
     app.post("/profile/:id", async (req, res) => {
         try {
             const id = req.params.id;
@@ -58,7 +59,7 @@ async function upsertUserProfile(app, db) {
 }
 
 ///////////////////////////// UpdateProfileEndgame /////////////////////////////
-async function UpdateProfileEndgame(app, db) {
+async function UpdateProfileEndgame(app) {
     app.post("/endgame/:id", async (req, res) => {
         try {
             const id = req.params.id;
@@ -94,8 +95,8 @@ async function UpdateProfileEndgame(app, db) {
     });
 }
 
-export function init(app, db) {
-    getUserProfile(app, db),
-        upsertUserProfile(app, db),
-        UpdateProfileEndgame(app, db);
+export function init(app) {
+    getUserProfile(app),
+        upsertUserProfile(app),
+        UpdateProfileEndgame(app);
 }
