@@ -1,4 +1,6 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
 
 const CanvasHeaderContainer = styled.div`
     display: grid;
@@ -13,11 +15,19 @@ const CanvasHeaderContainer = styled.div`
 
 function GameHeader(props) {
 
-    const { timeLeft, gameData, isDrawing, word } = { ...props };
+    const { gameData, isDrawing, word } = { ...props };
 
     const currentTurn = gameData.currentTurn;
     const numRounds = gameData.numberOfRounds;
     const currentRound = gameData.currentRound;
+    const [timeLeft, setTimeLeft] = useState('0');
+
+    useEffect(() => {
+        socket.off("timer");
+        socket.on("timer", (data) => {
+            setTimeLeft(data);
+        });
+    }, [timeLeft]);
 
     return (
         <CanvasHeaderContainer>

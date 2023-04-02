@@ -15,28 +15,15 @@ const ScoreboardList = styled.div`
     height: 100%;
 `;
 
-const ScoreboardCard = styled.div`
-    display: grid;
-    grid-template-columns: 130px 60px;
-    align-items: center;
-    text-align: center;
-    
-    background-color: var(--light-beige);
-    border-radius: 0.25rem;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-
-    // outline: 2px solid var(--seconday);
-`;
-
 const scoreboardCardStyle = {
     'display': 'grid',
-    'grid-template-columns': '130px 60px',
-    'align-items': 'center',
-    'text-align': 'center',
+    'gridTemplateColumns': '130px 60px',
+    'alignItems': 'center',
+    'textAlign': 'center',
     
-    'background-color': 'var(--light-beige)',
-    'border-radius': '0.25rem',
-    'box-shadow': '0px 4px 4px rgba(0, 0, 0, 0.1)',
+    'backgroundColor': 'var(--light-beige)',
+    'borderRadius': '0.25rem',
+    'boxShadow': '0px 4px 4px rgba(0, 0, 0, 0.1)',
 }
 
 const UserImage = styled.img`
@@ -54,7 +41,7 @@ function Scoreboard(props) {
         <ScoreboardContainer>
             <ScoreboardList>
                 {gameData.players.map(({username, score, isHost, hasGuessed}) => (
-                    <div style={{...scoreboardCardStyle, ...{outline : username==gameData.currentTurn? '2px solid var(--secondary)' : '0'}}}>
+                    <div style={{...scoreboardCardStyle, ...{outline : username===gameData.currentTurn? '2px solid var(--secondary)' : '0'}}}>
                         {username === this_username && 
                             <div>
                                 <p style={{margin: '0', color: 'var(--secondary)'}}>

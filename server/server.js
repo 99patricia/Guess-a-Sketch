@@ -92,7 +92,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
         },
         'startTurn': async function () {
             // console.log(this);
-            console.log("it is "+this.currentTurn+"'s turn, and the word is "+this.currentWord);
+            // console.log("it is "+this.currentTurn+"'s turn, and the word is "+this.currentWord);
             // send word to the current drawing player
             io.to(this.players.find(player => player.username == this.currentTurn).socketId).emit("turn-start", this.currentWord);
 
@@ -133,7 +133,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                 this.currentRound += 1;
                 if (this.currentRound > numberOfRounds) { // end of game
                     this.gameOver = true;
-                    console.log("game over");
+                    // console.log("game over");
                     io.to(this.roomId).emit("game-over");
                     io.to(this.roomId).emit("chat-message", {
                         "message": "Game over.",
@@ -181,7 +181,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
 
 // Socket functions
 io.on("connection", async (socket) => {
-    console.log("A user connected with id: " + socket.id);
+    // console.log("A user connected with id: " + socket.id);
     let currentRoom = "";
     let host;
     let username = ""; // This will be the username of the host
@@ -237,7 +237,6 @@ io.on("connection", async (socket) => {
         }
         if (rooms.has(room.roomId)) {
             game = games.find(game => game.roomId == room.roomId);
-            console.log(game);
             if (game.gameOver) {
                 io.to(socket.id).emit("join-room-fail", {
                     room,
@@ -332,7 +331,9 @@ io.on("connection", async (socket) => {
     });
 
     socket.on("clear-canvas", (data) => {
-        io.to(currentRoom).emit("clear-canvas", data);
+        if (username == game.currentTurn) {
+            io.to(currentRoom).emit("clear-canvas", data);
+        }
     });
 
     socket.on("disconnect", () => {
@@ -342,7 +343,7 @@ io.on("connection", async (socket) => {
             username: "GAME",
             id: `${socket.id}${Math.random()}`,
         });
-        console.log(socket.id + " with username " + username + " disconnected");
+        // console.log(socket.id + " with username " + username + " disconnected");
         if (Object.keys(game).length > 0) {
             game.removePlayer(username);
         }

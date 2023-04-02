@@ -15,15 +15,16 @@ function Room() {
     const [word, setWord] = useState('');
     const [gameStart, setGameStart] = useState(false);
     const [gameData, setGameData] = useState({});
-    const [timeLeft, setTimeLeft] = useState('0');
 
     useEffect(() => {
 
+        socket.off("game-start");
         socket.on("game-start", (data) => {
             setGameStart(true);
             setGameData(data);
         });
 
+        socket.off("players-data");
         socket.on("players-data", (data) => {
             setPlayers(data);
             if (players?.length > 0) {
@@ -31,21 +32,18 @@ function Room() {
             }
         });
 
-        socket.on("timer", (data) => {
-            setTimeLeft(data);
-        });
-
+        socket.off("turn-start");
         socket.on("turn-start", (word) => {
             setIsDrawing(true);
             setWord(word);
         });
 
+        socket.off("turn-end");
         socket.on("turn-end", () => {
             setIsDrawing(false);
         });
 
-
-    }, [players, isHost, isDrawing, gameStart, gameData, timeLeft, username, word]);
+    }, [players, isHost, isDrawing, gameStart, gameData, username, word]);
     return (
         <>
             <Header />
@@ -54,7 +52,7 @@ function Room() {
                     {gameStart && 
                         <>
                         <Scoreboard this_username={username} gameData={gameData} isHost={isHost} />
-                        <Canvas ref={canvasRef} timeLeft={timeLeft} gameData={gameData} isDrawing={isDrawing} word={word} sendToSocket/>
+                        <Canvas ref={canvasRef} gameData={gameData} isDrawing={isDrawing} word={word} sendToSocket/>
                         </>
                     }
                     {!gameStart && 
