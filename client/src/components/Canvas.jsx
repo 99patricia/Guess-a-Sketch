@@ -47,8 +47,7 @@ const Canvas = React.forwardRef((props, ref) => {
             coord.y = (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
         };
 
-        const draw = (x0, y0, x1, y1, emit, isTurn) => {
-            if (!isTurn) return;
+        const draw = (x0, y0, x1, y1, emit) => {
             y0 = y0 + mainWindow.scrollTop;
             y1 = y1 + mainWindow.scrollTop;
             ctx.beginPath();
@@ -79,6 +78,10 @@ const Canvas = React.forwardRef((props, ref) => {
             // Mouse is clicked, set drawing flag to true and update current coordinates
             drawing = true;
             updateCoords(e);
+            lastCoord.x =
+                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
+            lastCoord.y =
+                (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
         };
 
         const onMouseUp = (e) => {
@@ -96,8 +99,7 @@ const Canvas = React.forwardRef((props, ref) => {
                     (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
                 lastCoord.y ||
                     (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
-                sendToSocket,
-                canDraw
+                sendToSocket
             );
         };
 
@@ -110,8 +112,7 @@ const Canvas = React.forwardRef((props, ref) => {
                 coord.y,
                 (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
                 (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
-                sendToSocket,
-                canDraw
+                sendToSocket
             );
             // Update coordinates as mouse is moving
             updateCoords(e);
@@ -146,6 +147,17 @@ const Canvas = React.forwardRef((props, ref) => {
             });
         }
 
+        return () => {
+            canvas.removeEventListener("mousedown", onMouseDown);
+            canvas.removeEventListener("mouseup", onMouseUp);
+            canvas.removeEventListener("mouseout", onMouseUp);
+            canvas.removeEventListener("mousemove", onMouseMove);
+
+            canvas.removeEventListener("touchstart", onMouseDown);
+            canvas.removeEventListener("touchend", onMouseUp);
+            canvas.removeEventListener("touchcancel", onMouseUp);
+            canvas.removeEventListener("touchmove", onMouseMove);
+        }
     }, [canvasRef, sendToSocket, isDrawing]);
 
     return (
