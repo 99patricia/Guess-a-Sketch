@@ -60,6 +60,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                 'hasGuessed': false,
             };
             this.players.push(player);
+            this.sendGameData();
         },
         'removePlayer': function(username) {
             let player = this.players.find(player => player.username == username);
@@ -76,6 +77,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                     this.nextTurn();
                 }
             }
+            this.sendGameData();
         },
         'startGame': function() {
             this.sendGameData();
@@ -96,6 +98,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             let game = this;
             let timeleft = this.drawTime;
             let currentPlayer = game.players.find(player => player.username == game.currentTurn);
+            this.sendGameData();
             let gameTimer = setInterval(function() {
                 if(timeleft <= 0){
                     clearInterval(gameTimer);
@@ -112,7 +115,6 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
                     }
                 }
                 io.to(game.roomId).emit("timer", (timeleft.toString()));
-                game.sendGameData();
                 timeleft -= 1;
             }, 1000);
         },
@@ -147,6 +149,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
         },
         'addPoints': function(username) {
             this.players.find(player => player.username == username).score += 50;
+            this.sendGameData();
         },
         'sendGameData': function() {
             const gameData = {
@@ -304,8 +307,10 @@ io.on("connection", async (socket) => {
                     username: username,
                     id: `${socket.id}${Math.random()}`,
                 });
+                return;
             }
         }
+        io.to(currentRoom).emit("chat-message", msg);
     });
 
     socket.on("draw", (data) => {
