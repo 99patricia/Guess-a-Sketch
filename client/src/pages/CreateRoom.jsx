@@ -16,14 +16,14 @@ function CreateRoom() {
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
     const { userData } = useUserData();
     const [wordbankNames, setWordbankNames] = useState([]);
-    // let wordbankNames = [];
+    const [chosenCategory, setChosenCategory] = useState("");
 
     useEffect(() => {
         axios.get(`/wordbank/${userData.uid}`).then((res) => {
             const names = res.data;
-            for (let i = 0; i < names.length; i++) {
-                names[i] = names[i].replace("__GLOBAL", "");
-            }
+            // for (let i = 0; i < names.length; i++) {
+            //     names[i] = names[i].replace("__GLOBAL", "");
+            // }
 
             setWordbankNames(names);
         });
@@ -35,21 +35,27 @@ function CreateRoom() {
         roomId += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    const handleJoinRoom = (e) => {
+    const handleCreateRoom = (e) => {
         e.preventDefault();
-        const username = localStorage.getItem("username") || "guest";
-        const room = {
-            roomId,
-            username: userData.username,
-            avatar: userData.avatar,
-            numberOfPlayers,
-            drawTime,
-            numberOfRounds,
-        };
-        socket.emit("create-room", room);
-        socket.on("create-room-success", () => {
-            navigate(`/room/${roomId}`);
-        });
+
+        axios
+            .get(`/wordbankcontent/${chosenCategory || wordbankNames[0]}`)
+            .then((res) => {
+                const wordbankContent = res.data;
+                const room = {
+                    roomId,
+                    username: userData.username,
+                    avatar: userData.avatar,
+                    numberOfPlayers,
+                    drawTime,
+                    numberOfRounds,
+                    wordbankContent,
+                };
+                socket.emit("create-room", room);
+                socket.on("create-room-success", () => {
+                    navigate(`/room/${roomId}`);
+                });
+            });
     };
 
     return (
@@ -58,7 +64,7 @@ function CreateRoom() {
             <Container>
                 <Form
                     className={`${isDesktop ? "grid-form" : "flex-form"}`}
-                    onSubmit={handleJoinRoom}
+                    onSubmit={handleCreateRoom}
                 >
                     <FormInput
                         label="Players"
@@ -89,9 +95,14 @@ function CreateRoom() {
                     />
                     <FormInput
                         label="Category"
-                        options={wordbankNames}
+                        value={chosenCategory}
+                        onChange={(e) => setChosenCategory(e.target.value)}
                         select
-                    />
+                    >
+                        {wordbankNames.map((name) => (
+                            <option key={name}>{name}</option>
+                        ))}
+                    </FormInput>
                     <Button fullWidth column type="submit">
                         Create
                     </Button>

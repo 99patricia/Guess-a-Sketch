@@ -84,15 +84,11 @@ function FormInput(props) {
         <>
             <StyledLabel>{props.label}</StyledLabel>
             {props.textArea ? (
-                <StyledTextArea {...props}></StyledTextArea>
+                <StyledTextArea {...props} />
             ) : props.select ? (
-                <StyledSelect>
-                    {props.options.map((name) => (
-                        <option key={name}>{name}</option>
-                    ))}
-                </StyledSelect>
+                <StyledSelect {...props} />
             ) : (
-                <StyledInput {...props}></StyledInput>
+                <StyledInput {...props} />
             )}
         </>
     );
