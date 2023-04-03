@@ -34,7 +34,9 @@ function GameHeader(props) {
             <p style={{textAlign:'left'}}>Round {currentRound} of {numRounds}</p>
             <p style={{textAlign:'left'}}>Time Left: {timeLeft}</p>
             {isDrawing && 
-                <p style={{textAlign:'right'}}>Your word is {word}.</p>
+                <p style={{textAlign:'right'}}>Your word is 
+                <span style={{color: 'var(--secondary)'}}> {word}</span>
+                </p>
             }
             {!isDrawing &&
                 <p style={{textAlign:'right'}}>{currentTurn} is drawing...</p>

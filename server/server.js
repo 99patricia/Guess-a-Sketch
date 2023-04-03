@@ -31,7 +31,7 @@ app.use(cors(corsOptions));
 const rooms = io.of("/").adapter.rooms;
 const games = [];
 
-function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRounds) {
+function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime, numberOfRounds) {
     let game = {
         'roomId': roomId,
         'host': host, // username of host
@@ -44,6 +44,7 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
             socketId,
             'score': 0,
             'hasGuessed': false,
+            'avatar': hostAvatar,
         }], // stores username of players
         'listGuessed': [],
         'currentTurn': '',
@@ -51,13 +52,14 @@ function makeGame(roomId, host, socketId, numberOfPlayers, drawTime, numberOfRou
         'gameOver': false,
         'wordBank': ['banana', 'peach', 'orange'],
         'currentWord': '',
-        'addPlayer': function(username, socketId) {
+        'addPlayer': function(username, avatar, socketId) {
             let player = {
                 'username': username,
                 'isHost': false,
                 socketId,
                 'score': 0,
                 'hasGuessed': false,
+                'avatar': avatar,
             };
             this.players.push(player);
             if (this.currentTurn !== '') {
@@ -210,7 +212,7 @@ io.on("connection", async (socket) => {
             // drawTime = room.drawTime;
             // numberOfRounds = room.numberOfRounds;
 
-            game = makeGame(room.roomId, room.username, socket.id, room.numberOfPlayers, room.drawTime, room.numberOfRounds);
+            game = makeGame(room.roomId, room.username, room.avatar, socket.id, room.numberOfPlayers, room.drawTime, room.numberOfRounds);
             games.push(game);
 
             player = game.players.find(player => player.username == username);
@@ -258,7 +260,7 @@ io.on("connection", async (socket) => {
             currentRoom = roomId;
             host = false;
             username = room.username;
-            game.addPlayer(room.username, socket.id);
+            game.addPlayer(room.username, room.avatar, socket.id);
 
             player = game.players.find(player => player.username == username);
 

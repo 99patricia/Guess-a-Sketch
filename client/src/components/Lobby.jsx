@@ -66,8 +66,8 @@ const LobbyFooter = styled.div`
 `;
 
 function Lobby(props) {
-    const { this_username, players, isHost } = { ...props };
-    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
+    const { userData, players, isHost } = { ...props };
+    // const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     socket.emit("get-players-data");
 
@@ -85,11 +85,11 @@ function Lobby(props) {
     return (
         <LobbyContainer>
             <UserCardList>
-                {players.map(({ username, isHost }) => (
+                {players.map(({ username, isHost, avatar }) => (
                     <UserCard key={username}>
                         {username === userData.username && (
                             <>
-                                <ThisUserImage src={userData.avatar} />
+                                <ThisUserImage src={avatar} />
                                 <h3 style={{ margin: "5px" }}>
                                     {isHost && (
                                         <p
@@ -114,9 +114,9 @@ function Lobby(props) {
                                 </h3>
                             </>
                         )}
-                        {username !== this_username && (
+                        {username !== userData.username && (
                             <>
-                                <UserImage src={default_user_image} />
+                                <UserImage src={avatar} />
                                 <h3 style={{ margin: "5px" }}>
                                     {isHost && (
                                         <p

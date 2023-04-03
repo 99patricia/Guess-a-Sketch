@@ -35,14 +35,14 @@ const UserImage = styled.img`
 `;
 
 function Scoreboard(props) {
-    const { gameData, isHost, this_username } = { ...props };
+    const { userData, gameData, isHost } = { ...props };
 
     return (
         <ScoreboardContainer>
             <ScoreboardList>
-                {gameData.players.map(({username, score, isHost, hasGuessed}) => (
+                {gameData.players.map(({username, avatar, score, isHost, hasGuessed}) => (
                     <div style={{...scoreboardCardStyle, ...{outline : username===gameData.currentTurn? '2px solid var(--secondary)' : '0'}}}>
-                        {username === this_username && 
+                        {username === userData.username && 
                             <div>
                                 <p style={{margin: '0', color: 'var(--secondary)'}}>
                                     {username} <br></br>
@@ -50,7 +50,7 @@ function Scoreboard(props) {
                                 </p>
                             </div>
                         }
-                        {username !== this_username &&
+                        {username !== userData.username &&
                             <div>
                                 <p style={{margin: '0', color: 'var(--primary)'}}>
                                     {username} <br></br>
@@ -58,7 +58,7 @@ function Scoreboard(props) {
                                 </p>
                             </div>
                         }
-                        <UserImage src={default_user_image} />
+                        <UserImage src={avatar} />
                     </div>
                 ))}
             </ScoreboardList>

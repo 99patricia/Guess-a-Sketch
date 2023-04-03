@@ -18,7 +18,7 @@ function Home() {
 
     const [roomId, setRoomId] = useState("");
     const [showErrorMessage, setShowErrorMessage] = useState("");
-    const { isLoggedIn, loggedInAsGuest } = useUserData();
+    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     const createRoomButtonRef = useRef();
     const [showCreateRoomPage, setShowCreateRoomPage] = useState(false);
@@ -30,10 +30,11 @@ function Home() {
         if (roomId === "") {
             setShowErrorMessage("Room code cannot be empty");
         } else {
-            const username = localStorage.getItem("username");
+            // const username = localStorage.getItem("username");
             const room = {
                 roomId,
-                username,
+                "username": userData.username,
+                "avatar": userData.avatar,
             };
             socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {

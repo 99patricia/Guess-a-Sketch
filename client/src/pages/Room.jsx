@@ -3,12 +3,14 @@ import { useParams } from "react-router-dom";
 
 import { Canvas, Chat, Container, FlexContainer, Header, Lobby, Scoreboard } from "components";
 import { socket } from "service/socket";
+import { useUserData } from "hooks";
 
 function Room() {
     const canvasRef = useRef();
     const { roomId } = useParams();
-    const username = localStorage.getItem("username") || localStorage.getItem("nickname");
-    
+    // const username = localStorage.getItem("username") || localStorage.getItem("nickname");
+    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
+
     const [players, setPlayers] = useState([]);
     const [isHost, setHost]= useState(false);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -28,7 +30,7 @@ function Room() {
         socket.on("players-data", (data) => {
             setPlayers(data);
             if (players?.length > 0) {
-                setHost(players.find(player => player.username === username).isHost);
+                setHost(players.find(player => player.username === userData.username).isHost);
             }
         });
 
@@ -43,7 +45,7 @@ function Room() {
             setIsDrawing(false);
         });
 
-    }, [players, isHost, isDrawing, gameStart, gameData, username, word]);
+    }, [players, isHost, isDrawing, gameStart, gameData, userData, word]);
     return (
         <>
             <Header />
@@ -51,14 +53,14 @@ function Room() {
                 <FlexContainer>
                     {gameStart && 
                         <>
-                        <Scoreboard this_username={username} gameData={gameData} isHost={isHost} />
+                        <Scoreboard userData={userData} gameData={gameData} isHost={isHost} />
                         <Canvas ref={canvasRef} gameData={gameData} isDrawing={isDrawing} word={word} sendToSocket/>
                         </>
                     }
                     {!gameStart && 
-                        <Lobby this_username={username} players={players} isHost={isHost} />
+                        <Lobby userData={userData} players={players} isHost={isHost} />
                     }
-                    <Chat roomId={roomId} username={username} />
+                    <Chat roomId={roomId} username={userData.username} />
                 </FlexContainer>
             </Container>
         </>
