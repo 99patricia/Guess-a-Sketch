@@ -5,7 +5,7 @@ import { socket } from "service/socket";
 import { CanvasFooter, CanvasHeader } from "components/Canvas/";
 
 const StyledCanvasContainer = styled.div`
-    width: ${(props) => (props.width ? props.width + "px" : "500px")};
+    // width: ${(props) => (props.width ? props.width + "px" : "500px")};
 
     ${(props) =>
         !props.noContainer &&
@@ -175,8 +175,8 @@ const Canvas = React.forwardRef((props, ref) => {
                 />
             )}
             <StyledCanvas
-                width={props.width || "500"}
-                height={props.height || "400"}
+                // width={props.width || "500"}
+                // height={props.height || "400"}
                 ref={canvasRef}
             ></StyledCanvas>
             <CanvasFooter 

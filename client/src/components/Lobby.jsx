@@ -1,11 +1,8 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { socket } from "service/socket";
 
-import { useUserData } from "hooks";
 import { Button } from "components";
-
-import default_user_image from "../images/default_user.png";
 
 const LobbyContainer = styled.div`
     background-color: var(--light-beige);
@@ -38,10 +35,7 @@ const UserCard = styled.div`
     justify-content: center;
     padding: 0.1rem;
     height: 8rem;
-
-    // border: 1px solid black;
     border-radius: 1rem;
-    // box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const HoverButton = styled.button`
@@ -89,6 +83,13 @@ const LobbyFooter = styled.div`
     align-items: center;
     justify-content: center;
 `;
+
+const StyledText = styled.p`
+    margin: 0;
+    color: ${(props) =>
+        props.secondary ? "var(--secondary)" : "var(--primary)"};
+`;
+
 function Lobby(props) {
     const { userData, players, host } = { ...props };
 
@@ -99,7 +100,7 @@ function Lobby(props) {
     }
 
     function kickPlayer(username) {
-        socket.emit("kick-player", (username));
+        socket.emit("kick-player", username);
     }
 
     if (!players) {
@@ -114,34 +115,23 @@ function Lobby(props) {
             <UserCardList>
                 {players.map(({ username, isHost, avatar }) => (
                     <UserCard key={username}>
-                        {(host && username !== userData.username) && 
+                        {host && username !== userData.username && (
                             <HoverButton onClick={() => kickPlayer(username)}>
                                 Kick
-                            </HoverButton> 
-                        }
+                            </HoverButton>
+                        )}
                         {username === userData.username && (
                             <>
                                 <ThisUserImage src={avatar} />
                                 <h3 style={{ margin: "5px" }}>
-                                    {isHost && (
-                                        <p
-                                            style={{
-                                                margin: "0",
-                                                color: "var(--secondary)",
-                                            }}
-                                        >
+                                    {isHost ? (
+                                        <StyledText secondary>
                                             {username} (host)
-                                        </p>
-                                    )}
-                                    {!isHost && (
-                                        <p
-                                            style={{
-                                                margin: "0",
-                                                color: "var(--secondary)",
-                                            }}
-                                        >
+                                        </StyledText>
+                                    ) : (
+                                        <StyledText secondary>
                                             {username}
-                                        </p>
+                                        </StyledText>
                                     )}
                                 </h3>
                             </>
@@ -150,25 +140,12 @@ function Lobby(props) {
                             <>
                                 <UserImage src={avatar} />
                                 <h3 style={{ margin: "5px" }}>
-                                    {isHost && (
-                                        <p
-                                            style={{
-                                                margin: "0",
-                                                color: "var(--primary)",
-                                            }}
-                                        >
+                                    {isHost ? (
+                                        <StyledText>
                                             {username} (host)
-                                        </p>
-                                    )}
-                                    {!isHost && (
-                                        <p
-                                            style={{
-                                                margin: "0",
-                                                color: "var(--primary)",
-                                            }}
-                                        >
-                                            {username}
-                                        </p>
+                                        </StyledText>
+                                    ) : (
+                                        <StyledText>{username}</StyledText>
                                     )}
                                 </h3>
                             </>
@@ -178,17 +155,11 @@ function Lobby(props) {
             </UserCardList>
             <LobbyFooter>
                 {host && (
-                    <Button
-                        style={{ display: "block", margin: "auto" }}
-                        noShadow
-                        onClick={startGame}
-                    >
+                    <Button noShadow onClick={startGame}>
                         Start
                     </Button>
                 )}
-                {!host && (
-                    <p style={{paddingTop:'0.5rem'}}>Waiting for the host to start the game...</p>
-                )}
+                {!host && <p>Waiting for the host to start the game...</p>}
             </LobbyFooter>
         </LobbyContainer>
     );

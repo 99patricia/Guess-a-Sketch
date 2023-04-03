@@ -26,8 +26,8 @@ function CreateRoomPage() {
         const username = localStorage.getItem("username") || "guest";
         const room = {
             roomId,
-            "username": userData.username,
-            "avatar": userData.avatar,
+            username: userData.username,
+            avatar: userData.avatar,
             numberOfPlayers,
             drawTime,
             numberOfRounds,
@@ -45,7 +45,7 @@ function CreateRoomPage() {
             <Header />
             <Container>
                 <Form
-                    className={`${isDesktop ? "grid-form" : ""}`}
+                    className={`${isDesktop ? "grid-form" : "flex-form"}`}
                     onSubmit={handleJoinRoom}
                 >
                     <FormInput
