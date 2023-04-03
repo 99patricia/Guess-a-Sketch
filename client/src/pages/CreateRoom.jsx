@@ -22,7 +22,7 @@ function CreateRoom() {
         axios
             .get(`/wordbank/${userData.uid}`)
             .then((res) => setWordbankNames(res.data));
-    }, [wordbankNames, userData]);
+    }, [setWordbankNames, userData]);
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
