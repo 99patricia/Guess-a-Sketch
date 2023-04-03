@@ -11,7 +11,6 @@ import {
     users,
     wordbank,
 } from "./routes/index.js";
-import axios from "axios";
 
 const PORT = process.env.PORT || 3001;
 
@@ -261,7 +260,7 @@ io.on("connection", async (socket) => {
                 room.wordbankContent
             );
             games.push(game);
-            console.log(game)
+            console.log(game);
 
             player = game.players.find((player) => player.username == username);
 
