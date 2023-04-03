@@ -19,14 +19,9 @@ function CreateRoom() {
     const [chosenCategory, setChosenCategory] = useState("");
 
     useEffect(() => {
-        axios.get(`/wordbank/${userData.uid}`).then((res) => {
-            const names = res.data;
-            // for (let i = 0; i < names.length; i++) {
-            //     names[i] = names[i].replace("__GLOBAL", "");
-            // }
-
-            setWordbankNames(names);
-        });
+        axios
+            .get(`/wordbank/${userData.uid}`)
+            .then((res) => setWordbankNames(res.data));
     }, [wordbankNames, userData]);
 
     var roomId = "";
@@ -99,9 +94,10 @@ function CreateRoom() {
                         onChange={(e) => setChosenCategory(e.target.value)}
                         select
                     >
-                        {wordbankNames.map((name) => (
-                            <option key={name}>{name}</option>
-                        ))}
+                        {wordbankNames.map((name) => {
+                            const displayName = name.replace("__GLOBAL", "");
+                            return <option key={name}>{displayName}</option>;
+                        })}
                     </FormInput>
                     <Button fullWidth column type="submit">
                         Create

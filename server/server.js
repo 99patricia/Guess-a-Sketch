@@ -261,6 +261,7 @@ io.on("connection", async (socket) => {
                 room.wordbankContent
             );
             games.push(game);
+            console.log(game)
 
             player = game.players.find((player) => player.username == username);
 
