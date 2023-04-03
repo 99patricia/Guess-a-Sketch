@@ -3,12 +3,14 @@ import { socket } from "service/socket";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
+import { useUserData } from "hooks";
 
 function CreateRoomPage() {
     const navigate = useNavigate();
     const [numberOfPlayers, setNumberOfPlayers] = useState(2); // Default to 2 players
     const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
+    const { userData } = useUserData();
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -21,7 +23,8 @@ function CreateRoomPage() {
         const username = localStorage.getItem("username") || "guest";
         const room = {
             roomId,
-            username,
+            "username": userData.username,
+            "avatar": userData.avatar,
             numberOfPlayers,
             drawTime,
             numberOfRounds,

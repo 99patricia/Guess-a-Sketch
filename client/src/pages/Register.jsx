@@ -90,6 +90,7 @@ function Register() {
                             <StyledLabel>Avatar</StyledLabel>
                             <Canvas
                                 ref={canvasRef}
+                                isDrawing={true}
                                 width={334}
                                 height={334}
                                 noContainer

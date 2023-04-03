@@ -27,7 +27,7 @@ const StyledCanvas = styled.canvas`
 
 const Canvas = React.forwardRef((props, ref) => {
     const canvasRef = ref;
-    const { timeLeft, currentTurn, isDrawing, word, sendToSocket } = {
+    const { gameData, isDrawing, word, sendToSocket } = {
         ...props,
     };
 
@@ -36,6 +36,8 @@ const Canvas = React.forwardRef((props, ref) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
         const mainWindow = document.querySelector("html");
+        const canDraw = isDrawing;
+        console.log("can draw", canDraw);
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -78,12 +80,18 @@ const Canvas = React.forwardRef((props, ref) => {
             // Mouse is clicked, set drawing flag to true and update current coordinates
             drawing = true;
             updateCoords(e);
+            lastCoord.x =
+                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
+            lastCoord.y =
+                (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
         };
 
         const onMouseUp = (e) => {
             // Mouse is up, set drawing flag to false
             if (!drawing) return;
             drawing = false;
+            if (canDraw===false) return;
+            console.log("inside function can draw", canDraw);
 
             // Draw the path from current coordinates to final mouse position
             draw(
@@ -98,7 +106,7 @@ const Canvas = React.forwardRef((props, ref) => {
         };
 
         const onMouseMove = (e) => {
-            if (!drawing) return;
+            if (!drawing || canDraw===false) return;
 
             // Draw the path from current coordinates to mouse position while mouse is moving
             draw(
@@ -116,6 +124,11 @@ const Canvas = React.forwardRef((props, ref) => {
                 (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
         };
 
+        canvas.removeEventListener("mousedown", onMouseDown);
+        canvas.removeEventListener("mouseup", onMouseUp);
+        canvas.removeEventListener("mouseout", onMouseUp);
+        canvas.removeEventListener("mousemove", onMouseMove);
+
         // Mouse event listeners
         canvas.addEventListener("mousedown", onMouseDown);
         canvas.addEventListener("mouseup", onMouseUp);
@@ -129,11 +142,25 @@ const Canvas = React.forwardRef((props, ref) => {
 
         // If we receive coordinates from socket, draw them
         if (sendToSocket) {
+            socket.off("draw");
             socket.on("draw", (data) => {
                 draw(data.x0, data.y0, data.x1, data.y1);
+                console.log("draw");
             });
         }
-    }, [canvasRef, sendToSocket]);
+
+        return () => {
+            canvas.removeEventListener("mousedown", onMouseDown);
+            canvas.removeEventListener("mouseup", onMouseUp);
+            canvas.removeEventListener("mouseout", onMouseUp);
+            canvas.removeEventListener("mousemove", onMouseMove);
+
+            canvas.removeEventListener("touchstart", onMouseDown);
+            canvas.removeEventListener("touchend", onMouseUp);
+            canvas.removeEventListener("touchcancel", onMouseUp);
+            canvas.removeEventListener("touchmove", onMouseMove);
+        }
+    }, [canvasRef, sendToSocket, isDrawing]);
 
     return (
         <StyledCanvasContainer
@@ -142,8 +169,7 @@ const Canvas = React.forwardRef((props, ref) => {
         >
             {sendToSocket && (
                 <CanvasHeader
-                    timeLeft={timeLeft}
-                    currentTurn={currentTurn}
+                    gameData={gameData}
                     isDrawing={isDrawing}
                     word={word}
                 />
@@ -153,7 +179,11 @@ const Canvas = React.forwardRef((props, ref) => {
                 height={props.height || "400"}
                 ref={canvasRef}
             ></StyledCanvas>
-            <CanvasFooter canvasRef={canvasRef} sendToSocket={sendToSocket} />
+            <CanvasFooter 
+                canvasRef={canvasRef} 
+                sendToSocket={sendToSocket} 
+                isDrawing={isDrawing}
+            />
         </StyledCanvasContainer>
     );
 });

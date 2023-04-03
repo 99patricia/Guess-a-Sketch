@@ -1,9 +1,11 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
 
 const CanvasHeaderContainer = styled.div`
     display: grid;
-    // grid-template-columns: 200px 200px;
-    grid-template-columns: repeat(auto-fill,minmax(200px, 1fr));
+    // grid-template-columns: 150px 50px 150px;
+    grid-template-columns: repeat(auto-fit,minmax(100px, 1fr));
     align-items: center;
     // text-align: center;
     margin: 0;
@@ -13,13 +15,28 @@ const CanvasHeaderContainer = styled.div`
 
 function GameHeader(props) {
 
-    const { timeLeft, currentTurn, isDrawing, word } = { ...props };
+    const { gameData, isDrawing, word } = { ...props };
+
+    const currentTurn = gameData.currentTurn;
+    const numRounds = gameData.numberOfRounds;
+    const currentRound = gameData.currentRound;
+    const [timeLeft, setTimeLeft] = useState('0');
+
+    useEffect(() => {
+        socket.off("timer");
+        socket.on("timer", (data) => {
+            setTimeLeft(data);
+        });
+    }, [timeLeft]);
 
     return (
         <CanvasHeaderContainer>
+            <p style={{textAlign:'left'}}>Round {currentRound} of {numRounds}</p>
             <p style={{textAlign:'left'}}>Time Left: {timeLeft}</p>
             {isDrawing && 
-                <p style={{textAlign:'right'}}>Your word is {word}.</p>
+                <p style={{textAlign:'right'}}>Your word is 
+                <span style={{color: 'var(--secondary)'}}> {word}</span>
+                </p>
             }
             {!isDrawing &&
                 <p style={{textAlign:'right'}}>{currentTurn} is drawing...</p>

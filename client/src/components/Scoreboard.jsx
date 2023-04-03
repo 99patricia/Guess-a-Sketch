@@ -15,28 +15,15 @@ const ScoreboardList = styled.div`
     height: 100%;
 `;
 
-const ScoreboardCard = styled.div`
-    display: grid;
-    grid-template-columns: 130px 60px;
-    align-items: center;
-    text-align: center;
-    
-    background-color: var(--light-beige);
-    border-radius: 0.25rem;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-
-    // outline: 2px solid var(--seconday);
-`;
-
 const scoreboardCardStyle = {
     'display': 'grid',
-    'grid-template-columns': '130px 60px',
-    'align-items': 'center',
-    'text-align': 'center',
+    'gridTemplateColumns': '130px 60px',
+    'alignItems': 'center',
+    'textAlign': 'center',
     
-    'background-color': 'var(--light-beige)',
-    'border-radius': '0.25rem',
-    'box-shadow': '0px 4px 4px rgba(0, 0, 0, 0.1)',
+    'backgroundColor': 'var(--light-beige)',
+    'borderRadius': '0.25rem',
+    'boxShadow': '0px 4px 4px rgba(0, 0, 0, 0.1)',
 }
 
 const UserImage = styled.img`
@@ -48,14 +35,14 @@ const UserImage = styled.img`
 `;
 
 function Scoreboard(props) {
-    const { gameData, isHost, this_username } = { ...props };
+    const { userData, gameData, isHost } = { ...props };
 
     return (
         <ScoreboardContainer>
             <ScoreboardList>
-                {gameData.players.map(({username, score, isHost, hasGuessed}) => (
-                    <div style={{...scoreboardCardStyle, ...{outline : username==gameData.currentTurn? '2px solid var(--secondary)' : '0'}}}>
-                        {username === this_username && 
+                {gameData.players.map(({username, avatar, score, isHost, hasGuessed}) => (
+                    <div style={{...scoreboardCardStyle, ...{outline : username===gameData.currentTurn? '2px solid var(--secondary)' : '0'}}}>
+                        {username === userData.username && 
                             <div>
                                 <p style={{margin: '0', color: 'var(--secondary)'}}>
                                     {username} <br></br>
@@ -63,7 +50,7 @@ function Scoreboard(props) {
                                 </p>
                             </div>
                         }
-                        {username !== this_username &&
+                        {username !== userData.username &&
                             <div>
                                 <p style={{margin: '0', color: 'var(--primary)'}}>
                                     {username} <br></br>
@@ -71,7 +58,7 @@ function Scoreboard(props) {
                                 </p>
                             </div>
                         }
-                        <UserImage src={default_user_image} />
+                        <UserImage src={avatar} />
                     </div>
                 ))}
             </ScoreboardList>
