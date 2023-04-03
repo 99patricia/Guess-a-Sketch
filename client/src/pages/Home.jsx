@@ -10,7 +10,7 @@ import {
     Form,
     FormInput,
 } from "components";
-import { CreateRoomPage } from "pages";
+
 import { useUserData } from "hooks";
 
 function Home() {
@@ -21,7 +21,6 @@ function Home() {
     const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     const createRoomButtonRef = useRef();
-    const [showCreateRoomPage, setShowCreateRoomPage] = useState(false);
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
@@ -33,8 +32,8 @@ function Home() {
             // const username = localStorage.getItem("username");
             const room = {
                 roomId,
-                "username": userData.username,
-                "avatar": userData.avatar,
+                username: userData.username,
+                avatar: userData.avatar,
             };
             socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {
@@ -52,13 +51,11 @@ function Home() {
         const button = createRoomButtonRef.current;
         button.addEventListener("click", (e) => {
             e.preventDefault();
-            setShowCreateRoomPage(true);
+            navigate("/createRoom");
         });
     }, [isLoggedIn, loggedInAsGuest, navigate]);
 
-    return showCreateRoomPage ? (
-        <CreateRoomPage />
-    ) : (
+    return (
         <>
             <Header />
             <Container>

@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { socket } from "service/socket";
 import { Desktop } from "service/mediaQueries";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
 import { useUserData } from "hooks";
+import axios from "axios";
 
-function CreateRoomPage() {
+function CreateRoom() {
     const navigate = useNavigate();
     const isDesktop = Desktop();
 
@@ -14,6 +15,19 @@ function CreateRoomPage() {
     const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
     const { userData } = useUserData();
+    const [wordbankNames, setWordbankNames] = useState([]);
+    // let wordbankNames = [];
+
+    useEffect(() => {
+        axios.get(`/wordbank/${userData.uid}`).then((res) => {
+            const names = res.data;
+            for (let i = 0; i < names.length; i++) {
+                names[i] = names[i].replace("__GLOBAL", "");
+            }
+
+            setWordbankNames(names);
+        });
+    }, [wordbankNames, userData]);
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -74,9 +88,9 @@ function CreateRoomPage() {
                         type="number"
                     />
                     <FormInput
-                        textArea
-                        label="Custom words"
-                        placeholder="Define any custom words here separated by a , (comma)"
+                        label="Category"
+                        options={wordbankNames}
+                        select
                     />
                     <Button fullWidth column type="submit">
                         Create
@@ -87,4 +101,4 @@ function CreateRoomPage() {
     );
 }
 
-export default CreateRoomPage;
+export default CreateRoom;
