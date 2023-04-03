@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import { Desktop } from "service/mediaQueries";
 
 import { StyledLabel } from "components/FormInput";
 import {
@@ -8,11 +9,11 @@ import {
     Canvas,
     Header,
     Container,
-    CustomLink,
     ErrorMessage,
     Form,
     FormInput,
 } from "components";
+import { Link } from "react-router-dom";
 
 const StyledMessage = styled.div`
     background-color: var(--light-beige);
@@ -22,7 +23,14 @@ const StyledMessage = styled.div`
     margin: 0 auto;
 `;
 
+const StyledLink = styled(Link)`
+    text-align: center;
+    color: var(--primary);
+`;
+
 function Register() {
+    const isDesktop = Desktop();
+
     const canvasRef = useRef();
     const submitButtonRef = useRef();
 
@@ -83,7 +91,7 @@ function Register() {
                     <StyledMessage>{message}</StyledMessage>
                 ) : (
                     <>
-                        <Form className="grid-form">
+                        <Form className={`${isDesktop ? "grid-form" : "flex-form"}`}>
                             {errorMessage && (
                                 <ErrorMessage>{errorMessage}</ErrorMessage>
                             )}
@@ -120,9 +128,9 @@ function Register() {
                             >
                                 Submit
                             </Button>
-                            <CustomLink to="/login">
+                            <StyledLink to="/login">
                                 Already have an account? Sign in
-                            </CustomLink>
+                            </StyledLink>
                         </Form>
                     </>
                 )}

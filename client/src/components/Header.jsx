@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { SideDrawer } from "components";
 import { useUserData } from "hooks";
 
-
 const StyledHeader = styled.div`
     background-color: var(--primary);
     width: 100%;
@@ -12,8 +11,6 @@ const StyledHeader = styled.div`
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    margin-bottom: 100px;
-    padding: 0 1.8rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     z-index: 1;

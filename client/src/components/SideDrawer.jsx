@@ -16,6 +16,7 @@ const StyledNavButton = styled(IconButton)`
 `;
 
 const StyledSideDrawer = styled.div`
+    z-index: 1;
     background-color: var(--light-beige);
     height: 100vh;
     padding: 3rem;
