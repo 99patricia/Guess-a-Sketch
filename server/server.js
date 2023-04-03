@@ -77,14 +77,23 @@ function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime,
                     return;
                 }
                 this.players.splice(index,1);
-                if (this.currentTurn == username) {
+                if (this.currentTurn === username) {
                     this.nextTurn();
                 }
             }
             this.sendGameData();
         },
         'startGame': function() {
-            this.sendGameData();
+            const gameData = {
+                'players': this.players,
+                'host': this.host,
+                'maxNumPlayers': this.maxNumPlayers,
+                'drawTime': this.drawTime,
+                'numberOfRounds': this.numberOfRounds,
+                'currentRound': this.currentRound,
+                'currentTurn': this.currentTurn,
+            }
+            io.to(this.roomId).emit("game-start", (gameData));
 
             this.currentTurn = this.players[0].username;
             this.currentRound = 1;
@@ -135,7 +144,7 @@ function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime,
                 this.currentRound += 1;
                 if (this.currentRound > numberOfRounds) { // end of game
                     this.gameOver = true;
-                    // console.log("game over");
+                    // console.log("sendGameDatagame over");
                     io.to(this.roomId).emit("game-over");
                     io.to(this.roomId).emit("chat-message", {
                         "message": "Game over.",
@@ -175,7 +184,7 @@ function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime,
                 'currentRound': this.currentRound,
                 'currentTurn': this.currentTurn,
             }
-            io.to(this.roomId).emit("game-start", (gameData));
+            io.to(this.roomId).emit("game-data", (gameData));
         },
     };
     return game;
@@ -297,6 +306,12 @@ io.on("connection", async (socket) => {
         io.to(room).emit("players-data", game.players);
     });
 
+    socket.on("kick-player", async (username) => {
+        const socket_id = game.players.find(player => player.username == username).socketId;
+        var sockets = await io.in(game.roomID).fetchSockets();
+        io.to(socket_id).emit("kick-player", (game.roomId));
+    });
+
     socket.on("get-players-data", (data) => {
         io.to(socket.id).emit("players-data", game.players);
     });
@@ -305,7 +320,7 @@ io.on("connection", async (socket) => {
         if (username == game.host) {
             game.startGame();
         }
-    })
+    });
 
     socket.on("chat-message", (msg) => {
         // console.log("Room " + currentRoom + " - " + msg.username + ": " + msg.message);

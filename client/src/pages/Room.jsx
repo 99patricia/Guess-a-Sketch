@@ -26,6 +26,11 @@ function Room() {
             setGameData(data);
         });
 
+        socket.off("game-data");
+        socket.on("game-data", (data) => {
+            setGameData(data);
+        });
+
         socket.off("players-data");
         socket.on("players-data", (data) => {
             setPlayers(data);
@@ -45,6 +50,11 @@ function Room() {
             setIsDrawing(false);
         });
 
+        socket.off("kick-player");
+        socket.on("kick-player", (room_id) => {
+            socket.emit("leave-room", (room_id));
+        });
+
     }, [players, isHost, isDrawing, gameStart, gameData, userData, word]);
     return (
         <>
@@ -58,7 +68,7 @@ function Room() {
                         </>
                     }
                     {!gameStart && 
-                        <Lobby userData={userData} players={players} isHost={isHost} />
+                        <Lobby userData={userData} players={players} host={isHost} />
                     }
                     <Chat roomId={roomId} username={userData.username} />
                 </FlexContainer>
