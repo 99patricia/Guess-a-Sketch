@@ -3,6 +3,7 @@
 
 :root {
     --primary: #294b8a;
+    --primary-dark: #153060;
     --secondary: #f36326;
     --white: #ffffff;
     --light-beige: #f3f3ec;
@@ -63,6 +64,15 @@ input {
     display: flex;
 }
 
+.flex.column {
+    flex-direction: column;
+}
+
+.float-right {
+    float: right;
+    margin-top: 1rem;
+}
+
 .flex-form {
     display: flex;
     flex-direction: column;
@@ -76,7 +86,6 @@ input {
 
 .grid-form > label {
     grid-column: 1/2;
-    margin-bottom: 1rem;
 }
 
 .grid-form > input,
@@ -91,6 +100,8 @@ input {
 
 .grid-form > input,
 .grid-form > textarea,
-.grid-form > button {
+.grid-form > button,
+.grid-form > div,
+.grid-form > a {
     grid-column: 2/3;
 }

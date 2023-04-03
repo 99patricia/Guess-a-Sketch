@@ -7,12 +7,13 @@ import { IconButton } from "components";
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
     padding: 1rem;
+    margin-bottom: 1rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
 `;
 
 function CanvasFooter(props) {
-    const canvasRef = props.canvasRef;
+    const { canvasRef, sendToSocket, isDrawing } = { ...props };
     const clearButtonRef = useRef();
 
     useEffect(() => {
@@ -24,17 +25,27 @@ function CanvasFooter(props) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         };
 
-        const handleClearCanvas = () => {
+        const handleClearCanvas = (e) => {
+            if (!isDrawing) {
+                return;
+            }
+            e.preventDefault();
             clearCanvas();
             // Tell socket to clear the canvas
-            socket.emit("clear-canvas");
+            if (sendToSocket) socket.emit("clear-canvas");
         };
 
         clearButton.addEventListener("click", handleClearCanvas);
 
         // If we receive clear-canvas from socket, clear the canvas
-        socket.on("clear-canvas", clearCanvas);
-    }, [canvasRef]);
+        if (sendToSocket) {
+            socket.off("clear-canvas");
+             socket.on("clear-canvas", clearCanvas);
+        }
+        return () => {
+            clearButton.removeEventListener("click", handleClearCanvas);
+        }
+    }, [canvasRef, sendToSocket, isDrawing]);
 
     return (
         <StyledCanvasFooter>

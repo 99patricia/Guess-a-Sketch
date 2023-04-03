@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const StyledLabel = styled.label`
+export const StyledLabel = styled.label`
     text-align: center;
     text-transform: uppercase;
     font-size: 1.5rem;
@@ -15,9 +15,9 @@ const StyledInput = styled.input`
     border: 1px solid var(--beige);
     font-size: 1.2rem;
     color: var(--primary);
+
     margin-bottom: 2rem;
     width: 100%;
-
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

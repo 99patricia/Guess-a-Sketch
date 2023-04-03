@@ -11,26 +11,32 @@ import {
     FormInput,
 } from "components";
 import { CreateRoomPage } from "pages";
+import { useUserData } from "hooks";
 
 function Home() {
-    const [roomId, setRoomId] = useState("");
-    const [nickname, setNickname] = useState("");
-    const [showErrorMessage, setShowErrorMessage] = useState("");
-
     const navigate = useNavigate();
+
+    const [roomId, setRoomId] = useState("");
+    const [showErrorMessage, setShowErrorMessage] = useState("");
+    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     const createRoomButtonRef = useRef();
     const [showCreateRoomPage, setShowCreateRoomPage] = useState(false);
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
-        localStorage.setItem("nickname", nickname);
         socket.room = roomId;
 
         if (roomId === "") {
             setShowErrorMessage("Room code cannot be empty");
         } else {
-            socket.emit("join-room", roomId);
+            // const username = localStorage.getItem("username");
+            const room = {
+                roomId,
+                "username": userData.username,
+                "avatar": userData.avatar,
+            };
+            socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {
                 setShowErrorMessage(data.msg);
             });
@@ -41,12 +47,14 @@ function Home() {
     };
 
     useEffect(() => {
+        if (!(isLoggedIn || loggedInAsGuest)) navigate("/login");
+
         const button = createRoomButtonRef.current;
         button.addEventListener("click", (e) => {
             e.preventDefault();
             setShowCreateRoomPage(true);
         });
-    }, []);
+    }, [isLoggedIn, loggedInAsGuest, navigate]);
 
     return showCreateRoomPage ? (
         <CreateRoomPage />
@@ -64,13 +72,6 @@ function Home() {
                         type="text"
                         onChange={(e) => setRoomId(e.target.value)}
                         value={roomId}
-                    ></FormInput>
-                    <FormInput
-                        label="Nickname"
-                        placeholder="Enter nickname"
-                        type="text"
-                        onChange={(e) => setNickname(e.target.value)}
-                        value={nickname}
                     ></FormInput>
                     <Button column fullWidth type="submit">
                         Join

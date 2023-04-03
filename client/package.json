@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:3001",
-  "_prodproxy": "https://server-nimbe3rria-uc.a.run.app/",
+  "_prodproxy": "https://guess-a-sketch-cloud-run-nimbe3rria-uc.a.run.app/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
