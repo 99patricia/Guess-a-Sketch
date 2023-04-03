@@ -96,7 +96,11 @@ function CreateRoom() {
                     >
                         {wordbankNames.map((name) => {
                             const displayName = name.replace("__GLOBAL", "");
-                            return <option key={name}>{displayName}</option>;
+                            return (
+                                <option key={name} label={displayName}>
+                                    {name}
+                                </option>
+                            );
                         })}
                     </FormInput>
                     <Button fullWidth column type="submit">
