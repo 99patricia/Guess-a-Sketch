@@ -98,9 +98,10 @@ function SideDrawer(props) {
                     </div>
                 )}
                 <div className="flex column">
-                    <StyledNavLink to="/">Home</StyledNavLink>
                     <StyledNavLink to="/">Join a game</StyledNavLink>
-                    <StyledNavLink to="/">Create a room</StyledNavLink>
+                    <StyledNavLink to="/createRoom">
+                        Create a room
+                    </StyledNavLink>
                     {isLoggedIn || loggedInAsGuest ? (
                         <StyledNavLink onClick={handleLogout}>
                             Logout
