@@ -10,7 +10,7 @@ const LobbyContainer = styled.div`
     border-radius: 1rem;
     width: 500px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-
+    min-height: 70vh;
     display: flex;
     flex-flow: column;
 `;
@@ -23,9 +23,7 @@ const UserCardList = styled.div`
     padding: 0.25rem;
     height: 100%;
     overflow: auto;
-
     border-radius: 1rem;
-    // border: 2px solid var(--primary);
 `;
 
 const UserCard = styled.div`

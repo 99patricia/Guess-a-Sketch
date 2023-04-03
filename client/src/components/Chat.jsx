@@ -9,6 +9,7 @@ const StyledChat = styled.div`
     padding: 1rem;
     border-radius: 1rem;
     display: flex;
+    max-height: 70vh;
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
