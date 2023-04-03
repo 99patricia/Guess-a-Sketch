@@ -5,8 +5,6 @@ import { socket } from "service/socket";
 import { CanvasFooter, CanvasHeader } from "components/Canvas/";
 
 const StyledCanvasContainer = styled.div`
-    // width: ${(props) => (props.width ? props.width + "px" : "500px")};
-
     ${(props) =>
         !props.noContainer &&
         `
@@ -37,7 +35,11 @@ const Canvas = React.forwardRef((props, ref) => {
         const ctx = canvas.getContext("2d");
         const mainWindow = document.querySelector("html");
         const canDraw = isDrawing;
-        console.log("can draw", canDraw);
+
+        // Resize canvas
+        const canvasParentWidth = canvas.parentElement.clientWidth;
+        canvas.width = canvasParentWidth;
+        canvas.height = canvasParentWidth;
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -90,8 +92,7 @@ const Canvas = React.forwardRef((props, ref) => {
             // Mouse is up, set drawing flag to false
             if (!drawing) return;
             drawing = false;
-            if (canDraw===false) return;
-            console.log("inside function can draw", canDraw);
+            if (canDraw === false) return;
 
             // Draw the path from current coordinates to final mouse position
             draw(
@@ -106,7 +107,7 @@ const Canvas = React.forwardRef((props, ref) => {
         };
 
         const onMouseMove = (e) => {
-            if (!drawing || canDraw===false) return;
+            if (!drawing || canDraw === false) return;
 
             // Draw the path from current coordinates to mouse position while mouse is moving
             draw(
@@ -145,7 +146,6 @@ const Canvas = React.forwardRef((props, ref) => {
             socket.off("draw");
             socket.on("draw", (data) => {
                 draw(data.x0, data.y0, data.x1, data.y1);
-                console.log("draw");
             });
         }
 
@@ -159,7 +159,7 @@ const Canvas = React.forwardRef((props, ref) => {
             canvas.removeEventListener("touchend", onMouseUp);
             canvas.removeEventListener("touchcancel", onMouseUp);
             canvas.removeEventListener("touchmove", onMouseMove);
-        }
+        };
     }, [canvasRef, sendToSocket, isDrawing]);
 
     return (
@@ -174,14 +174,10 @@ const Canvas = React.forwardRef((props, ref) => {
                     word={word}
                 />
             )}
-            <StyledCanvas
-                // width={props.width || "500"}
-                // height={props.height || "400"}
-                ref={canvasRef}
-            ></StyledCanvas>
-            <CanvasFooter 
-                canvasRef={canvasRef} 
-                sendToSocket={sendToSocket} 
+            <StyledCanvas ref={canvasRef}></StyledCanvas>
+            <CanvasFooter
+                canvasRef={canvasRef}
+                sendToSocket={sendToSocket}
                 isDrawing={isDrawing}
             />
         </StyledCanvasContainer>

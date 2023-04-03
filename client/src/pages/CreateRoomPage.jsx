@@ -33,11 +33,9 @@ function CreateRoomPage() {
             numberOfRounds,
         };
         socket.emit("create-room", room);
-        socket.on("create-room-success", (data) => {
-            console.log(data);
+        socket.on("create-room-success", () => {
+            navigate(`/room/${roomId}`);
         });
-
-        navigate(`/room/${roomId}`);
     };
 
     return (
