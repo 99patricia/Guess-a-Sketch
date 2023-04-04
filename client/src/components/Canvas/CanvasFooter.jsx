@@ -76,19 +76,24 @@ function CanvasFooter(props) {
     const { canvasRef, sendToSocket, isDrawing } = { ...props };
     const clearButtonRef = useRef();
 
+    const drawingInGame = isDrawing || !sendToSocket;
+
     const handleChangePenSize = (e) => {
+        if (!drawingInGame) return;
         e.preventDefault();
         setPenSize(e.target.value);
         localStorage.setItem("penSize", e.target.value);
     };
 
     const handleChangeColor = (e) => {
+        if (!drawingInGame) return;
         e.preventDefault();
         setPenColor(e.target.getAttribute("color"));
         localStorage.setItem("penColor", e.target.getAttribute("color"));
     };
 
     const handlePenTool = (e) => {
+        if (!drawingInGame) return;
         e.preventDefault();
         if (penColor === "white") {
             setPenColor("black");
@@ -98,6 +103,7 @@ function CanvasFooter(props) {
     };
 
     const handleEraserTool = (e) => {
+        if (!drawingInGame) return;
         e.preventDefault();
         setPenColor("white");
         localStorage.setItem("penColor", "white");
@@ -114,9 +120,7 @@ function CanvasFooter(props) {
         };
 
         const handleClearCanvas = (e) => {
-            if (!isDrawing && sendToSocket) {
-                return;
-            }
+            if (!drawingInGame) return;
             e.preventDefault();
             clearCanvas();
             // Tell socket to clear the canvas
