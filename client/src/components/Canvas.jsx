@@ -35,11 +35,17 @@ const Canvas = React.forwardRef((props, ref) => {
         const ctx = canvas.getContext("2d");
         const mainWindow = document.querySelector("html");
         const canDraw = isDrawing;
+        const resizeCanvas = gameData === undefined; // resize canvas if not used in game
 
         // Resize canvas
-        const canvasParentWidth = canvas.parentElement.clientWidth;
-        canvas.width = canvasParentWidth;
-        canvas.height = canvasParentWidth;
+        if (resizeCanvas) {
+            const canvasParentWidth = canvas.parentElement.clientWidth;
+            canvas.width = canvasParentWidth;
+            canvas.height = canvasParentWidth;
+        } else {
+            canvas.width = 500;
+            canvas.height = 375;
+        }
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
