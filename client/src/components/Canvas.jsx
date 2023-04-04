@@ -85,6 +85,7 @@ const Canvas = React.forwardRef((props, ref) => {
         };
 
         const onMouseDown = (e) => {
+            e.preventDefault();
             // Mouse is clicked, set drawing flag to true and update current coordinates
             drawing = true;
             updateCoords(e);
@@ -95,6 +96,7 @@ const Canvas = React.forwardRef((props, ref) => {
         };
 
         const onMouseUp = (e) => {
+            e.preventDefault();
             // Mouse is up, set drawing flag to false
             if (!drawing) return;
             drawing = false;
@@ -113,6 +115,7 @@ const Canvas = React.forwardRef((props, ref) => {
         };
 
         const onMouseMove = (e) => {
+            e.preventDefault();
             if (!drawing || canDraw === false) return;
 
             // Draw the path from current coordinates to mouse position while mouse is moving
@@ -151,7 +154,8 @@ const Canvas = React.forwardRef((props, ref) => {
         if (sendToSocket) {
             socket.off("draw");
             socket.on("draw", (data) => {
-                draw(data.x0, data.y0, data.x1, data.y1);
+                // Only receive if we are not the person currently drawing
+                if (!canDraw) draw(data.x0, data.y0, data.x1, data.y1);
             });
         }
 
