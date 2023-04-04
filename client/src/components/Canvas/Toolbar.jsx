@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const StyledToolbar = styled.div``;
@@ -13,6 +13,17 @@ const StyledColor = styled.button`
 `;
 
 function Toolbar(props) {
+    const penSizeRef = useRef();
+
+    useEffect(() => {
+        const penSizeRange = penSizeRef.current;
+
+        penSizeRange.addEventListener("change", (e) => {
+            e.preventDefault();
+            localStorage.setItem("penSize", e.target.value);
+        });
+    }, []);
+
     const handleChangeColor = (e) => {
         e.preventDefault();
         localStorage.setItem("penColor", e.target.getAttribute("color"));
@@ -22,7 +33,13 @@ function Toolbar(props) {
         <StyledToolbar>
             <div>
                 <i className="bi bi-pencil-fill"></i>
-                <input type="range"></input>
+                <input
+                    min={5}
+                    max={25}
+                    step={5}
+                    ref={penSizeRef}
+                    type="range"
+                ></input>
             </div>
             <div>
                 <StyledColor color="green" onClick={handleChangeColor} />
