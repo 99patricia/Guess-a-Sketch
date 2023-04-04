@@ -1,9 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { IconButton } from "components";
-import { Toolbar } from "components/Canvas/";
 
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
@@ -13,9 +12,97 @@ const StyledCanvasFooter = styled.div`
     border-bottom-right-radius: 1rem;
 `;
 
+const StyledToolbar = styled.div`
+    display: grid;
+    grid-auto-flow: column;
+`;
+
+const StyledColor = styled.button`
+    width: 20px;
+    height: 20px;
+    margin: 0.2rem;
+    border-radius: 100%;
+    border: none;
+    cursor: pointer;
+    background-color: ${(props) => props.color};
+`;
+
+const StyledRangeInputContainer = styled.div`
+    background-color: var(--beige);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    height: 30px;
+    margin-top: -120px;
+    position: absolute;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const StyledRangeInput = styled.input`
+    -webkit-appearance: none;
+
+    width: 100%;
+    height: 5px;
+    border-radius: 5px;
+    background: var(--white);
+    outline: none;
+
+    ::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+
+        width: ${(props) => props.value}px;
+        height: ${(props) => props.value}px;
+        border-radius: 50%;
+        background: ${(props) => props.penColor};
+        cursor: pointer;
+    }
+
+    ::-moz-range-thumb {
+        width: ${(props) => props.value}px;
+        height: ${(props) => props.value}px;
+        border-radius: 50%;
+        background: ${(props) => props.penColor};
+        cursor: pointer;
+    }
+`;
+
 function CanvasFooter(props) {
+    const [penSize, setPenSize] = useState(10);
+    const [penColor, setPenColor] = useState("black");
+    const [showPenSize, setShowPenSize] = useState();
+
     const { canvasRef, sendToSocket, isDrawing } = { ...props };
     const clearButtonRef = useRef();
+
+    const handleChangePenSize = (e) => {
+        e.preventDefault();
+        setPenSize(e.target.value);
+        localStorage.setItem("penSize", e.target.value);
+    };
+
+    const handleChangeColor = (e) => {
+        e.preventDefault();
+        setPenColor(e.target.getAttribute("color"));
+        localStorage.setItem("penColor", e.target.getAttribute("color"));
+    };
+
+    const handlePenTool = (e) => {
+        e.preventDefault();
+        if (penColor === "white") {
+            setPenColor("black");
+            localStorage.setItem("penColor", "black");
+        }
+        setShowPenSize(!showPenSize);
+    };
+
+    const handleEraserTool = (e) => {
+        e.preventDefault();
+        setPenColor("white");
+        localStorage.setItem("penColor", "white");
+        setShowPenSize(!showPenSize);
+    };
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -37,7 +124,7 @@ function CanvasFooter(props) {
         };
 
         clearButton.addEventListener("click", handleClearCanvas);
-
+        canvas.addEventListener("click", () => setShowPenSize(false));
         // If we receive clear-canvas from socket, clear the canvas
         if (sendToSocket) {
             socket.off("clear-canvas");
@@ -50,8 +137,42 @@ function CanvasFooter(props) {
 
     return (
         <StyledCanvasFooter>
-            <IconButton ref={clearButtonRef} iconClassName="bi-eraser-fill" />
-            <Toolbar />
+            <StyledToolbar>
+                <div>
+                    <IconButton
+                        ref={clearButtonRef}
+                        iconClassName="bi-trash-fill"
+                    />
+                    <IconButton
+                        iconClassName="bi-eraser-fill"
+                        onClick={handleEraserTool}
+                    />
+                    <IconButton
+                        iconClassName="bi-pencil-fill"
+                        onClick={handlePenTool}
+                    />
+                    {showPenSize && (
+                        <StyledRangeInputContainer>
+                            <StyledRangeInput
+                                penColor={penColor}
+                                min={10}
+                                max={50}
+                                step={10}
+                                value={penSize}
+                                onChange={handleChangePenSize}
+                                type="range"
+                            />
+                        </StyledRangeInputContainer>
+                    )}
+                </div>
+                <div>
+                    <StyledColor color="black" onClick={handleChangeColor} />
+                    <StyledColor color="green" onClick={handleChangeColor} />
+                    <StyledColor color="blue" onClick={handleChangeColor} />
+                    <StyledColor color="red" onClick={handleChangeColor} />
+                    <StyledColor color="orange" onClick={handleChangeColor} />
+                </div>
+            </StyledToolbar>
         </StyledCanvasFooter>
     );
 }

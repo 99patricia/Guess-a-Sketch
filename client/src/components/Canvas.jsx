@@ -24,6 +24,10 @@ const StyledCanvas = styled.canvas`
 `;
 
 const Canvas = React.forwardRef((props, ref) => {
+    // Clear pen size and color when canvas is first rendered
+    localStorage.setItem("penSize", 10);
+    localStorage.setItem("penColor", "black");
+
     const canvasRef = ref;
     const { gameData, isDrawing, word, sendToSocket } = {
         ...props,
@@ -104,7 +108,7 @@ const Canvas = React.forwardRef((props, ref) => {
             if (!drawing) return;
             drawing = false;
             if (canDraw === false) return;
-            const penSize = localStorage.getItem("penSize") || 5;
+            const penSize = localStorage.getItem("penSize") || 10;
             const penColor = localStorage.getItem("penColor") || "black";
             // Draw the path from current coordinates to final mouse position
             draw(

@@ -11,6 +11,7 @@ const StyledIconButton = styled.button`
     cursor: pointer;
     z-index: 3;
     position: relative;
+    margin: 0.3rem;
 `;
 
 const IconButton = React.forwardRef((props, ref) => {
