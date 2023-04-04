@@ -91,7 +91,7 @@ function Room() {
                                 <Scoreboard
                                     userData={userData}
                                     gameData={gameData}
-                                    isHost={isHost}
+                                    host={isHost}
                                 />
                                 <Canvas
                                     ref={canvasRef}

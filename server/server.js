@@ -194,6 +194,7 @@ function makeGame(
             this.sendGameData();
         },
         sendGameData: function () {
+            if (this.gameOver) return;
             const gameData = {
                 players: this.players,
                 host: this.host,
