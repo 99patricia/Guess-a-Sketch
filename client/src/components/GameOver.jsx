@@ -31,11 +31,9 @@ const GameOverHeader = styled.div`
 const UserCardList = styled.div`
     display: grid;
     grid-template-columns: repeat(2, minmax(8rem, 1fr));
-    grid-template-rows: 1fr 1fr;
-    grid-gap: 1rem;
+    grid-template-rows: 55% 40%;
     padding: 0.25rem;
     height: 100%;
-    padding-top: 2rem;
     border-radius: 1rem;
     overflow: hidden;
 `;
@@ -46,7 +44,7 @@ const UserCard1 = styled.div`
     align-items: center;
     justify-content: center;
     padding: 0.1rem;
-    height: 13rem;
+    height: flex;
     border-radius: 1rem;
 
     grid-column-start: 1;
@@ -59,7 +57,7 @@ const UserCard = styled.div`
     align-items: center;
     justify-content: center;
     padding: 0.1rem;
-    height: 11rem;
+    height: flex;
     border-radius: 1rem;
 `;
 
@@ -67,6 +65,8 @@ const UserImage = styled.img`
     display: block;
     border-radius: 50%;
     overflow: auto;
+    max-width: 50%;
+    max-height: 50%;
 
     border: 2px solid var(--primary);
 `;
