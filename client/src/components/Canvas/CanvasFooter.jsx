@@ -26,7 +26,7 @@ function CanvasFooter(props) {
         };
 
         const handleClearCanvas = (e) => {
-            if (!isDrawing) {
+            if (!isDrawing && sendToSocket) {
                 return;
             }
             e.preventDefault();
@@ -40,11 +40,11 @@ function CanvasFooter(props) {
         // If we receive clear-canvas from socket, clear the canvas
         if (sendToSocket) {
             socket.off("clear-canvas");
-             socket.on("clear-canvas", clearCanvas);
+            socket.on("clear-canvas", clearCanvas);
         }
         return () => {
             clearButton.removeEventListener("click", handleClearCanvas);
-        }
+        };
     }, [canvasRef, sendToSocket, isDrawing]);
 
     return (
