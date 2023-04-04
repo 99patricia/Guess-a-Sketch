@@ -1,16 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { socket } from "service/socket";
+import { Desktop } from "service/mediaQueries";
 import { useNavigate } from "react-router-dom";
 
 import { Button, Header, Container, Form, FormInput } from "components";
 import { useUserData } from "hooks";
+import axios from "axios";
 
-function CreateRoomPage() {
+function CreateRoom() {
     const navigate = useNavigate();
+    const isDesktop = Desktop();
+
     const [numberOfPlayers, setNumberOfPlayers] = useState(2); // Default to 2 players
     const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
     const { userData } = useUserData();
+    const [wordbankNames, setWordbankNames] = useState([]);
+    const [chosenCategory, setChosenCategory] = useState("");
+
+    useEffect(() => {
+        axios
+            .get(`/wordbank/${userData.uid}`)
+            .then((res) => setWordbankNames(res.data));
+    }, [setWordbankNames, userData]);
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -18,30 +30,37 @@ function CreateRoomPage() {
         roomId += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    const handleJoinRoom = (e) => {
+    const handleCreateRoom = (e) => {
         e.preventDefault();
-        const username = localStorage.getItem("username") || "guest";
-        const room = {
-            roomId,
-            "username": userData.username,
-            "avatar": userData.avatar,
-            numberOfPlayers,
-            drawTime,
-            numberOfRounds,
-        };
-        socket.emit("create-room", room);
-        socket.on("create-room-success", (data) => {
-            console.log(data);
-        });
 
-        navigate(`/room/${roomId}`);
+        axios
+            .get(`/wordbankcontent/${chosenCategory || wordbankNames[0]}`)
+            .then((res) => {
+                const wordbankContent = res.data;
+                const room = {
+                    roomId,
+                    username: userData.username,
+                    avatar: userData.avatar,
+                    numberOfPlayers,
+                    drawTime,
+                    numberOfRounds,
+                    wordbankContent,
+                };
+                socket.emit("create-room", room);
+                socket.on("create-room-success", () => {
+                    navigate(`/room/${roomId}`);
+                });
+            });
     };
 
     return (
         <>
             <Header />
             <Container>
-                <Form className="grid-form" onSubmit={handleJoinRoom}>
+                <Form
+                    className={`${isDesktop ? "grid-form" : "flex-form"}`}
+                    onSubmit={handleCreateRoom}
+                >
                     <FormInput
                         label="Players"
                         placeholder="Number of players"
@@ -70,11 +89,21 @@ function CreateRoomPage() {
                         type="number"
                     />
                     <FormInput
-                        textArea
-                        label="Custom words"
-                        placeholder="Define any custom words here separated by a , (comma)"
-                    />
-                    <Button column type="submit">
+                        label="Category"
+                        value={chosenCategory}
+                        onChange={(e) => setChosenCategory(e.target.value)}
+                        select
+                    >
+                        {wordbankNames.map((name) => {
+                            const displayName = name.replace("__GLOBAL", "");
+                            return (
+                                <option key={name} label={displayName}>
+                                    {name}
+                                </option>
+                            );
+                        })}
+                    </FormInput>
+                    <Button fullWidth column type="submit">
                         Create
                     </Button>
                 </Form>
@@ -83,4 +112,4 @@ function CreateRoomPage() {
     );
 }
 
-export default CreateRoomPage;
+export default CreateRoom;

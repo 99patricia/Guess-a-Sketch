@@ -9,6 +9,7 @@ const StyledButton = styled.button`
     text-transform: uppercase;
     color: var(--white);
     cursor: pointer;
+    width: ${(props) => (props.fullWidth ? "100%" : "auto")};
 
     padding: 0.8rem 1.2rem;
     display: block;

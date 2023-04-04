@@ -31,43 +31,56 @@ app.use(cors(corsOptions));
 const rooms = io.of("/").adapter.rooms;
 const games = [];
 
-function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime, numberOfRounds) {
+function makeGame(
+    roomId,
+    host,
+    hostAvatar,
+    socketId,
+    numberOfPlayers,
+    drawTime,
+    numberOfRounds,
+    wordbankContent
+) {
     let game = {
-        'roomId': roomId,
-        'host': host, // username of host
-        'maxNumPlayers': numberOfPlayers,
-        'drawTime': drawTime,
-        'numberOfRounds': numberOfRounds,
-        'players': [{
-            'username': host,
-            'isHost': true,
-            socketId,
-            'score': 0,
-            'hasGuessed': false,
-            'avatar': hostAvatar,
-        }], // stores username of players
-        'listGuessed': [],
-        'currentTurn': '',
-        'currentRound': 0,
-        'gameOver': false,
-        'wordBank': ['banana', 'peach', 'orange'],
-        'currentWord': '',
-        'addPlayer': function(username, avatar, socketId) {
-            let player = {
-                'username': username,
-                'isHost': false,
+        roomId: roomId,
+        host: host, // username of host
+        maxNumPlayers: numberOfPlayers,
+        drawTime: drawTime,
+        numberOfRounds: numberOfRounds,
+        players: [
+            {
+                username: host,
+                isHost: true,
                 socketId,
-                'score': 0,
-                'hasGuessed': false,
-                'avatar': avatar,
+                score: 0,
+                hasGuessed: false,
+                avatar: hostAvatar,
+            },
+        ], // stores username of players
+        listGuessed: [],
+        currentTurn: "",
+        currentRound: 0,
+        gameOver: false,
+        wordBank: wordbankContent,
+        currentWord: "",
+        addPlayer: function (username, avatar, socketId) {
+            let player = {
+                username: username,
+                isHost: false,
+                socketId,
+                score: 0,
+                hasGuessed: false,
+                avatar: avatar,
             };
             this.players.push(player);
-            if (this.currentTurn !== '') {
+            if (this.currentTurn !== "") {
                 this.sendGameData();
             }
         },
-        'removePlayer': function(username) {
-            let player = this.players.find(player => player.username == username);
+        removePlayer: function (username) {
+            let player = this.players.find(
+                (player) => player.username == username
+            );
             let index = this.players.indexOf(player);
             if (index > -1) {
                 if (this.players.length === 1) {
@@ -76,78 +89,89 @@ function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime,
                     this.gameOver = true;
                     return;
                 }
-                this.players.splice(index,1);
+                this.players.splice(index, 1);
                 if (this.currentTurn === username) {
                     this.nextTurn();
                 }
             }
             this.sendGameData();
         },
-        'startGame': function() {
+        startGame: function () {
             const gameData = {
-                'players': this.players,
-                'host': this.host,
-                'maxNumPlayers': this.maxNumPlayers,
-                'drawTime': this.drawTime,
-                'numberOfRounds': this.numberOfRounds,
-                'currentRound': this.currentRound,
-                'currentTurn': this.currentTurn,
-            }
-            io.to(this.roomId).emit("game-start", (gameData));
+                players: this.players,
+                host: this.host,
+                maxNumPlayers: this.maxNumPlayers,
+                drawTime: this.drawTime,
+                numberOfRounds: this.numberOfRounds,
+                currentRound: this.currentRound,
+                currentTurn: this.currentTurn,
+            };
+            io.to(this.roomId).emit("game-start", gameData);
 
             this.currentTurn = this.players[0].username;
             this.currentRound = 1;
-            this.currentWord = this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
+            this.currentWord =
+                this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
 
             this.startTurn();
         },
-        'startTurn': async function () {
+        startTurn: async function () {
             // console.log(this);
             // console.log("it is "+this.currentTurn+"'s turn, and the word is "+this.currentWord);
             // send word to the current drawing player
-            io.to(this.players.find(player => player.username == this.currentTurn).socketId).emit("turn-start", this.currentWord);
+            io.to(
+                this.players.find(
+                    (player) => player.username == this.currentTurn
+                ).socketId
+            ).emit("turn-start", this.currentWord);
 
             // maybe create async function to manage the timer
             let game = this;
             let timeleft = this.drawTime;
-            let currentPlayer = game.players.find(player => player.username == game.currentTurn);
+            let currentPlayer = game.players.find(
+                (player) => player.username == game.currentTurn
+            );
             this.sendGameData();
             io.to(this.roomId).emit("chat-message", {
-                "message": "It is "+currentPlayer.username+"'s turn to draw...",
+                message:
+                    "It is " + currentPlayer.username + "'s turn to draw...",
                 username: "GAME",
                 id: `${currentPlayer.socketId}${Math.random()}`,
             });
-            let gameTimer = setInterval(function() {
-                if(timeleft <= 0){
+            let gameTimer = setInterval(function () {
+                if (timeleft <= 0) {
                     clearInterval(gameTimer);
                     if (currentPlayer) {
                         io.to(currentPlayer.socketId).emit("turn-end");
                         game.sendGameData();
                     }
-                    timeleft=0;
+                    timeleft = 0;
                     game.nextTurn();
-                }
-                else if (game.listGuessed) {
-                    if (game.listGuessed.length == game.players.length-1) {
+                } else if (game.listGuessed) {
+                    if (game.listGuessed.length == game.players.length - 1) {
                         timeleft = 0;
                     }
                 }
-                io.to(game.roomId).emit("timer", (timeleft.toString()));
+                io.to(game.roomId).emit("timer", timeleft.toString());
                 timeleft -= 1;
             }, 1000);
         },
-        'nextTurn': function() {
+        nextTurn: function () {
             io.to(this.roomId).emit("clear-canvas");
-            const currentPlayer = this.players.find(player => player.username == this.currentTurn);
+            const currentPlayer = this.players.find(
+                (player) => player.username == this.currentTurn
+            );
             const index = this.players.indexOf(currentPlayer) + 1;
-            if (index >= this.players.length) { // next round or end of game
+            if (index >= this.players.length) {
+                // next round or end of game
                 this.currentRound += 1;
-                if (this.currentRound > numberOfRounds) { // end of game
+                if (this.currentRound > numberOfRounds) {
+                    // end of game
                     this.gameOver = true;
                     // console.log("sendGameDatagame over");
                     io.to(this.roomId).emit("game-over");
                     io.to(this.roomId).emit("chat-message", {
-                        "message": "Game over.",
+                        message: "Game over.",
                         username: "GAME",
                         id: `${currentPlayer.socketId}${Math.random()}`,
                     });
@@ -157,34 +181,38 @@ function makeGame(roomId, host, hostAvatar, socketId, numberOfPlayers, drawTime,
                 if (this.players.length > 0) {
                     this.currentTurn = this.players[0].username;
                 } else {
-                    return
+                    return;
                 }
             } else {
                 this.currentTurn = this.players[index].username;
             }
-            this.players.map(function(x) { // set all players hasGuessed to false so that they may earn points again
+            this.players.map(function (x) {
+                // set all players hasGuessed to false so that they may earn points again
                 x.hasGuessed = false;
             });
             this.listGuessed = [];
             // select new word
-            this.currentWord = this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
+            this.currentWord =
+                this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
             this.startTurn();
         },
-        'addPoints': function(username) {
-            this.players.find(player => player.username == username).score += 50;
+        addPoints: function (username) {
+            this.players.find(
+                (player) => player.username == username
+            ).score += 50;
             this.sendGameData();
         },
-        'sendGameData': function() {
+        sendGameData: function () {
             const gameData = {
-                'players': this.players,
-                'host': this.host,
-                'maxNumPlayers': this.maxNumPlayers,
-                'drawTime': this.drawTime,
-                'numberOfRounds': this.numberOfRounds,
-                'currentRound': this.currentRound,
-                'currentTurn': this.currentTurn,
-            }
-            io.to(this.roomId).emit("game-data", (gameData));
+                players: this.players,
+                host: this.host,
+                maxNumPlayers: this.maxNumPlayers,
+                drawTime: this.drawTime,
+                numberOfRounds: this.numberOfRounds,
+                currentRound: this.currentRound,
+                currentTurn: this.currentTurn,
+            };
+            io.to(this.roomId).emit("game-data", gameData);
         },
     };
     return game;
@@ -221,10 +249,20 @@ io.on("connection", async (socket) => {
             // drawTime = room.drawTime;
             // numberOfRounds = room.numberOfRounds;
 
-            game = makeGame(room.roomId, room.username, room.avatar, socket.id, room.numberOfPlayers, room.drawTime, room.numberOfRounds);
+            game = makeGame(
+                room.roomId,
+                room.username,
+                room.avatar,
+                socket.id,
+                room.numberOfPlayers,
+                room.drawTime,
+                room.numberOfRounds,
+                room.wordbankContent
+            );
             games.push(game);
+            console.log(game);
 
-            player = game.players.find(player => player.username == username);
+            player = game.players.find((player) => player.username == username);
 
             io.to(socket.id).emit("create-room-success", room);
             io.to(socket.id).emit("players-data", game.players);
@@ -248,15 +286,15 @@ io.on("connection", async (socket) => {
             }
         }
         if (rooms.has(roomId)) {
-            game = games.find(game => game.roomId == roomId);
+            game = games.find((game) => game.roomId == roomId);
             if (game.gameOver) {
                 io.to(socket.id).emit("join-room-fail", {
                     room,
                     msg: "Game is over",
                 });
                 return;
-            }
-            else if (game.players.length >= game.maxNumPlayers) { // game is full
+            } else if (game.players.length >= game.maxNumPlayers) {
+                // game is full
                 io.to(socket.id).emit("join-room-fail", {
                     room,
                     msg: "Room is full",
@@ -271,10 +309,10 @@ io.on("connection", async (socket) => {
             username = room.username;
             game.addPlayer(room.username, room.avatar, socket.id);
 
-            player = game.players.find(player => player.username == username);
+            player = game.players.find((player) => player.username == username);
 
             io.to(roomId).emit("chat-message", {
-                "message": username+" has joined the game.",
+                message: username + " has joined the game.",
                 username: "GAME",
                 id: `${socket.id}${Math.random()}`,
             });
@@ -293,7 +331,7 @@ io.on("connection", async (socket) => {
     socket.on("leave-room", (room) => {
         socket.leave(room);
         io.to(room).emit("chat-message", {
-            "message": username+" has left the game.",
+            message: username + " has left the game.",
             username: "GAME",
             id: `${socket.id}${Math.random()}`,
         });
@@ -307,16 +345,18 @@ io.on("connection", async (socket) => {
     });
 
     socket.on("kick-player", async (username) => {
-        const socket_id = game.players.find(player => player.username == username).socketId;
+        const socket_id = game.players.find(
+            (player) => player.username == username
+        ).socketId;
         var sockets = await io.in(game.roomID).fetchSockets();
-        io.to(socket_id).emit("kick-player", (game.roomId));
+        io.to(socket_id).emit("kick-player", game.roomId);
     });
 
     socket.on("get-players-data", (data) => {
         io.to(socket.id).emit("players-data", game.players);
     });
 
-    socket.on("start-game", data => {
+    socket.on("start-game", (data) => {
         if (username == game.host) {
             game.startGame();
         }
@@ -325,14 +365,19 @@ io.on("connection", async (socket) => {
     socket.on("chat-message", (msg) => {
         // console.log("Room " + currentRoom + " - " + msg.username + ": " + msg.message);
         // io.to(currentRoom).emit("chat-message", msg);
-        let canGuess = ((!game.gameOver) && (game.currentRound > 0)) && ((player.hasGuessed == false) && !(game.currentTurn == username));
+        let canGuess =
+            !game.gameOver &&
+            game.currentRound > 0 &&
+            player.hasGuessed == false &&
+            !(game.currentTurn == username);
         if (canGuess) {
-            if (msg.message.toLowerCase() == game.currentWord.toLowerCase()) { // current word is guessed
+            if (msg.message.toLowerCase() == game.currentWord.toLowerCase()) {
+                // current word is guessed
                 game.addPoints(username);
                 player.hasGuessed = true;
                 game.listGuessed.push(username);
                 io.to(currentRoom).emit("chat-message", {
-                    "message": username + " has guessed the word!",
+                    message: username + " has guessed the word!",
                     username: "GAME",
                     id: `${socket.id}${Math.random()}`,
                 });
@@ -357,7 +402,7 @@ io.on("connection", async (socket) => {
     socket.on("disconnect", () => {
         socket.leave(currentRoom);
         io.to(currentRoom).emit("chat-message", {
-            "message": username+" has left the game.",
+            message: username + " has left the game.",
             username: "GAME",
             id: `${socket.id}${Math.random()}`,
         });

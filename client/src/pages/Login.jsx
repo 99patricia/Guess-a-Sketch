@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
-import { CustomLink } from "components";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
     Button,
@@ -12,6 +10,17 @@ import {
     Form,
     FormInput,
 } from "components";
+import styled from "styled-components";
+
+const StyledP = styled.p`
+    text-align: center;
+    margin: 0;
+`;
+
+const StyledLink = styled(Link)`
+    text-align: center;
+    color: var(--primary);
+`;
 
 function Login() {
     const [showErrorMessage, setShowErrorMessage] = useState("");
@@ -69,13 +78,17 @@ function Login() {
                         type="password"
                         onChange={(e) => setPassword(e.target.value)}
                     ></FormInput>
-                    <CustomLink to="/changePassword">
+                    <StyledLink to="/changePassword">
                         Forgot your password?
-                    </CustomLink>
+                    </StyledLink>
                     <Button column type="submit">
                         Login
                     </Button>
-                    <CustomLink to="/guestLogin">Login as guest</CustomLink>
+                    <StyledLink to="/register">
+                        Don't have an account? Sign up here
+                    </StyledLink>
+                    <StyledP>or</StyledP>
+                    <StyledLink to="/guestLogin">Login as guest</StyledLink>
                 </Form>
             </Container>
         </>
