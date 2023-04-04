@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { IconButton } from "components";
+import { Toolbar } from "components/Canvas/";
 
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
@@ -50,6 +51,7 @@ function CanvasFooter(props) {
     return (
         <StyledCanvasFooter>
             <IconButton ref={clearButtonRef} iconClassName="bi-eraser-fill" />
+            <Toolbar />
         </StyledCanvasFooter>
     );
 }

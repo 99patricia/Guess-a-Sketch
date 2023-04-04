@@ -58,13 +58,15 @@ const Canvas = React.forwardRef((props, ref) => {
         };
 
         const draw = (x0, y0, x1, y1, emit) => {
+            const penColor = localStorage.getItem("penColor") || "black";
+
             y0 = y0 + mainWindow.scrollTop;
             y1 = y1 + mainWindow.scrollTop;
             ctx.beginPath();
             // Size and colour of pen
             ctx.lineCap = "round";
             ctx.lineWidth = 5;
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = penColor;
             // Starting coordinate of path
             ctx.moveTo(x0, y0);
             // Ending coordinate of path
