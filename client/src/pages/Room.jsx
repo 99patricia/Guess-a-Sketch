@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import {
     Canvas,
@@ -9,11 +9,13 @@ import {
     Header,
     Lobby,
     Scoreboard,
+    GameOver,
 } from "components";
 import { socket } from "service/socket";
 import { useUserData } from "hooks";
 
 function Room() {
+    const navigate = useNavigate();
     const canvasRef = useRef();
     const { roomId } = useParams();
     // const username = localStorage.getItem("username") || localStorage.getItem("nickname");
@@ -25,6 +27,7 @@ function Room() {
     const [word, setWord] = useState("");
     const [gameStart, setGameStart] = useState(false);
     const [gameData, setGameData] = useState({});
+    const [gameOver, setGameOver] = useState(false);
 
     useEffect(() => {
         socket.off("game-start");
@@ -64,6 +67,12 @@ function Room() {
         socket.off("kick-player");
         socket.on("kick-player", (room_id) => {
             socket.emit("leave-room", room_id);
+            navigate(`/`);
+        });
+
+        socket.off("game-over");
+        socket.on("game-over", () => {
+            setGameOver(true);
         });
     }, [players, isHost, isDrawing, gameStart, gameData, userData, word]);
 
@@ -72,28 +81,34 @@ function Room() {
             <Header />
             <Container>
                 <FlexContainer>
-                    {gameStart ? (
-                        <>
-                            <Scoreboard
-                                userData={userData}
-                                gameData={gameData}
-                                isHost={isHost}
-                            />
-                            <Canvas
-                                ref={canvasRef}
-                                gameData={gameData}
-                                isDrawing={isDrawing}
-                                word={word}
-                                sendToSocket
-                            />
-                        </>
-                    ) : (
-                        <Lobby
-                            userData={userData}
-                            players={players}
-                            host={isHost}
+                    {gameOver ? (
+                        <GameOver 
+                            gameData={gameData}
                         />
-                    )}
+                    ) : <>
+                        {gameStart ? (
+                            <>
+                                <Scoreboard
+                                    userData={userData}
+                                    gameData={gameData}
+                                    isHost={isHost}
+                                />
+                                <Canvas
+                                    ref={canvasRef}
+                                    gameData={gameData}
+                                    isDrawing={isDrawing}
+                                    word={word}
+                                    sendToSocket
+                                />
+                            </>
+                        ) : (
+                            <Lobby
+                                userData={userData}
+                                players={players}
+                                host={isHost}
+                            />
+                        )}
+                    </>}
                     <Chat roomId={roomId} username={userData.username} />
                 </FlexContainer>
             </Container>

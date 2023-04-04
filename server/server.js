@@ -83,10 +83,8 @@ function makeGame(
             );
             let index = this.players.indexOf(player);
             if (index > -1) {
-                if (this.players.length === 1) {
-                    const index = games.indexOf(this);
-                    games.splice(index, 1);
-                    this.gameOver = true;
+                if (this.players.length === 1 && this.currentTurn.length > 0) {
+                    this.endGame();
                     return;
                 }
                 this.players.splice(index, 1);
@@ -167,14 +165,7 @@ function makeGame(
                 this.currentRound += 1;
                 if (this.currentRound > numberOfRounds) {
                     // end of game
-                    this.gameOver = true;
-                    // console.log("sendGameDatagame over");
-                    io.to(this.roomId).emit("game-over");
-                    io.to(this.roomId).emit("chat-message", {
-                        message: "Game over.",
-                        username: "GAME",
-                        id: `${currentPlayer.socketId}${Math.random()}`,
-                    });
+                    this.endGame();
                     return;
                 }
                 // new round
@@ -213,6 +204,19 @@ function makeGame(
                 currentTurn: this.currentTurn,
             };
             io.to(this.roomId).emit("game-data", gameData);
+        },
+        endGame: function() {
+            this.gameOver = true;
+            this.sendGameData();
+            io.to(this.roomId).emit("game-over");
+            io.to(this.roomId).emit("chat-message", {
+                message: "Game over.",
+                username: "GAME",
+                id: `${this.currentTurn.socketId}${Math.random()}`,
+            });
+
+            const index = games.indexOf(this);
+            games.splice(index, 1);
         },
     };
     return game;
@@ -260,7 +264,6 @@ io.on("connection", async (socket) => {
                 room.wordbankContent
             );
             games.push(game);
-            console.log(game);
 
             player = game.players.find((player) => player.username == username);
 
