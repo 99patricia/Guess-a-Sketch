@@ -11,6 +11,11 @@ import {
     users,
     wordbank,
 } from "./routes/index.js";
+import {
+    db
+} from "./service/firebase.js";
+import { doc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { profile } from "console";
 
 const PORT = process.env.PORT || 3001;
 
@@ -206,7 +211,7 @@ function makeGame(
             };
             io.to(this.roomId).emit("game-data", gameData);
         },
-        endGame: function() {
+        endGame: async function () {
             this.gameOver = true;
             this.sendGameData();
             io.to(this.roomId).emit("game-over");
@@ -218,6 +223,25 @@ function makeGame(
 
             const index = games.indexOf(this);
             games.splice(index, 1);
+
+            this.players.forEach(async (player) => { // update player scores in the db
+                // var washingtonRef = db.collection('cities').doc('DC');
+                // washingtonRef.update({
+                //     population: firebase.firestore.FieldValue.increment(50)
+                // });
+                const q = query(collection(db, "profiles"), where("username", "==", player.username));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((docSnapshot) => { // get doc of each registered player
+                    // doc.data() is never undefined for query doc snapshots
+                    let profileData = docSnapshot.data();
+                    profileData.currency += player.score;
+
+                    const id = profileData.id;
+                    const profileDocRef = doc(db, "profiles", id);
+
+                    setDoc(profileDocRef, profileData, { merge: true });
+                });
+            });
         },
     };
     return game;

@@ -36,10 +36,8 @@ const UserCardList = styled.div`
     padding: 0.25rem;
     height: 100%;
     padding-top: 2rem;
-    // overflow: auto;
     border-radius: 1rem;
     overflow: hidden;
-    // border: 1px solid black;
 `;
 
 const UserCard1 = styled.div`
@@ -53,9 +51,6 @@ const UserCard1 = styled.div`
 
     grid-column-start: 1;
     grid-column-end: 3;
-    // grid-row-start: 1;
-    // grid-row-end: 1;
-    // border: 1px solid red;
 `;
 
 const UserCard = styled.div`
@@ -66,7 +61,6 @@ const UserCard = styled.div`
     padding: 0.1rem;
     height: 11rem;
     border-radius: 1rem;
-    // border: 1px solid black;
 `;
 
 const UserImage = styled.img`
