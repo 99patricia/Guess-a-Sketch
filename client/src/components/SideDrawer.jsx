@@ -9,6 +9,7 @@ const StyledNavButton = styled(IconButton)`
     background-color: transparent;
     position: fixed;
     top: 30px;
+    margin: 0;
 
     transition: transform 0.3s ease-in-out;
     transform: ${(props) =>

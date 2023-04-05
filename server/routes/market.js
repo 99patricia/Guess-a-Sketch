@@ -172,7 +172,6 @@ async function deletePerk(app) {
     });
 }
 
-
 export function init(app) {
     createPerk(app),
         getPerk(app),
