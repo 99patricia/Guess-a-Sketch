@@ -26,6 +26,7 @@ import {
 } from "firebase/firestore";
 
 const PORT = process.env.PORT || 3001;
+const GAMEHISTORYLENGTH = 10;
 
 // Initialize app
 const app = express();
@@ -264,6 +265,9 @@ function makeGame(
                     } else {
                         profileData.loss += 1;
                     }
+                    
+                    profileData.gamehistory.unshift(docRef.id);
+                    profileData.gamehistory = profileData.gamehistory.slice(0, GAMEHISTORYLENGTH);
 
                     const id = profileData.id;
                     const profileDocRef = doc(db, "profiles", id);
