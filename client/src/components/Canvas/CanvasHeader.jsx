@@ -9,6 +9,7 @@ const CanvasHeaderContainer = styled.div`
     align-items: center;
     // text-align: center;
     margin: 0;
+    height: 80px;
 
     // outline: 1px solid black;
 `;

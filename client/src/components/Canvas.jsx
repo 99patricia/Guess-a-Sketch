@@ -48,7 +48,7 @@ const Canvas = React.forwardRef((props, ref) => {
             canvas.height = canvasParentWidth;
         } else {
             canvas.width = 500;
-            canvas.height = 375;
+            canvas.height = 340;
         }
 
         // Stores the initial position of the cursor
