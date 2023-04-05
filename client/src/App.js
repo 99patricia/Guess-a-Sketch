@@ -9,6 +9,7 @@ import {
     Login,
     Register,
     Room,
+    Leaderboard,
 } from "pages";
 
 import axios from "axios";
@@ -29,6 +30,7 @@ function App() {
             <Route exact path="/register" element={<Register />} />
             <Route exact path="/createRoom" element={<CreateRoom />} />
             <Route exact path="/room/:roomId" element={<Room />} />
+            <Route exact path="/leaderboard" element={<Leaderboard />} />
         </Routes>
     );
 }

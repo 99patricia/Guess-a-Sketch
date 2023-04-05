@@ -11,6 +11,7 @@ import {
     users,
     wordbank,
     game,
+    leaderboard,
 } from "./routes/index.js";
 import {
     db
@@ -505,4 +506,5 @@ server.listen(PORT, () => {
     users(app);
     wordbank(app);
     game(app);
+    leaderboard(app);
 });
