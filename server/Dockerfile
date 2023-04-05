@@ -2,7 +2,7 @@ FROM node:18.14.0
 
 WORKDIR /server
 
-COPY package*.json .
+COPY package*.json ./
 RUN npm install
 RUN npm install express@4  
 RUN npm install socket.io  
