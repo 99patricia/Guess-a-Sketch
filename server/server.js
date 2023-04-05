@@ -10,6 +10,7 @@ import {
     userProfile,
     users,
     wordbank,
+    game,
 } from "./routes/index.js";
 import {
     db
@@ -499,4 +500,5 @@ server.listen(PORT, () => {
     userProfile(app);
     users(app);
     wordbank(app);
+    game(app);
 });
