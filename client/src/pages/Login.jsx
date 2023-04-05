@@ -46,6 +46,10 @@ function Login() {
             .then((res) => {
                 setShowErrorMessage("");
                 localStorage.setItem("userData", JSON.stringify(res.data.data));
+                localStorage.setItem(
+                    "userPerks",
+                    JSON.stringify(res.data.userPerks)
+                );
                 navigate("/");
             })
             .catch((err) => {

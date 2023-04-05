@@ -133,10 +133,41 @@ async function login(app) {
                         .then((docsnap) => {
                             if (docsnap.exists()) {
                                 const userData = docsnap.data();
-                                // Send response to client with user data
-                                res.status(200).json({
-                                    message: `User ${userData.username} successfully logged in`,
-                                    data: userData,
+
+                                // Fetch the user's profile data to get their perks
+                                const profileDocRef = doc(
+                                    db,
+                                    "profiles",
+                                    user.uid
+                                );
+                                getDoc(profileDocRef).then(async (docsnap) => {
+                                    if (docsnap.exists()) {
+                                        const profileData = docsnap.data();
+                                        const inventory = profileData.inventory;
+
+                                        // Fetch the perk data from user's inventory
+                                        const userPerks = [];
+                                        for (
+                                            let i = 0;
+                                            i < inventory.length;
+                                            i++
+                                        ) {
+                                            const perkId = inventory[i];
+                                            await getDoc(
+                                                doc(db, "perks", perkId)
+                                            ).then((docsnap) => {
+                                                const perkData = docsnap.data();
+                                                userPerks.push(perkData);
+                                            });
+                                        }
+
+                                        // Send response to client with user data
+                                        res.status(200).json({
+                                            message: `User ${userData.username} successfully logged in`,
+                                            data: userData,
+                                            userPerks,
+                                        });
+                                    }
                                 });
                             } else {
                                 console.log("No user data available");
