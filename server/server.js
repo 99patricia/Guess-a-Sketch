@@ -18,7 +18,7 @@ import {
 import { doc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
 import { profile } from "console";
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 80;
 
 // Initialize app
 const app = express();
