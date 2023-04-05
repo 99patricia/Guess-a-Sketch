@@ -29,7 +29,7 @@ function Room() {
 
     useEffect(() => {
         const userPerks = JSON.parse(localStorage.getItem("userPerks"));
-        if (userPerks) {
+        if (userPerks.length > 0) {
             // User may have unlocked more than one perk, use their best one
             const bestPerk = userPerks.reduce((prev, current) => {
                 return prev.rank > current.rank ? prev : current;
