@@ -90,6 +90,42 @@ async function getAllPerks(app) {
     });
 }
 
+async function getUserPerks(app) {
+    app.get("/user_perks/:user_id", async (req, res) => {
+        try {
+            const userId = req.params.user_id;
+
+            // Fetch the user's profile data
+            const profileDocRef = doc(db, "profiles", userId);
+            await getDoc(profileDocRef).then(async (docsnap) => {
+                if (!docsnap.exists()) {
+                    res.status(404).json({ error: "User not found" });
+                } else {
+                    const userData = docsnap.data();
+                    const inventory = userData.inventory;
+
+                    // Fetch the perk data from user's inventory
+                    const userPerks = [];
+                    for (let i = 0; i < inventory.length; i++) {
+                        const perkId = inventory[i];
+                        await getDoc(doc(db, "perks", perkId)).then(
+                            (docsnap) => {
+                                const perkData = docsnap.data();
+                                userPerks.push(perkData);
+                            }
+                        );
+                    }
+
+                    res.status(200).json({ userPerks });
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to fetch user's perks" });
+        }
+    });
+}
+
 ///////////////////////////// purchasePerk  /////////////////////////////
 async function purchasePerk(app) {
     app.post("/purchase/:user_id/:perk_id", async (req, res) => {
@@ -172,11 +208,11 @@ async function deletePerk(app) {
     });
 }
 
-
 export function init(app) {
     createPerk(app),
         getPerk(app),
         getAllPerks(app),
+        getUserPerks(app),
         purchasePerk(app),
         deletePerk(app);
 }
