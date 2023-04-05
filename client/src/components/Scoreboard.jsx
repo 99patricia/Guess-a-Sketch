@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 
+import { socket } from "service/socket";
+
 const ScoreboardContainer = styled.div`
     width: 220px;
 `;
@@ -25,6 +27,10 @@ const StyledScoreboard = styled.div`
     outline: ${(props) =>
         props.currentTurn ? "2px solid var(--secondary)" : "0"};
 `;
+const UserImageDiv = styled.div`
+    display: flex;
+    align-items: center;
+`;
 
 const UserImage = styled.img`
     display: block;
@@ -38,8 +44,35 @@ const StyledText = styled.p`
         props.secondary ? "var(--secondary)" : "var(--primary)"};
 `;
 
+const HoverButton = styled.button`
+    display: none;
+    background-color: red;
+    font-family: var(--font);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--white);
+
+    padding: 0.6rem 0.8rem;
+    border: 0;
+    border-radius: 0.5rem;
+
+    cursor: pointer;
+    ${UserImageDiv}:hover & {
+        position: absolute;
+        display: block;
+    }
+
+    :active {
+        transform: scale(0.9);
+    }
+`;
+
 function Scoreboard(props) {
-    const { userData, gameData, isHost } = { ...props };
+    const { userData, gameData, host } = { ...props };
+
+    function kickPlayer(username) {
+        socket.emit("kick-player", username);
+    }
 
     return (
         <ScoreboardContainer>
@@ -65,7 +98,14 @@ function Scoreboard(props) {
                                     <StyledText>Score: {score}</StyledText>
                                 </div>
                             )}
-                            <UserImage src={avatar} />
+                            <UserImageDiv>
+                                {host && username !== userData.username && (
+                                <HoverButton onClick={() => kickPlayer(username)}>
+                                    Kick
+                                </HoverButton>
+                                )}
+                                <UserImage src={avatar} />
+                            </UserImageDiv>
                         </StyledScoreboard>
                     )
                 )}

@@ -11,6 +11,11 @@ import {
     users,
     wordbank,
 } from "./routes/index.js";
+import {
+    db
+} from "./service/firebase.js";
+import { doc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { profile } from "console";
 
 const PORT = process.env.PORT || 3001;
 
@@ -83,10 +88,8 @@ function makeGame(
             );
             let index = this.players.indexOf(player);
             if (index > -1) {
-                if (this.players.length === 1) {
-                    const index = games.indexOf(this);
-                    games.splice(index, 1);
-                    this.gameOver = true;
+                if (this.players.length === 1 && this.currentTurn.length > 0) {
+                    this.endGame();
                     return;
                 }
                 this.players.splice(index, 1);
@@ -167,14 +170,7 @@ function makeGame(
                 this.currentRound += 1;
                 if (this.currentRound > numberOfRounds) {
                     // end of game
-                    this.gameOver = true;
-                    // console.log("sendGameDatagame over");
-                    io.to(this.roomId).emit("game-over");
-                    io.to(this.roomId).emit("chat-message", {
-                        message: "Game over.",
-                        username: "GAME",
-                        id: `${currentPlayer.socketId}${Math.random()}`,
-                    });
+                    this.endGame();
                     return;
                 }
                 // new round
@@ -203,6 +199,7 @@ function makeGame(
             this.sendGameData();
         },
         sendGameData: function () {
+            if (this.gameOver) return;
             const gameData = {
                 players: this.players,
                 host: this.host,
@@ -213,6 +210,38 @@ function makeGame(
                 currentTurn: this.currentTurn,
             };
             io.to(this.roomId).emit("game-data", gameData);
+        },
+        endGame: async function () {
+            this.gameOver = true;
+            this.sendGameData();
+            io.to(this.roomId).emit("game-over");
+            io.to(this.roomId).emit("chat-message", {
+                message: "Game over.",
+                username: "GAME",
+                id: `${this.currentTurn.socketId}${Math.random()}`,
+            });
+
+            const index = games.indexOf(this);
+            games.splice(index, 1);
+
+            this.players.forEach(async (player) => { // update player scores in the db
+                // var washingtonRef = db.collection('cities').doc('DC');
+                // washingtonRef.update({
+                //     population: firebase.firestore.FieldValue.increment(50)
+                // });
+                const q = query(collection(db, "profiles"), where("username", "==", player.username));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((docSnapshot) => { // get doc of each registered player
+                    // doc.data() is never undefined for query doc snapshots
+                    let profileData = docSnapshot.data();
+                    profileData.currency += player.score;
+
+                    const id = profileData.id;
+                    const profileDocRef = doc(db, "profiles", id);
+
+                    setDoc(profileDocRef, profileData, { merge: true });
+                });
+            });
         },
     };
     return game;
@@ -260,7 +289,6 @@ io.on("connection", async (socket) => {
                 room.wordbankContent
             );
             games.push(game);
-            console.log(game);
 
             player = game.players.find((player) => player.username == username);
 
