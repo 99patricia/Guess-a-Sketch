@@ -10,7 +10,6 @@ import {
     userProfile,
     users,
     wordbank,
-    gameHistory,
 } from "./routes/index.js";
 import {
     db
