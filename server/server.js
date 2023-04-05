@@ -10,12 +10,20 @@ import {
     userProfile,
     users,
     wordbank,
+    gameHistory,
 } from "./routes/index.js";
 import {
     db
 } from "./service/firebase.js";
-import { doc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
-import { profile } from "console";
+import { 
+    doc, 
+    getDocs, 
+    setDoc,
+    addDoc,
+    collection, 
+    query, 
+    where,
+} from "firebase/firestore";
 
 const PORT = process.env.PORT || 3001;
 
@@ -69,6 +77,7 @@ function makeGame(
         wordBank: wordbankContent,
         currentWord: "",
         addPlayer: function (username, avatar, socketId) {
+            if (this.gameOver) return;
             let player = {
                 username: username,
                 isHost: false,
@@ -83,15 +92,16 @@ function makeGame(
             }
         },
         removePlayer: function (username) {
+            if (this.gameOver) return;
             let player = this.players.find(
                 (player) => player.username == username
             );
             let index = this.players.indexOf(player);
             if (index > -1) {
-                if (this.players.length === 1 && this.currentTurn.length > 0) {
-                    this.endGame();
-                    return;
-                }
+                // if (this.players.length === 1 && this.currentTurn.length > 0) {
+                //     this.endGame();
+                //     return;
+                // }
                 this.players.splice(index, 1);
                 if (this.currentTurn === username) {
                     this.nextTurn();
@@ -100,6 +110,7 @@ function makeGame(
             this.sendGameData();
         },
         startGame: function () {
+            if (this.gameOver) return;
             const gameData = {
                 players: this.players,
                 host: this.host,
@@ -119,6 +130,7 @@ function makeGame(
             this.startTurn();
         },
         startTurn: async function () {
+            if (this.gameOver) return;
             // console.log(this);
             // console.log("it is "+this.currentTurn+"'s turn, and the word is "+this.currentWord);
             // send word to the current drawing player
@@ -160,6 +172,7 @@ function makeGame(
             }, 1000);
         },
         nextTurn: function () {
+            if (this.gameOver) return;
             io.to(this.roomId).emit("clear-canvas");
             const currentPlayer = this.players.find(
                 (player) => player.username == this.currentTurn
@@ -193,6 +206,7 @@ function makeGame(
             this.startTurn();
         },
         addPoints: function (username) {
+            if (this.gameOver) return;
             this.players.find(
                 (player) => player.username == username
             ).score += 50;
@@ -223,25 +237,49 @@ function makeGame(
 
             const index = games.indexOf(this);
             games.splice(index, 1);
-
-            this.players.forEach(async (player) => { // update player scores in the db
-                // var washingtonRef = db.collection('cities').doc('DC');
-                // washingtonRef.update({
-                //     population: firebase.firestore.FieldValue.increment(50)
-                // });
+            if (this.players.length < 2) {
+                // if game only has 1 player then dont count it
+                return;
+            }
+            const docRef = await addDoc(collection(db, "games"), {});
+            // sort players by score
+            const sortedPlayers = this.players.sort((a, b) => b.score - a.score);
+            var gamedocPlayers = []; // only registered players will show up in the game history
+            for (const [i, player] of sortedPlayers.entries()) { // update player scores in the db
                 const q = query(collection(db, "profiles"), where("username", "==", player.username));
                 const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    // player is a guest
+                    gamedocPlayers.push({username: player.username+' (guest)', score: player.score});
+                } else {
+                    gamedocPlayers.push({username: player.username, score: player.score});
+                }
+
                 querySnapshot.forEach((docSnapshot) => { // get doc of each registered player
                     // doc.data() is never undefined for query doc snapshots
                     let profileData = docSnapshot.data();
                     profileData.currency += player.score;
+                    if (i===0) {
+                        profileData.win += 1;
+                    } else {
+                        profileData.loss += 1;
+                    }
 
                     const id = profileData.id;
                     const profileDocRef = doc(db, "profiles", id);
 
                     setDoc(profileDocRef, profileData, { merge: true });
                 });
-            });
+            }
+            // create game doc object to save in the db
+            const gamedocObj = {
+                winner: gamedocPlayers[0].username,
+                players: gamedocPlayers,
+            };
+            // const res = await collection(db, "games").add(gamedocObj);
+            // const docRef = await addDoc(collection(db, "games"), gamedocObj);
+            await setDoc(doc(db, "games", docRef.id), gamedocObj);
+            console.log('Added game to db with ID: ', docRef.id);
         },
     };
     return game;
