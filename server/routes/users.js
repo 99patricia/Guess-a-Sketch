@@ -89,6 +89,7 @@ async function register(app) {
                             currency: 0,
                             avatar,
                             inventory: [],
+                            gamehistory:[],
                         };
 
                         await setDoc(
