@@ -24,8 +24,24 @@ function Room() {
     const [word, setWord] = useState("");
     const [gameStart, setGameStart] = useState(false);
     const [gameData, setGameData] = useState({});
+    const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
+    const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
 
     useEffect(() => {
+        const userPerks = JSON.parse(localStorage.getItem("userPerks"));
+        if (userPerks) {
+            // User may have unlocked more than one perk, use their best one
+            const bestPerk = userPerks.reduce((prev, current) => {
+                return prev.rank > current.rank ? prev : current;
+            });
+            setColorChoices(bestPerk["colors"]);
+            setPenSizeChoices(
+                bestPerk["pen_sizes"].sort(function (a, b) {
+                    return a - b;
+                })
+            );
+        }
+
         socket.off("game-start");
         socket.on("game-start", (data) => {
             setGameStart(true);
@@ -84,6 +100,8 @@ function Room() {
                                 isDrawing={isDrawing}
                                 word={word}
                                 sendToSocket
+                                penSizeChoices={penSizeChoices}
+                                colorChoices={colorChoices}
                             />
                         </>
                     ) : (

@@ -69,7 +69,8 @@ const StyledRangeInput = styled.input`
 `;
 
 function CanvasFooter(props) {
-    const { canvasRef, sendToSocket, isDrawing } = { ...props };
+    const { canvasRef, sendToSocket, isDrawing, penSizeChoices, colorChoices } =
+        { ...props };
 
     const drawingInGame = isDrawing || !sendToSocket;
 
@@ -77,8 +78,6 @@ function CanvasFooter(props) {
 
     const [penColor, setPenColor] = useState("black");
     const [showPenSize, setShowPenSize] = useState();
-    const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
-    const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
     const [penSizeIndex, setPenSizeIndex] = useState(0);
 
     const handleChangePenSize = (e) => {
@@ -114,21 +113,6 @@ function CanvasFooter(props) {
     };
 
     useEffect(() => {
-        // Get the perks unlocked by (registered) user
-        const userPerks = JSON.parse(localStorage.getItem("userPerks"));
-        if (drawingInGame && userPerks) {
-            // User may have unlocked more than one perk, use their best one
-            const bestPerk = userPerks.reduce((prev, current) => {
-                return prev.rank > current.rank ? prev : current;
-            });
-            setColorChoices(bestPerk["colors"]);
-            setPenSizeChoices(
-                bestPerk["pen_sizes"].sort(function (a, b) {
-                    return a - b;
-                })
-            );
-        }
-
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
         const clearButton = clearButtonRef.current;

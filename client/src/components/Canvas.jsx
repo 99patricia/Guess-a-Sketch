@@ -33,6 +33,9 @@ const Canvas = React.forwardRef((props, ref) => {
         ...props,
     };
 
+    const penSizeChoices = props.penSizeChoices || [10, 50];
+    const colorChoices = props.colorChoices || ["black", "red", "blue"];
+
     useEffect(() => {
         var drawing = false;
         const canvas = canvasRef.current;
@@ -210,6 +213,8 @@ const Canvas = React.forwardRef((props, ref) => {
                 canvasRef={canvasRef}
                 sendToSocket={sendToSocket}
                 isDrawing={isDrawing}
+                penSizeChoices={penSizeChoices}
+                colorChoices={colorChoices}
             />
         </StyledCanvasContainer>
     );
