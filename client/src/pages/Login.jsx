@@ -45,12 +45,11 @@ function Login() {
             .post("/login", body, options)
             .then((res) => {
                 setShowErrorMessage("");
-                const username = res.data.data.username;
-                const uid = res.data.data.id;
-
-                localStorage.setItem("username", username);
-                localStorage.setItem("uid", uid);
-
+                localStorage.setItem("userData", JSON.stringify(res.data.data));
+                localStorage.setItem(
+                    "userPerks",
+                    JSON.stringify(res.data.userPerks)
+                );
                 navigate("/");
             })
             .catch((err) => {

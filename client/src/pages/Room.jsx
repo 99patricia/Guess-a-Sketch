@@ -18,8 +18,7 @@ function Room() {
     const navigate = useNavigate();
     const canvasRef = useRef();
     const { roomId } = useParams();
-    // const username = localStorage.getItem("username") || localStorage.getItem("nickname");
-    const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
+    const { userData } = useUserData();
 
     const [players, setPlayers] = useState([]);
     const [isHost, setHost] = useState(false);
@@ -28,8 +27,24 @@ function Room() {
     const [gameStart, setGameStart] = useState(false);
     const [gameData, setGameData] = useState({});
     const [gameOver, setGameOver] = useState(false);
+    const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
+    const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
 
     useEffect(() => {
+        const userPerks = JSON.parse(localStorage.getItem("userPerks"));
+        if (userPerks && userPerks.length > 0) {
+            // User may have unlocked more than one perk, use their best one
+            const bestPerk = userPerks.reduce((prev, current) => {
+                return prev.rank > current.rank ? prev : current;
+            });
+            setColorChoices(bestPerk["colors"]);
+            setPenSizeChoices(
+                bestPerk["pen_sizes"].sort(function (a, b) {
+                    return a - b;
+                })
+            );
+        }
+
         socket.off("game-start");
         socket.on("game-start", (data) => {
             setGameStart(true);
@@ -82,33 +97,35 @@ function Room() {
             <Container>
                 <FlexContainer>
                     {gameOver ? (
-                        <GameOver 
-                            gameData={gameData}
-                        />
-                    ) : <>
-                        {gameStart ? (
-                            <>
-                                <Scoreboard
+                        <GameOver gameData={gameData} />
+                    ) : (
+                        <>
+                            {gameStart ? (
+                                <>
+                                    <Scoreboard
+                                        userData={userData}
+                                        gameData={gameData}
+                                        host={isHost}
+                                    />
+                                    <Canvas
+                                        ref={canvasRef}
+                                        gameData={gameData}
+                                        isDrawing={isDrawing}
+                                        word={word}
+                                        sendToSocket
+                                        penSizeChoices={penSizeChoices}
+                                        colorChoices={colorChoices}
+                                    />
+                                </>
+                            ) : (
+                                <Lobby
                                     userData={userData}
-                                    gameData={gameData}
+                                    players={players}
                                     host={isHost}
                                 />
-                                <Canvas
-                                    ref={canvasRef}
-                                    gameData={gameData}
-                                    isDrawing={isDrawing}
-                                    word={word}
-                                    sendToSocket
-                                />
-                            </>
-                        ) : (
-                            <Lobby
-                                userData={userData}
-                                players={players}
-                                host={isHost}
-                            />
-                        )}
-                    </>}
+                            )}
+                        </>
+                    )}
                     <Chat roomId={roomId} username={userData.username} />
                 </FlexContainer>
             </Container>
