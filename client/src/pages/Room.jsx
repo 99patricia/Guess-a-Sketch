@@ -16,7 +16,6 @@ import { useUserData } from "hooks";
 function Room() {
     const canvasRef = useRef();
     const { roomId } = useParams();
-    // const username = localStorage.getItem("username") || localStorage.getItem("nickname");
     const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
 
     const [players, setPlayers] = useState([]);

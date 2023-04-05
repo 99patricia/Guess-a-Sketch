@@ -29,7 +29,6 @@ function Home() {
         if (roomId === "") {
             setShowErrorMessage("Room code cannot be empty");
         } else {
-            // const username = localStorage.getItem("username");
             const room = {
                 roomId,
                 username: userData.username,
