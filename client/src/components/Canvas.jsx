@@ -167,7 +167,6 @@ const Canvas = React.forwardRef((props, ref) => {
         if (sendToSocket) {
             socket.off("draw");
             socket.on("draw", (data) => {
-                console.log(data);
                 // Only receive if we are not the person currently drawing
                 if (!canDraw)
                     draw(
@@ -192,7 +191,7 @@ const Canvas = React.forwardRef((props, ref) => {
             canvas.removeEventListener("touchcancel", onMouseUp);
             canvas.removeEventListener("touchmove", onMouseMove);
         };
-    }, [canvasRef, sendToSocket, isDrawing]);
+    }, [canvasRef, sendToSocket, gameData, isDrawing]);
 
     return (
         <StyledCanvasContainer

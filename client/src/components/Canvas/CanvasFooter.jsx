@@ -52,16 +52,16 @@ const StyledRangeInput = styled.input`
         -webkit-appearance: none;
         appearance: none;
 
-        width: ${(props) => props.value}px;
-        height: ${(props) => props.value}px;
+        width: ${(props) => props.size}px;
+        height: ${(props) => props.size}px;
         border-radius: 50%;
         background: ${(props) => props.penColor};
         cursor: pointer;
     }
 
     ::-moz-range-thumb {
-        width: ${(props) => props.value}px;
-        height: ${(props) => props.value}px;
+        width: ${(props) => props.size}px;
+        height: ${(props) => props.size}px;
         border-radius: 50%;
         background: ${(props) => props.penColor};
         cursor: pointer;
@@ -69,20 +69,23 @@ const StyledRangeInput = styled.input`
 `;
 
 function CanvasFooter(props) {
-    const [penSize, setPenSize] = useState(10);
-    const [penColor, setPenColor] = useState("black");
-    const [showPenSize, setShowPenSize] = useState();
-
     const { canvasRef, sendToSocket, isDrawing } = { ...props };
-    const clearButtonRef = useRef();
 
     const drawingInGame = isDrawing || !sendToSocket;
+
+    const clearButtonRef = useRef();
+
+    const [penColor, setPenColor] = useState("black");
+    const [showPenSize, setShowPenSize] = useState();
+    const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
+    const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
+    const [penSizeIndex, setPenSizeIndex] = useState(0);
 
     const handleChangePenSize = (e) => {
         if (!drawingInGame) return;
         e.preventDefault();
-        setPenSize(e.target.value);
-        localStorage.setItem("penSize", e.target.value);
+        setPenSizeIndex(e.target.value);
+        localStorage.setItem("penSize", penSizeChoices[e.target.value]);
     };
 
     const handleChangeColor = (e) => {
@@ -111,6 +114,21 @@ function CanvasFooter(props) {
     };
 
     useEffect(() => {
+        // Get the perks unlocked by (registered) user
+        const userPerks = JSON.parse(localStorage.getItem("userPerks"));
+        if (drawingInGame && userPerks) {
+            // User may have unlocked more than one perk, use their best one
+            const bestPerk = userPerks.reduce((prev, current) => {
+                return prev.rank > current.rank ? prev : current;
+            });
+            setColorChoices(bestPerk["colors"]);
+            setPenSizeChoices(
+                bestPerk["pen_sizes"].sort(function (a, b) {
+                    return a - b;
+                })
+            );
+        }
+
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
         const clearButton = clearButtonRef.current;
@@ -137,7 +155,7 @@ function CanvasFooter(props) {
         return () => {
             clearButton.removeEventListener("click", handleClearCanvas);
         };
-    }, [canvasRef, sendToSocket, isDrawing]);
+    }, [canvasRef, sendToSocket, isDrawing, drawingInGame]);
 
     return (
         <StyledCanvasFooter>
@@ -157,12 +175,14 @@ function CanvasFooter(props) {
                     />
                     {showPenSize && (
                         <StyledRangeInputContainer>
+                            <p>{penSizeChoices[penSizeIndex]}</p>
                             <StyledRangeInput
                                 penColor={penColor}
-                                min={10}
-                                max={50}
-                                step={10}
-                                value={penSize}
+                                min={0}
+                                max={penSizeChoices.length - 1}
+                                step={1}
+                                value={penSizeIndex}
+                                size={penSizeChoices[penSizeIndex]}
                                 onChange={handleChangePenSize}
                                 type="range"
                             />
@@ -170,11 +190,13 @@ function CanvasFooter(props) {
                     )}
                 </div>
                 <div>
-                    <StyledColor color="black" onClick={handleChangeColor} />
-                    <StyledColor color="green" onClick={handleChangeColor} />
-                    <StyledColor color="blue" onClick={handleChangeColor} />
-                    <StyledColor color="red" onClick={handleChangeColor} />
-                    <StyledColor color="orange" onClick={handleChangeColor} />
+                    {colorChoices.map((color) => (
+                        <StyledColor
+                            key={color}
+                            color={color}
+                            onClick={handleChangeColor}
+                        />
+                    ))}
                 </div>
             </StyledToolbar>
         </StyledCanvasFooter>

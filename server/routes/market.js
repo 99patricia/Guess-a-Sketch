@@ -176,7 +176,6 @@ export function init(app) {
     createPerk(app),
         getPerk(app),
         getAllPerks(app),
-        getUserPerks(app),
         purchasePerk(app),
         deletePerk(app);
 }
