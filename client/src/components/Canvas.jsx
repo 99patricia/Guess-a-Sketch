@@ -190,7 +190,7 @@ const Canvas = React.forwardRef((props, ref) => {
             canvas.removeEventListener("touchcancel", onMouseUp);
             canvas.removeEventListener("touchmove", onMouseMove);
         };
-    }, [canvasRef, sendToSocket, gameData, isDrawing]);
+    }, [canvasRef, sendToSocket, isDrawing]);
 
     return (
         <StyledCanvasContainer
