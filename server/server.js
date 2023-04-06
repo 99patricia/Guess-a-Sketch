@@ -164,7 +164,7 @@ function makeGame(
                         numberOfGuessers - game.listGuessed.length;
                     let multiplyer = playersNotGuessed / numberOfGuessers;
                     let drawerScore =
-                        multiplyer === 1 ? 0 : Math.round(multiplyer * 10) * 10;
+                        multiplyer === 1 ? 0 : Math.round(multiplyer * 30) * 10;
                     currentPlayer.score += drawerScore;
 
                     clearInterval(gameTimer);
@@ -179,7 +179,7 @@ function makeGame(
                 } else if (game.listGuessed) {
                     if (game.listGuessed.length == numberOfGuessers) {
                         // Award the drawer max points
-                        currentPlayer.score += 100;
+                        currentPlayer.score += 300;
                         timeleft = 0;
                     }
                 }
@@ -226,7 +226,7 @@ function makeGame(
         addPoints: function (username, timeLeft) {
             if (this.gameOver) return;
             // award guesser
-            let guesserScore = Math.round(100 * (timeLeft / this.drawTime));
+            let guesserScore = Math.floor(10 * (timeLeft / this.drawTime)) * 100;
             this.players.find((player) => player.username == username).score +=
                 guesserScore;
             console.log(`Player ${username} awarded ${guesserScore} points.`);
