@@ -29,6 +29,7 @@ function Room() {
     const [gameOver, setGameOver] = useState(false);
     const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
     const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
+    const [timeLeft, setTimeLeft] = useState("0");
 
     useEffect(() => {
         const userPerks = JSON.parse(localStorage.getItem("userPerks"));
@@ -79,6 +80,11 @@ function Room() {
             setIsDrawing(false);
         });
 
+        socket.off("timer");
+        socket.on("timer", (data) => {
+            setTimeLeft(data);
+        });
+
         socket.off("kick-player");
         socket.on("kick-player", (room_id) => {
             socket.emit("leave-room", room_id);
@@ -89,7 +95,7 @@ function Room() {
         socket.on("game-over", () => {
             setGameOver(true);
         });
-    }, [players, isHost, isDrawing, gameStart, userData, word]);
+    }, [players, isHost, isDrawing, gameStart, timeLeft, userData, word]);
 
     return (
         <>
@@ -115,6 +121,7 @@ function Room() {
                                         sendToSocket
                                         penSizeChoices={penSizeChoices}
                                         colorChoices={colorChoices}
+                                        timeLeft={timeLeft}
                                     />
                                 </>
                             ) : (
@@ -126,7 +133,7 @@ function Room() {
                             )}
                         </>
                     )}
-                    <Chat roomId={roomId} username={userData.username} />
+                    <Chat roomId={roomId} timeLeft={timeLeft} username={userData.username} />
                 </FlexContainer>
             </Container>
         </>
