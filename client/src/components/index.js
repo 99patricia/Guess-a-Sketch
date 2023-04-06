@@ -12,3 +12,4 @@ export { default as Lobby } from "./Lobby";
 export { default as Scoreboard } from "./Scoreboard";
 export { default as SideDrawer } from "./SideDrawer";
 export { default as GameOver } from "./GameOver";
+export { default as Leaderboard } from "./Leaderboard";
