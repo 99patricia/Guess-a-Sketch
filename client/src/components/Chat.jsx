@@ -28,7 +28,7 @@ const StyledRoomCode = styled.div`
 
 function Chat(props) {
     const chatRef = useRef();
-    const { roomId, username } = { ...props };
+    const { roomId, timeLeft, username } = { ...props };
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -50,7 +50,7 @@ function Chat(props) {
                 <div className="code">{roomId}</div>
             </StyledRoomCode>
             <ChatBody ref={chatRef} messages={messages} />
-            <ChatFooter username={username} />
+            <ChatFooter timeLeft={timeLeft} username={username} />
         </StyledChat>
     );
 }

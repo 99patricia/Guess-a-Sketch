@@ -16,7 +16,7 @@ const StyledChatInput = styled(FormInput)`
 `;
 
 function ChatFooter(props) {
-    const username = props.username;
+    const { timeLeft, username } = { ...props };
     const [message, setMessage] = useState("");
 
     const handleSendMessage = (e) => {
@@ -26,6 +26,7 @@ function ChatFooter(props) {
                 message,
                 username: username,
                 id: `${socket.id}${Math.random()}`,
+                timeLeft: timeLeft,
             });
         }
         setMessage("");

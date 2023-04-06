@@ -12,10 +12,15 @@ import {
     wordbank,
     game,
 } from "./routes/index.js";
+import { db } from "./service/firebase.js";
 import {
-    db
-} from "./service/firebase.js";
-import { doc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+    doc,
+    getDocs,
+    setDoc,
+    collection,
+    query,
+    where,
+} from "firebase/firestore";
 import { profile } from "console";
 
 const PORT = process.env.PORT || 3001;
@@ -193,10 +198,20 @@ function makeGame(
                 this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
             this.startTurn();
         },
-        addPoints: function (username) {
+        addPoints: function (username, timeLeft) {
+            // award guesser
+            let guesserScore = Math.round(100 * (timeLeft / this.drawTime));
+            this.players.find((player) => player.username == username).score +=
+                guesserScore;
+            // award drawer
+            let drawerScore = Math.round(50 * (timeLeft / this.drawTime));
             this.players.find(
-                (player) => player.username == username
-            ).score += 50;
+                (player) => player.username == this.currentTurn
+            ).score += drawerScore;
+            console.log(`Player ${username} awarded ${guesserScore} points.`);
+            console.log(
+                `Player ${this.currentTurn} awarded ${drawerScore} points.`
+            );
             this.sendGameData();
         },
         sendGameData: function () {
@@ -225,14 +240,19 @@ function makeGame(
             const index = games.indexOf(this);
             games.splice(index, 1);
 
-            this.players.forEach(async (player) => { // update player scores in the db
+            this.players.forEach(async (player) => {
+                // update player scores in the db
                 // var washingtonRef = db.collection('cities').doc('DC');
                 // washingtonRef.update({
                 //     population: firebase.firestore.FieldValue.increment(50)
                 // });
-                const q = query(collection(db, "profiles"), where("username", "==", player.username));
+                const q = query(
+                    collection(db, "profiles"),
+                    where("username", "==", player.username)
+                );
                 const querySnapshot = await getDocs(q);
-                querySnapshot.forEach((docSnapshot) => { // get doc of each registered player
+                querySnapshot.forEach((docSnapshot) => {
+                    // get doc of each registered player
                     // doc.data() is never undefined for query doc snapshots
                     let profileData = docSnapshot.data();
                     profileData.currency += player.score;
@@ -392,8 +412,6 @@ io.on("connection", async (socket) => {
     });
 
     socket.on("chat-message", (msg) => {
-        // console.log("Room " + currentRoom + " - " + msg.username + ": " + msg.message);
-        // io.to(currentRoom).emit("chat-message", msg);
         let canGuess =
             !game.gameOver &&
             game.currentRound > 0 &&
@@ -402,7 +420,9 @@ io.on("connection", async (socket) => {
         if (canGuess) {
             if (msg.message.toLowerCase() == game.currentWord.toLowerCase()) {
                 // current word is guessed
-                game.addPoints(username);
+                // get the time left from message data
+                let timeLeft = parseInt(msg.timeLeft);
+                game.addPoints(username, timeLeft);
                 player.hasGuessed = true;
                 game.listGuessed.push(username);
                 io.to(currentRoom).emit("chat-message", {
