@@ -157,7 +157,16 @@ function makeGame(
                 id: `${currentPlayer.socketId}${Math.random()}`,
             });
             let gameTimer = setInterval(function () {
+                let numberOfGuessers = game.players.length - 1;
                 if (timeleft <= 0) {
+                    // Award the drawer a percentage of max points based on how many players have not guessed
+                    let playersNotGuessed =
+                        numberOfGuessers - game.listGuessed.length;
+                    let multiplyer = playersNotGuessed / numberOfGuessers;
+                    let drawerScore =
+                        multiplyer === 1 ? 0 : Math.round(multiplyer * 10) * 10;
+                    currentPlayer.score += drawerScore;
+
                     clearInterval(gameTimer);
                     if (currentPlayer) {
                         roomsNamespace
@@ -168,7 +177,9 @@ function makeGame(
                     timeleft = 0;
                     game.nextTurn();
                 } else if (game.listGuessed) {
-                    if (game.listGuessed.length == game.players.length - 1) {
+                    if (game.listGuessed.length == numberOfGuessers) {
+                        // Award the drawer max points
+                        currentPlayer.score += 100;
                         timeleft = 0;
                     }
                 }
@@ -218,15 +229,7 @@ function makeGame(
             let guesserScore = Math.round(100 * (timeLeft / this.drawTime));
             this.players.find((player) => player.username == username).score +=
                 guesserScore;
-            // award drawer
-            let drawerScore = Math.round(50 * (timeLeft / this.drawTime));
-            this.players.find(
-                (player) => player.username == this.currentTurn
-            ).score += drawerScore;
             console.log(`Player ${username} awarded ${guesserScore} points.`);
-            console.log(
-                `Player ${this.currentTurn} awarded ${drawerScore} points.`
-            );
             this.sendGameData();
         },
         sendGameData: function () {
@@ -433,8 +436,8 @@ roomsNamespace.on("connection", async (socket) => {
     });
 
     socket.on("leave-room", (room) => {
-        socket.leave(room);
         console.log(`Socket ${socket.id} has left room ${room.roomId}`);
+        socket.leave(room);
         roomsNamespace.to(room).emit("chat-message", {
             message: username + " has left the game.",
             username: "GAME",
@@ -505,6 +508,7 @@ roomsNamespace.on("connection", async (socket) => {
     });
 
     socket.on("disconnect", () => {
+        console.log(`Socket ${socket.id} has left room ${currentRoom}`);
         socket.leave(currentRoom);
         roomsNamespace.to(currentRoom).emit("chat-message", {
             message: username + " has left the game.",
