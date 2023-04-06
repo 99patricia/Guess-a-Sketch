@@ -76,7 +76,9 @@ function CanvasFooter(props) {
 
     const clearButtonRef = useRef();
 
-    const [penColor, setPenColor] = useState("black");
+    const [penColor, setPenColor] = useState(
+        localStorage.getItem("penColor") || "black"
+    );
     const [showPenSize, setShowPenSize] = useState();
     const [penSizeIndex, setPenSizeIndex] = useState(0);
 

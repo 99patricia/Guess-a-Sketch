@@ -89,7 +89,7 @@ function Room() {
         socket.on("game-over", () => {
             setGameOver(true);
         });
-    }, [players, isHost, isDrawing, gameStart, gameData, userData, word]);
+    }, [players, isHost, isDrawing, gameStart, userData, word]);
 
     return (
         <>
