@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 function useUserData() {
     const [userData, setUserData] = useState({});
-    const isLoggedIn = document.cookie.includes("token");
+    const isLoggedIn = localStorage.getItem("userData") !== null;
     const loggedInAsGuest = sessionStorage.getItem("guestLoggedIn");
 
     useEffect(() => {
