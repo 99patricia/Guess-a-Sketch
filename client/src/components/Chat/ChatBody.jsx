@@ -3,17 +3,15 @@ import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
 
 const StyledChatBody = styled.div`
+    margin-top: auto;
     overflow-y: auto;
-    height: 100%;
 `;
 
 const StyledScrollableList = styled.div`
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    min-height: ${(props) => (props.isDesktop ? "100%" : "40vh")};
-    max-height: ${(props) => (props.isDesktop ? "none" : "40vh")};
+    margin-top: auto;
+    overflow-y: auto;
 `;
 
 const StyledMessage = styled.div`

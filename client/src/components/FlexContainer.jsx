@@ -6,8 +6,6 @@ const StyledFlexContainer = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: ${(props) => (props.isDesktop ? "row" : "column")};
-    min-height: 70vh;
-    max-height: 70vh;
 
     > div {
         margin: 0.5rem;
