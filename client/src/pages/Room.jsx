@@ -14,30 +14,23 @@ import {
 import { socket } from "service/socket";
 import { useUserData } from "hooks";
 import { Desktop } from "service/mediaQueries";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import styled from "styled-components";
+const NavBar = styled.div`
+    padding-bottom: 1rem;
+    // border: 1px solid purple;
+`;
 
-const StyledTabs = styled(Tabs)`
-    height: 85vh;
-    width: 90vw;
+const StyledNavLink = styled.a`
     margin: 1rem;
-`;
-
-const StyledTabList = styled(TabList)`
-    list-style: none;
-    margin: 0 0 1rem 0;
-    padding: 0;
-    position: relative;
-    display: grid;
-    gap: 1rem;
-    grid-auto-flow: column;
-`;
-
-const StyledTab = styled(Tab)`
-    padding: 1rem 0;
-    position: relative;
-    display: flex;
-    justify-content: center;
+    padding-bottom: 0.2rem;
+    color: var(--primary);
+    cursor: pointer;
+    :hover {
+        color: var(--secondary);
+    }
+    :active {
+        color: var(--primary);
+    }
 `;
 
 function Room() {
@@ -57,7 +50,28 @@ function Room() {
     const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
     const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
     const [timeLeft, setTimeLeft] = useState("0");
+    // https://www.w3schools.com/howto/howto_js_tabs.asp
+    function openTab(e, tabName) {
+        var i, tabcontent, tablinks;
 
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName(
+            StyledNavLink.styledComponentId
+        );
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(
+                " selected",
+                ""
+            );
+        }
+
+        document.getElementById(tabName).style.display = "block";
+        e.currentTarget.className += " selected";
+    }
     useEffect(() => {
         const userPerks = JSON.parse(localStorage.getItem("userPerks"));
         if (userPerks && userPerks.length > 0) {
@@ -129,66 +143,81 @@ function Room() {
             <Header />
             <Container>
                 {isDesktop ? (
-                    <>
-                        <FlexContainer>
-                            {gameOver ? (
-                                <GameOver gameData={gameData} />
-                            ) : (
-                                <>
-                                    {gameStart ? (
-                                        <>
-                                            <Scoreboard
-                                                userData={userData}
-                                                gameData={gameData}
-                                                host={isHost}
-                                            />
-                                            <Canvas
-                                                ref={canvasRef}
-                                                gameData={gameData}
-                                                isDrawing={isDrawing}
-                                                word={word}
-                                                sendToSocket
-                                                penSizeChoices={penSizeChoices}
-                                                colorChoices={colorChoices}
-                                                timeLeft={timeLeft}
-                                            />
-                                        </>
-                                    ) : (
-                                        <Lobby
+                    <FlexContainer>
+                        {gameOver ? (
+                            <GameOver gameData={gameData} />
+                        ) : (
+                            <>
+                                {gameStart ? (
+                                    <>
+                                        <Scoreboard
                                             userData={userData}
-                                            players={players}
+                                            gameData={gameData}
                                             host={isHost}
                                         />
-                                    )}
-                                </>
-                            )}
-                            <Chat
-                                roomId={roomId}
-                                timeLeft={timeLeft}
-                                username={userData.username}
-                            />
-                        </FlexContainer>
-                    </>
-                ) : (
-                    <StyledTabs>
-                        <StyledTabList>
-                            <StyledTab>
-                                {gameOver ? (
-                                    "Game Over"
+                                        <Canvas
+                                            ref={canvasRef}
+                                            gameData={gameData}
+                                            isDrawing={isDrawing}
+                                            word={word}
+                                            sendToSocket
+                                            penSizeChoices={penSizeChoices}
+                                            colorChoices={colorChoices}
+                                            timeLeft={timeLeft}
+                                        />
+                                    </>
                                 ) : (
-                                    <>{gameStart ? "Game" : "Lobby"}</>
+                                    <Lobby
+                                        userData={userData}
+                                        players={players}
+                                        host={isHost}
+                                    />
                                 )}
-                            </StyledTab>
-                            <StyledTab>Chat</StyledTab>
-                        </StyledTabList>
+                            </>
+                        )}
+                        <Chat
+                            roomId={roomId}
+                            timeLeft={timeLeft}
+                            username={userData.username}
+                        />
+                    </FlexContainer>
+                ) : (
+                    <>
+                        <NavBar>
+                            {gameStart ? (
+                                <StyledNavLink
+                                    onClick={(e) => {
+                                        openTab(e, "Game");
+                                    }}
+                                >
+                                    GAME
+                                </StyledNavLink>
+                            ) : (
+                                <StyledNavLink
+                                    className="selected"
+                                    onClick={(e) => {
+                                        openTab(e, "Lobby");
+                                    }}
+                                >
+                                    LOBBY
+                                </StyledNavLink>
+                            )}
+                            <StyledNavLink
+                                onClick={(e) => {
+                                    openTab(e, "Chat");
+                                }}
+                            >
+                                CHAT
+                            </StyledNavLink>
+                        </NavBar>
 
-                        <TabPanel>
+                        <div>
                             {gameOver ? (
                                 <GameOver gameData={gameData} />
                             ) : (
                                 <>
                                     {gameStart ? (
-                                        <>
+                                        <div id="Game" className="tabcontent">
                                             <Scoreboard
                                                 userData={userData}
                                                 gameData={gameData}
@@ -204,25 +233,31 @@ function Room() {
                                                 colorChoices={colorChoices}
                                                 timeLeft={timeLeft}
                                             />
-                                        </>
+                                        </div>
                                     ) : (
-                                        <Lobby
-                                            userData={userData}
-                                            players={players}
-                                            host={isHost}
-                                        />
+                                        <div id="Lobby" className="tabcontent">
+                                            <Lobby
+                                                userData={userData}
+                                                players={players}
+                                                host={isHost}
+                                            />
+                                        </div>
                                     )}
                                 </>
                             )}
-                        </TabPanel>
-                        <TabPanel>
-                            <Chat
-                                roomId={roomId}
-                                timeLeft={timeLeft}
-                                username={userData.username}
-                            />
-                        </TabPanel>
-                    </StyledTabs>
+                            <div
+                                id="Chat"
+                                className="tabcontent"
+                                style={{ display: "none" }}
+                            >
+                                <Chat
+                                    roomId={roomId}
+                                    timeLeft={timeLeft}
+                                    username={userData.username}
+                                />
+                            </div>
+                        </div>
+                    </>
                 )}
             </Container>
         </>

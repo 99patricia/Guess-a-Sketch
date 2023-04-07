@@ -13,8 +13,8 @@ const StyledChat = styled.div`
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-    min-height: ${(props) => (props.isDesktop ? "0" : "70vh")};
-    max-height: ${(props) => (props.isDesktop ? "100%" : "70vh")};
+    min-height: 70vh;
+    max-height: 70vh;
 `;
 
 const StyledRoomCode = styled.div`

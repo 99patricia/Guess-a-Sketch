@@ -106,13 +106,6 @@ input {
     grid-column: 2/3;
 }
 
-.react-tabs__tab--selected:after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--secondary);
-    height: 5px;
-    border-radius: 1rem;
+.selected {
+    border-bottom: 5px solid var(--secondary);
 }
