@@ -16,7 +16,9 @@ const ProfileContainer = styled.div`
     padding: 1rem;
     padding-top: 0.5rem;
     border-radius: 1rem;
-    width: 700px;
+    // min-width: 600px;
+    max-width: 700px;
+    width: 100vw;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-flow: column;
@@ -26,6 +28,8 @@ const ProfileNavContainer = styled.div`
     display: block;
     height: 100%;
     overflow: auto;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1) inset;
+    border-radius: 1rem;
 
     ::-webkit-scrollbar {
         width: 14px;
@@ -40,8 +44,7 @@ const ProfileNavContainer = styled.div`
 `;
 
 const NavBar = styled.div`
-    padding: 1rem;
-    padding-left: 0;
+    padding-bottom: 1rem;
     // border: 1px solid purple;
 `;
 
