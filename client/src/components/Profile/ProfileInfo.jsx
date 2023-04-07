@@ -18,11 +18,13 @@ const UserImage = styled.img`
     height: 105px;
     overflow: auto;
 
-    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
 `;
 
 const UserInfoText = styled.p`
     padding-left: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.3rem;
     margin: 0;
 `;
 
@@ -40,7 +42,7 @@ const AddFriendButton = styled.button`
     display: block;
     border: 0;
     border-radius: 1rem;
-    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
 
     -webkit-transition: background-color 0.05s ease-out;
     -moz-transition: background-color 0.05s ease-out;
@@ -50,15 +52,11 @@ const AddFriendButton = styled.button`
     :active {
         background-color: var(--primary);
     }
-    
-    :not(:last-child) {
-        margin: ${(props) => (props.column ? "1rem 0" : "0 1rem")};
-    }
 `;
 
 function ProfileInfo(props) {
 
-    const { userData, addFriendButtonRef } = { ...props };
+    const { userData, profileData, loggedInAsGuest, addFriendButtonRef } = { ...props };
 
     return (
         <>
@@ -66,12 +64,21 @@ function ProfileInfo(props) {
                 <UserImage src={userData.avatar} />
                 <div>
                     <UserInfoText>
-                        {userData.username} <br/>
-                        WINS: {userData.win} <br/> 
-                        POINTS: {userData.currency} <br/>
-                        <AddFriendButton ref={addFriendButtonRef}>
-                            ADD FRIEND
-                        </AddFriendButton>
+                        {loggedInAsGuest ? (
+                            <>
+                            Guest user: {userData.username} <br/><br/>
+                            Create an account to see your profile...
+                            </>
+                        ) : (
+                            <>
+                            {userData.username} <br/>
+                            WINS: {profileData.win} <br/> 
+                            POINTS: {profileData.currency} <br/>
+                            <AddFriendButton ref={addFriendButtonRef}>
+                                ADD FRIEND
+                            </AddFriendButton>
+                            </>
+                        ) }
                     </UserInfoText>
                 </div>
             </UserInfoContainer>
