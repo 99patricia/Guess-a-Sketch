@@ -1,5 +1,6 @@
 
 
 .selected {
-    border-bottom: 3px solid var(--secondary);
+    border-bottom: 4px solid var(--secondary);
+    border-radius: 0.2rem;
 }

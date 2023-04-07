@@ -19,8 +19,6 @@ function UserProfile(props) {
     const addFriendButtonRef = useRef();
 
     useEffect(() => {
-        const button = addFriendButtonRef.current;
-
         if (!loggedInAsGuest && userData.id) {
             axios
                 .get(`/profile/${userData.id}`)
@@ -28,6 +26,7 @@ function UserProfile(props) {
                     setProfileData(res.data);
                 });
         }
+        const button = addFriendButtonRef.current;
 
         function addFriend(e) {
             console.log("click");
@@ -42,7 +41,7 @@ function UserProfile(props) {
                 button.removeEventListener("click", addFriend);
             }
         };
-    }, [userData, profileData]);
+    }, [userData]);
 
     return (
         <>

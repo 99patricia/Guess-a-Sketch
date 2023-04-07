@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 
+import { IconButton } from "components";
+
 const UserInfoContainer = styled.div`
     display: flex;
     flex-direction: row;
@@ -26,6 +28,24 @@ const UserInfoText = styled.p`
     font-size: 1rem;
     line-height: 1.3rem;
     margin: 0;
+`;
+
+const EditButton = styled.button`
+    border-radius: 100%;
+    border: none;
+    color: var(--primary);
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    margin: 1rem;
+    margin-top: 1.5rem;
+    background-color: RGB(0, 0, 0, 0.05);
+
+    :active {
+        color: var(--secondary);
+    }
 `;
 
 const AddFriendButton = styled.button`
@@ -60,6 +80,9 @@ function ProfileInfo(props) {
 
     return (
         <>
+            <EditButton>
+                <i className="bi-pencil-fill"/>
+            </EditButton>
             <UserInfoContainer>
                 <UserImage src={userData.avatar} />
                 <div>

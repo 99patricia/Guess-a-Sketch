@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 import "components/Profile/profile.css";
 import { 
@@ -24,7 +25,18 @@ const ProfileContainer = styled.div`
 const ProfileNavContainer = styled.div`
     display: block;
     height: 100%;
-    border: 1px solid red;
+    overflow: auto;
+
+    ::-webkit-scrollbar {
+        width: 14px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-clip: padding-box;
+        background-color: #AAAAAA;
+        border-radius: 9999px;
+        border: 4px solid rgba(0, 0, 0, 0);
+    }
 `;
 
 const NavBar = styled.div`
@@ -51,6 +63,23 @@ const StyledNavLink = styled.a`
 function Profile(props) {
 
     const { userData, profileData, loggedInAsGuest, addFriendButtonRef } = { ...props };
+
+    const [ gameHistory, setGameHistory ] = useState([]);
+
+    useEffect(() => {
+        const games = profileData.gamehistory;
+        if (games) {
+            var i;
+            setGameHistory([]);
+            for (i=0; i<games.length; i++) {
+                axios
+                    .get(`/games/${games[i]}`)
+                    .then((res) => {
+                        setGameHistory(oldArray => [...oldArray, res.data]);
+                    });
+            }
+        }
+    }, [profileData]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
     function openTab(e, tabName ) {
@@ -80,21 +109,23 @@ function Profile(props) {
                     addFriendButtonRef={addFriendButtonRef}
                 />
                 {!loggedInAsGuest && 
+                <>
+                <NavBar>
+                    <StyledNavLink className="selected" onClick={(e) => {openTab(e, 'recentActivity')}}>
+                        RECENT ACTIVITY
+                    </StyledNavLink>
+                    <StyledNavLink onClick={(e) => {openTab(e, 'friends')}}>
+                        FRIENDS
+                    </StyledNavLink>
+                    <StyledNavLink onClick={(e) => {openTab(e, 'games')}}>
+                        GAMES
+                    </StyledNavLink>
+                    <StyledNavLink onClick={(e) => {openTab(e, 'customWordbanks')}}>
+                        CUSTOM WORDBANKS
+                    </StyledNavLink>
+                </NavBar>
                 <ProfileNavContainer>
-                    <NavBar>
-                        <StyledNavLink className="selected" onClick={(e) => {openTab(e, 'recentActivity')}}>
-                            RECENT ACTIVITY
-                        </StyledNavLink>
-                        <StyledNavLink onClick={(e) => {openTab(e, 'friends')}}>
-                            FRIENDS
-                        </StyledNavLink>
-                        <StyledNavLink onClick={(e) => {openTab(e, 'games')}}>
-                            GAMES
-                        </StyledNavLink>
-                        <StyledNavLink onClick={(e) => {openTab(e, 'customWordbanks')}}>
-                            CUSTOM WORDBANKS
-                        </StyledNavLink>
-                    </NavBar>
+
                     <div id="recentActivity" className="tabcontent">
                         <RecentActivity />
                     </div>
@@ -102,12 +133,13 @@ function Profile(props) {
                         <Friends />
                     </div>
                     <div id="games" className="tabcontent" style={{display:'none'}}>
-                        <Games />
+                        <Games gameHistory={gameHistory} />
                     </div>
                     <div id="customWordbanks" className="tabcontent" style={{display:'none'}}>
                         <CustomWordbanks />
                     </div>
                 </ProfileNavContainer>
+                </>
                 }
             </ProfileContainer>
         </>

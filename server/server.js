@@ -314,6 +314,7 @@ function makeGame(
             const gamedocObj = {
                 winner: gamedocPlayers[0].username,
                 players: gamedocPlayers,
+                room: this.roomId,
             };
             // const res = await collection(db, "games").add(gamedocObj);
             // const docRef = await addDoc(collection(db, "games"), gamedocObj);
