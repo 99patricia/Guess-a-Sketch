@@ -75,7 +75,7 @@ const TD = styled.td`
 
 function Leaderboard(props) {
 
-    const { leaderboardData } = { ...props };
+    const { leaderboardData, userData, loggedInAsGuest } = { ...props };
 
     return (
         <>
@@ -96,7 +96,7 @@ function Leaderboard(props) {
                         </THead>
                         <tbody>
                         {leaderboardData.map(({ username, wins, losses }, index) => (
-                            <TR key={username}>
+                            <TR key={username} style={userData.username == username && !loggedInAsGuest ? {color: "var(--secondary)"} : {color: "var(--primary)"}}>
                                 <TD>
                                     {index+1}
                                 </TD>
