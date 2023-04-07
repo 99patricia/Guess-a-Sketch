@@ -4,6 +4,7 @@ import IconButton from "./IconButton";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserData } from "hooks";
 import axios from "axios";
+import { Desktop } from "service/mediaQueries";
 
 const StyledNavButton = styled(IconButton)`
     background-color: transparent;
@@ -65,6 +66,7 @@ const StyledNavLink = styled(Link)`
 `;
 
 function SideDrawer(props) {
+    const isDesktop = Desktop();
     const [open, setOpen] = useState(false);
     const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
     const navigate = useNavigate();
@@ -88,6 +90,7 @@ function SideDrawer(props) {
         <>
             <StyledNavButton
                 iconClassName={open ? "bi-x-lg" : "bi-list"}
+                isDesktop={isDesktop}
                 onClick={() => setOpen(!open)}
                 open={open}
             />
