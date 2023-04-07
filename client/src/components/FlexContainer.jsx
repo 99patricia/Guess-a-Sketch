@@ -1,10 +1,11 @@
 import React from "react";
+import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
 
 const StyledFlexContainer = styled.div`
     display: flex;
     justify-content: center;
-    flex-direction: row;
+    flex-direction: ${(props) => (props.isDesktop ? "row" : "column")};
     min-height: 70vh;
     max-height: 70vh;
 
@@ -14,7 +15,12 @@ const StyledFlexContainer = styled.div`
 `;
 
 function FlexContainer(props) {
-    return <StyledFlexContainer>{props.children}</StyledFlexContainer>;
+    const isDesktop = Desktop();
+    return (
+        <StyledFlexContainer isDesktop={isDesktop}>
+            {props.children}
+        </StyledFlexContainer>
+    );
 }
 
 export default FlexContainer;

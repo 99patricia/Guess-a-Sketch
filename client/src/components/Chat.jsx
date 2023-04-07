@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { ChatBody, ChatFooter } from "components/Chat/";
+import { Desktop } from "service/mediaQueries";
 
 const StyledChat = styled.div`
     background-color: var(--light-beige);
@@ -27,6 +28,7 @@ const StyledRoomCode = styled.div`
 `;
 
 function Chat(props) {
+    const isDesktop = Desktop();
     const chatRef = useRef();
     const { roomId, timeLeft, username } = { ...props };
     const [messages, setMessages] = useState([]);

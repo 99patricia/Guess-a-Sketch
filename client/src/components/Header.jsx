@@ -3,11 +3,12 @@ import styled from "styled-components";
 
 import { SideDrawer } from "components";
 import { useUserData } from "hooks";
+import { Desktop } from "service/mediaQueries";
 
 const StyledHeader = styled.div`
     background-color: var(--primary);
     width: 100%;
-    height: 100px;
+    height: ${(props) => (props.isDesktop ? "100px" : "60px")};
     position: -webkit-sticky;
     position: sticky;
     top: 0;
@@ -31,10 +32,11 @@ const StyledSiteLink = styled.a`
 `;
 
 function Header(props) {
+    const isDesktop = Desktop();
     const { isLoggedIn, loggedInAsGuest } = useUserData();
     return (
         <>
-            <StyledHeader>
+            <StyledHeader isDesktop={isDesktop}>
                 <StyledSiteLink href="/">sketch.guess</StyledSiteLink>
             </StyledHeader>
             {(isLoggedIn || loggedInAsGuest) && <SideDrawer />}

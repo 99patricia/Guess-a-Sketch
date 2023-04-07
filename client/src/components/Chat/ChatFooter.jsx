@@ -4,18 +4,21 @@ import { socket } from "service/socket";
 
 import { Button } from "components";
 import FormInput from "components/FormInput";
+import { Desktop } from "service/mediaQueries";
 
 const StyledChatFooter = styled.form`
     display: flex;
+    flex-direction: ${(props) => (props.isDesktop ? "row" : "column")};
     margin: 0.5rem 0;
 `;
 
 const StyledChatInput = styled(FormInput)`
     font-size: 1rem;
-    margin: 0 0.5rem 0 0;
+    margin: ${(props) => (props.isDesktop ? "0 0.5rem 0 0" : "0.5rem 0")};
 `;
 
 function ChatFooter(props) {
+    const isDesktop = Desktop();
     const { timeLeft, username } = { ...props };
     const [message, setMessage] = useState("");
 
@@ -33,8 +36,9 @@ function ChatFooter(props) {
     };
 
     return (
-        <StyledChatFooter onSubmit={handleSendMessage}>
+        <StyledChatFooter isDesktop={isDesktop} onSubmit={handleSendMessage}>
             <StyledChatInput
+                isDesktop={isDesktop}
                 type="text"
                 placeholder="Enter guess here"
                 value={message}

@@ -13,8 +13,35 @@ import {
 } from "components";
 import { socket } from "service/socket";
 import { useUserData } from "hooks";
+import { Desktop } from "service/mediaQueries";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import styled from "styled-components";
+
+const StyledTabs = styled(Tabs)`
+    height: 85vh;
+    width: 90vw;
+    margin: 1rem;
+`;
+
+const StyledTabList = styled(TabList)`
+    list-style: none;
+    margin: 0 0 1rem 0;
+    padding: 0;
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    grid-auto-flow: column;
+`;
+
+const StyledTab = styled(Tab)`
+    padding: 1rem 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+`;
 
 function Room() {
+    const isDesktop = Desktop();
     const navigate = useNavigate();
     const canvasRef = useRef();
     const { roomId } = useParams();
@@ -101,40 +128,102 @@ function Room() {
         <>
             <Header />
             <Container>
-                <FlexContainer>
-                    {gameOver ? (
-                        <GameOver gameData={gameData} />
-                    ) : (
-                        <>
-                            {gameStart ? (
-                                <>
-                                    <Scoreboard
-                                        userData={userData}
-                                        gameData={gameData}
-                                        host={isHost}
-                                    />
-                                    <Canvas
-                                        ref={canvasRef}
-                                        gameData={gameData}
-                                        isDrawing={isDrawing}
-                                        word={word}
-                                        sendToSocket
-                                        penSizeChoices={penSizeChoices}
-                                        colorChoices={colorChoices}
-                                        timeLeft={timeLeft}
-                                    />
-                                </>
+                {isDesktop ? (
+                    <>
+                        <FlexContainer>
+                            {gameOver ? (
+                                <GameOver gameData={gameData} />
                             ) : (
-                                <Lobby
-                                    userData={userData}
-                                    players={players}
-                                    host={isHost}
-                                />
+                                <>
+                                    {gameStart ? (
+                                        <>
+                                            <Scoreboard
+                                                userData={userData}
+                                                gameData={gameData}
+                                                host={isHost}
+                                            />
+                                            <Canvas
+                                                ref={canvasRef}
+                                                gameData={gameData}
+                                                isDrawing={isDrawing}
+                                                word={word}
+                                                sendToSocket
+                                                penSizeChoices={penSizeChoices}
+                                                colorChoices={colorChoices}
+                                                timeLeft={timeLeft}
+                                            />
+                                        </>
+                                    ) : (
+                                        <Lobby
+                                            userData={userData}
+                                            players={players}
+                                            host={isHost}
+                                        />
+                                    )}
+                                </>
                             )}
-                        </>
-                    )}
-                    <Chat roomId={roomId} timeLeft={timeLeft} username={userData.username} />
-                </FlexContainer>
+                            <Chat
+                                roomId={roomId}
+                                timeLeft={timeLeft}
+                                username={userData.username}
+                            />
+                        </FlexContainer>
+                    </>
+                ) : (
+                    <StyledTabs>
+                        <StyledTabList>
+                            <StyledTab>
+                                {gameOver ? (
+                                    "Game Over"
+                                ) : (
+                                    <>{gameStart ? "Game" : "Lobby"}</>
+                                )}
+                            </StyledTab>
+                            <StyledTab>Chat</StyledTab>
+                        </StyledTabList>
+
+                        <TabPanel>
+                            {gameOver ? (
+                                <GameOver gameData={gameData} />
+                            ) : (
+                                <>
+                                    {gameStart ? (
+                                        <>
+                                            <Scoreboard
+                                                userData={userData}
+                                                gameData={gameData}
+                                                host={isHost}
+                                            />
+                                            <Canvas
+                                                ref={canvasRef}
+                                                gameData={gameData}
+                                                isDrawing={isDrawing}
+                                                word={word}
+                                                sendToSocket
+                                                penSizeChoices={penSizeChoices}
+                                                colorChoices={colorChoices}
+                                                timeLeft={timeLeft}
+                                            />
+                                        </>
+                                    ) : (
+                                        <Lobby
+                                            userData={userData}
+                                            players={players}
+                                            host={isHost}
+                                        />
+                                    )}
+                                </>
+                            )}
+                        </TabPanel>
+                        <TabPanel>
+                            <Chat
+                                roomId={roomId}
+                                timeLeft={timeLeft}
+                                username={userData.username}
+                            />
+                        </TabPanel>
+                    </StyledTabs>
+                )}
             </Container>
         </>
     );

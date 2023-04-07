@@ -8,7 +8,7 @@ import axios from "axios";
 const StyledNavButton = styled(IconButton)`
     background-color: transparent;
     position: fixed;
-    top: 30px;
+    top: ${(props) => (props.isDesktop ? "30px" : "10px")};
     margin: 0;
     z-index: 3;
 

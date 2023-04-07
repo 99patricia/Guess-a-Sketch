@@ -1,4 +1,5 @@
 import React from "react";
+import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
 
 const StyledChatBody = styled.div`
@@ -8,10 +9,11 @@ const StyledChatBody = styled.div`
 
 const StyledScrollableList = styled.div`
     overflow-y: auto;
-    min-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    min-height: ${(props) => (props.isDesktop ? "100%" : "40vh")};
+    max-height: ${(props) => (props.isDesktop ? "none" : "40vh")};
 `;
 
 const StyledMessage = styled.div`
@@ -25,9 +27,10 @@ const StyledMessage = styled.div`
 `;
 
 const ChatBody = React.forwardRef((props, ref) => {
+    const isDesktop = Desktop();
     return (
         <StyledChatBody ref={ref}>
-            <StyledScrollableList>
+            <StyledScrollableList isDesktop={isDesktop}>
                 {props.messages.map((msg) => (
                     <StyledMessage key={msg.id}>
                         {msg.username}: {msg.message}
