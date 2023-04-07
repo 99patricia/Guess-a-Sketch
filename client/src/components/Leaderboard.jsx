@@ -40,7 +40,7 @@ const LeaderboardTableDiv = styled.div`
 `;
 
 const LeaderboardTable = styled.table`
-    text-align: left;
+    text-align: center;
     border-collapse: collapse;
     width: 100%;
 `;
@@ -87,14 +87,18 @@ function Leaderboard(props) {
                     <LeaderboardTable>
                         <THead>
                             <TR>
-                                <TH>username</TH>
-                                <TH>wins</TH>
-                                <TH>losses</TH>
+                                <TH>Rank</TH>
+                                <TH>Username</TH>
+                                <TH>Wins</TH>
+                                <TH>Losses</TH>
                                 <TH>W/L</TH>
                             </TR>
                         </THead>
-                        {leaderboardData.map(({ username, wins, losses }) => (
+                        {leaderboardData.map(({ username, wins, losses }, index) => (
                             <TR>
+                                <TD>
+                                    {index+1}
+                                </TD>
                                 <TD>
                                     {username}
                                 </TD>
@@ -105,7 +109,8 @@ function Leaderboard(props) {
                                     {losses}
                                 </TD>
                                 <TD>
-                                    {wins/losses}
+                                    {isFinite(wins/losses) ? (Math.round((wins/losses) * 100)/100).toFixed(2)
+                                    : wins}
                                 </TD>
                             </TR>
                         ))}
