@@ -63,6 +63,7 @@ const StyledSelect = styled.select`
     border: 1px solid var(--beige);
     font-size: 1.2rem;
     color: var(--primary);
+    margin-bottom: 2rem;
 
     width: 100%;
     -webkit-box-sizing: border-box;

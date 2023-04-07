@@ -22,6 +22,7 @@ const StyledColor = styled.button`
     height: 20px;
     margin: 0.2rem;
     border-radius: 100%;
+    padding: 0;
     border: none;
     cursor: pointer;
     background-color: ${(props) => props.color};

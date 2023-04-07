@@ -10,6 +10,7 @@ const StyledNavButton = styled(IconButton)`
     position: fixed;
     top: 30px;
     margin: 0;
+    z-index: 3;
 
     transition: transform 0.3s ease-in-out;
     transform: ${(props) =>
@@ -17,7 +18,7 @@ const StyledNavButton = styled(IconButton)`
 `;
 
 const StyledSideDrawer = styled.div`
-    z-index: 1;
+    z-index: 2;
     background-color: var(--light-beige);
     height: 100vh;
     padding: 3rem;
@@ -43,7 +44,7 @@ const StyledSideDrawer = styled.div`
 
 const StyledAvatar = styled.img`
     border-radius: 100%;
-    margin: 1rem;
+    margin: 1rem 0;
 `;
 
 const StyledUsername = styled.div`
