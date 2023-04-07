@@ -95,6 +95,11 @@ function Room() {
         socket.on("game-over", () => {
             setGameOver(true);
         });
+
+        socket.off("disconnect");
+        socket.on("disconnect", (reason) => {
+            navigate(`/`);
+          });
     }, [players, isHost, isDrawing, gameStart, timeLeft, userData, word]);
 
     return (

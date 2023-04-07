@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const GamesContainer = styled.div`
     display: grid;
-    grid-template-rows: repeat(auto-fill, 3rem);
+    grid-template-rows: repeat(auto-fill);
     padding: 0.5rem;
     grid-gap: 0.5rem;
     height: 100%;
@@ -33,7 +33,7 @@ function Games(props) {
             {gameHistory.map(({ room, winner, players }, index) => (
                 <GameCard key={index}>
                     <p>
-                        Played a game with {players.length} players in room ({room || "temp"})
+                        Played a game with {players.length} players in room ({room ? (<>{room.toUpperCase()}</>): (<>temp</>)})
                     </p>
                     <p style={{color:"var(--secondary)"}}>
                         winner: {winner}

@@ -35,7 +35,15 @@ const corsOptions = {
 // Initialize app
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: corsOptions });
+const io = new Server(server, { 
+    cors: corsOptions,
+    connectionStateRecovery: {
+        // the backup duration of the sessions and the packets
+        maxDisconnectionDuration: 60 * 1000,
+        // whether to skip middlewares upon successful recovery
+        skipMiddlewares: true,
+    },
+});
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
@@ -348,7 +356,7 @@ roomsNamespace.on("connection", async (socket) => {
         } else {
             // create and join room
             socket.join(room.roomId);
-            console.log(`Room ${room.roomId} was created`);
+            console.log(`Room ${room.roomId} was created by ${socket.id}`);
 
             currentRoom = room.roomId;
             host = true;
