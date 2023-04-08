@@ -14,9 +14,14 @@ const StyledCanvasContainer = styled.div`
         padding: 1rem;
         padding-top: 0.25rem;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  `}
+    `}
 
-    ${(props) => !props.isDesktop && `width: 100vw;`}
+    ${(props) =>
+        !props.isDesktop &&
+        props.inGame &&
+        `width: 100vw;
+        margin-left: -1rem;
+    `}
 `;
 
 const StyledCanvas = styled.canvas`
@@ -28,9 +33,15 @@ const StyledCanvas = styled.canvas`
 const Canvas = React.forwardRef((props, ref) => {
     const isDesktop = Desktop();
     const canvasRef = ref;
-    const { gameData, isDrawing, noContainer, word, sendToSocket, timeLeft } = {
-        ...props,
-    };
+    const {
+        noContainer,
+        gameData,
+        isDrawing,
+        word,
+        sendToSocket,
+        timeLeft,
+        inGame,
+    } = { ...props };
 
     const penSizeChoices = props.penSizeChoices || [10, 50];
     const colorChoices = props.colorChoices || ["black", "red", "blue"];
@@ -43,9 +54,19 @@ const Canvas = React.forwardRef((props, ref) => {
         const canDraw = isDrawing;
 
         // Resize canvas
-        const canvasParentWidth = canvas.parentElement.clientWidth;
-        canvas.width = isDesktop ? "500" : canvasParentWidth;
-        canvas.height = isDesktop ? "340" : canvasParentWidth;
+        if (inGame) {
+            // Resize the canvas to fit screen width
+            canvas.width = !isDesktop || !gameData ? window.outerWidth : 500;
+            canvas.height =
+                !isDesktop || !gameData
+                    ? window.outerWidth
+                    : canvas.parentElement.clientHeight - 190;
+        } else {
+            // Resize the draw avatar canvas to fit form
+            const canvasParentWidth = canvas.parentElement.clientWidth;
+            canvas.width = canvasParentWidth;
+            canvas.height = canvasParentWidth;
+        }
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -193,6 +214,7 @@ const Canvas = React.forwardRef((props, ref) => {
         <StyledCanvasContainer
             width={props.width}
             isDesktop={isDesktop}
+            inGame={inGame}
             noContainer={noContainer}
         >
             {sendToSocket && (

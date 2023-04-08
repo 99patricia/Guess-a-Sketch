@@ -34,8 +34,15 @@ const StyledNavLink = styled.a`
 `;
 
 const TabContainer = styled.div`
-    min-width: 90vw;
+    height: 70vh;
+    width: 100vw;
+    padding: 0 1rem;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 `;
+
+const TabContentContainer = styled.div``;
 
 function Room() {
     const isDesktop = Desktop();
@@ -54,7 +61,7 @@ function Room() {
     const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
     const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
     const [timeLeft, setTimeLeft] = useState("0");
-    // https://www.w3schools.com/howto/howto_js_tabs.asp
+
     function openTab(e, tabName) {
         var i, tabcontent, tablinks;
 
@@ -168,6 +175,7 @@ function Room() {
                                             penSizeChoices={penSizeChoices}
                                             colorChoices={colorChoices}
                                             timeLeft={timeLeft}
+                                            inGame
                                         />
                                     </>
                                 ) : (
@@ -186,16 +194,26 @@ function Room() {
                         />
                     </FlexContainer>
                 ) : (
-                    <>
+                    <TabContainer>
                         <NavBar>
                             {gameStart ? (
-                                <StyledNavLink
-                                    onClick={(e) => {
-                                        openTab(e, "Game");
-                                    }}
-                                >
-                                    GAME
-                                </StyledNavLink>
+                                <>
+                                    <StyledNavLink
+                                        onClick={(e) => {
+                                            openTab(e, "Players");
+                                        }}
+                                    >
+                                        PLAYERS
+                                    </StyledNavLink>
+                                    <StyledNavLink
+                                        className="selected"
+                                        onClick={(e) => {
+                                            openTab(e, "Game");
+                                        }}
+                                    >
+                                        GAME
+                                    </StyledNavLink>
+                                </>
                             ) : (
                                 <StyledNavLink
                                     className="selected"
@@ -215,30 +233,44 @@ function Room() {
                             </StyledNavLink>
                         </NavBar>
 
-                        <TabContainer>
+                        <TabContentContainer>
                             {gameOver ? (
                                 <GameOver gameData={gameData} />
                             ) : (
                                 <>
                                     {gameStart ? (
-                                        <div id="Game" className="tabcontent">
-                                            <Scoreboard
-                                                userData={userData}
-                                                gameData={gameData}
-                                                host={isHost}
-                                            />
-                                            <Canvas
-                                                noContainer
-                                                ref={canvasRef}
-                                                gameData={gameData}
-                                                isDrawing={isDrawing}
-                                                word={word}
-                                                sendToSocket
-                                                penSizeChoices={penSizeChoices}
-                                                colorChoices={colorChoices}
-                                                timeLeft={timeLeft}
-                                            />
-                                        </div>
+                                        <>
+                                            <div
+                                                id="Players"
+                                                className="tabcontent"
+                                                style={{ display: "none" }}
+                                            >
+                                                <Scoreboard
+                                                    userData={userData}
+                                                    gameData={gameData}
+                                                    host={isHost}
+                                                />
+                                            </div>
+                                            <div
+                                                id="Game"
+                                                className="tabcontent"
+                                            >
+                                                <Canvas
+                                                    noContainer
+                                                    ref={canvasRef}
+                                                    gameData={gameData}
+                                                    isDrawing={isDrawing}
+                                                    word={word}
+                                                    sendToSocket
+                                                    penSizeChoices={
+                                                        penSizeChoices
+                                                    }
+                                                    colorChoices={colorChoices}
+                                                    timeLeft={timeLeft}
+                                                    inGame
+                                                />
+                                            </div>
+                                        </>
                                     ) : (
                                         <div id="Lobby" className="tabcontent">
                                             <Lobby
@@ -261,8 +293,8 @@ function Room() {
                                     username={userData.username}
                                 />
                             </div>
-                        </TabContainer>
-                    </>
+                        </TabContentContainer>
+                    </TabContainer>
                 )}
             </Container>
         </>
