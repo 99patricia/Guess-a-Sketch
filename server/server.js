@@ -118,7 +118,7 @@ function makeGame(
                 // }
                 this.players.splice(index, 1);
                 if (this.currentTurn === username) {
-                    this.nextTurn();
+                    this.nextTurn(index);
                 }
             }
             this.sendGameData();
@@ -160,6 +160,7 @@ function makeGame(
                 .emit("turn-start", this.currentWord);
 
             // maybe create async function to manage the timer
+            let disconnected = false;
             let game = this;
             let timeleft = this.drawTime;
             let currentPlayer = game.players.find(
@@ -173,6 +174,14 @@ function makeGame(
                 id: `${currentPlayer.socketId}${Math.random()}`,
             });
             let gameTimer = setInterval(function () {
+                if (disconnected) {
+                    return;
+                }
+                if (currentPlayer.username !== game.currentTurn) {
+                    timeleft = 0;
+                    disconnected = true;
+                    return;
+                }
                 let numberOfGuessers = game.players.length - 1;
                 if (timeleft <= 0) {
                     // Award the drawer a percentage of max points based on how many players have not guessed
@@ -191,7 +200,8 @@ function makeGame(
                         game.sendGameData();
                     }
                     timeleft = 0;
-                    game.nextTurn();
+                    let index = game.players.indexOf(currentPlayer);
+                    game.nextTurn(index+1);
                 } else if (game.listGuessed) {
                     if (game.listGuessed.length == numberOfGuessers) {
                         // Award the drawer max points
@@ -205,13 +215,9 @@ function makeGame(
                 timeleft -= 1;
             }, 1000);
         },
-        nextTurn: function () {
+        nextTurn: function (index) {
             if (this.gameOver) return;
             roomsNamespace.to(this.roomId).emit("clear-canvas");
-            const currentPlayer = this.players.find(
-                (player) => player.username == this.currentTurn
-            );
-            const index = this.players.indexOf(currentPlayer) + 1;
             if (index >= this.players.length) {
                 // next round or end of game
                 this.currentRound += 1;
