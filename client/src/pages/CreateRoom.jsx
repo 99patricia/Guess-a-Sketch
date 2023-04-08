@@ -46,6 +46,9 @@ function CreateRoom() {
                     numberOfRounds,
                     wordbankContent,
                 };
+
+                // Manually connect socket when creating room
+                socket.connect();
                 socket.emit("create-room", room);
                 socket.on("create-room-success", () => {
                     navigate(`/room/${roomId}`);

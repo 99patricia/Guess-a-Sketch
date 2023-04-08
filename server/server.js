@@ -35,7 +35,7 @@ const corsOptions = {
 // Initialize app
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { 
+const io = new Server(server, {
     cors: corsOptions,
     connectionStateRecovery: {
         // the backup duration of the sessions and the packets
@@ -43,6 +43,8 @@ const io = new Server(server, {
         // whether to skip middlewares upon successful recovery
         skipMiddlewares: true,
     },
+    // ping every 2 seconds
+    pingInterval: 2000,
 });
 app.use(express.json());
 app.use(cookieParser());
@@ -242,7 +244,8 @@ function makeGame(
         addPoints: function (username, timeLeft) {
             if (this.gameOver) return;
             // award guesser
-            let guesserScore = Math.floor(10 * (timeLeft / this.drawTime)) * 100;
+            let guesserScore =
+                Math.floor(10 * (timeLeft / this.drawTime)) * 100;
             this.players.find((player) => player.username == username).score +=
                 guesserScore;
             console.log(`Player ${username} awarded ${guesserScore} points.`);
@@ -531,15 +534,21 @@ roomsNamespace.on("connection", async (socket) => {
         }
     });
 
+    socket.on("connect", () => {
+        console.log(`Socket ${socket.id} connected`);
+    });
+
     socket.on("disconnect", () => {
-        console.log(`Socket ${socket.id} has left room ${currentRoom}`);
+        console.log(
+            `Socket ${socket.id} disconnected or has left room ${currentRoom}`
+        );
         socket.leave(currentRoom);
         roomsNamespace.to(currentRoom).emit("chat-message", {
             message: username + " has left the game.",
             username: "GAME",
             id: `${socket.id}${Math.random()}`,
         });
-        // console.log(socket.id + " with username " + username + " disconnected");
+
         if (Object.keys(game).length > 0) {
             game.removePlayer(username);
         }

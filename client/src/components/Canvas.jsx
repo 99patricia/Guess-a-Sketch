@@ -182,7 +182,6 @@ const Canvas = React.forwardRef((props, ref) => {
 
         // If we receive coordinates from socket, draw them
         if (sendToSocket) {
-            socket.off("draw");
             socket.on("draw", (data) => {
                 // Only receive if we are not the person currently drawing
                 if (!canDraw)
@@ -198,6 +197,10 @@ const Canvas = React.forwardRef((props, ref) => {
         }
 
         return () => {
+            // Socket cleanup
+            socket.off("draw");
+
+            // Event listener cleanup
             canvas.removeEventListener("mousedown", onMouseDown);
             canvas.removeEventListener("mouseup", onMouseUp);
             canvas.removeEventListener("mouseout", onMouseUp);

@@ -103,20 +103,17 @@ function Room() {
             socket.emit("get-game-data");
         }
 
-        socket.off("game-start");
         socket.on("game-start", (data) => {
             setGameStart(true);
             setGameData(data);
         });
 
-        socket.off("game-data");
         socket.on("game-data", (data) => {
             setGameData(data);
             setGameStart(data.gameStarted);
             setGameOver(data.gameOver);
         });
 
-        socket.off("players-data");
         socket.on("players-data", (data) => {
             setPlayers(data);
             if (players?.length > 0) {
@@ -128,43 +125,57 @@ function Room() {
             }
         });
 
-        socket.off("turn-start");
         socket.on("turn-start", (word) => {
             setIsDrawing(true);
             setWord(word);
         });
 
-        socket.off("turn-end");
         socket.on("turn-end", () => {
             setIsDrawing(false);
         });
 
-        socket.off("timer");
         socket.on("timer", (data) => {
             setTimeLeft(data);
         });
 
-        socket.off("kick-player");
         socket.on("kick-player", (room_id) => {
             socket.emit("leave-room", room_id);
             window.alert("You were kicked from the server...");
             navigate(`/`);
         });
 
-        socket.off("game-over");
         socket.on("game-over", () => {
             setGameOver(true);
         });
 
-        socket.off("disconnect");
         socket.on("disconnect", (reason) => {
             var txt;
             window.alert("You disconnected from the server...");
             navigate(`/`);
         });
-        
-        // console.log('useeffect');
-    }, [players, isHost, isDrawing, gameStart, timeLeft, userData, word, gameData]);
+
+        return () => {
+            // Socket cleanup
+            socket.off("game-start");
+            socket.off("game-data");
+            socket.off("players-data");
+            socket.off("turn-start");
+            socket.off("turn-end");
+            socket.off("timer");
+            socket.off("kick-player");
+            socket.off("game-over");
+            socket.off("disconnect");
+        };
+    }, [
+        players,
+        isHost,
+        isDrawing,
+        gameStart,
+        timeLeft,
+        userData,
+        word,
+        gameData,
+    ]);
 
     return (
         <>

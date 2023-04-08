@@ -136,10 +136,13 @@ function CanvasFooter(props) {
         canvas.addEventListener("click", () => setShowPenSize(false));
         // If we receive clear-canvas from socket, clear the canvas
         if (sendToSocket) {
-            socket.off("clear-canvas");
             socket.on("clear-canvas", clearCanvas);
         }
+
         return () => {
+            //Socket cleanup
+            socket.off("clear-canvas");
+            // Event listener cleanup
             clearButton.removeEventListener("click", handleClearCanvas);
         };
     }, [canvasRef, sendToSocket, isDrawing, drawingInGame]);

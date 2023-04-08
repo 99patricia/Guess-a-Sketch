@@ -36,7 +36,6 @@ function Chat(props) {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        socket.off("chat-message");
         socket.on("chat-message", (msg) => {
             // Append existing message with incoming message
             setMessages([...messages, msg]);
@@ -45,6 +44,11 @@ function Chat(props) {
         // Scroll to bottom of chat when new message arrives
         const chatBody = chatRef.current;
         chatBody.scrollTop = chatBody.scrollHeight;
+
+        return () => {
+            // Socket cleanup
+            socket.off("chat-message");
+        };
     }, [messages]);
 
     return (
