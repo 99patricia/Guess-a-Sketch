@@ -2,26 +2,28 @@ import React from "react";
 import styled from "styled-components";
 
 import { socket } from "service/socket";
+import { Desktop } from "service/mediaQueries";
 
 const ScoreboardContainer = styled.div`
-    width: 220px;
+    width: ${(props) => (props.isDesktop ? "220px" : "100%")};
 `;
 
 const ScoreboardList = styled.div`
     display: grid;
     grid-template-rows: repeat(auto-fill, 4rem);
-    grid-gap: 0.25rem;
-    padding-top: 0.25rem;
+    grid-gap: 1.5rem;
     height: 100%;
 `;
 
 const StyledScoreboard = styled.div`
+    background-color: var(--light-beige);
+    height: fit-content;
     display: grid;
-    grid-template-columns: 130px 60px;
+    grid-template-columns: 2fr 1fr;
     align-items: center;
     text-align: center;
-    background-color: var(--light-beige);
-    border-radius: 0.25rem;
+    padding: 0.5rem 0;
+    border-radius: 0.5rem;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     outline: ${(props) =>
@@ -68,6 +70,7 @@ const HoverButton = styled.button`
 `;
 
 function Scoreboard(props) {
+    const isDesktop = Desktop();
     const { userData, gameData, host } = { ...props };
 
     function kickPlayer(username) {
@@ -75,7 +78,7 @@ function Scoreboard(props) {
     }
 
     return (
-        <ScoreboardContainer>
+        <ScoreboardContainer isDesktop={isDesktop}>
             <ScoreboardList>
                 {gameData.players.map(
                     ({ username, avatar, score, isHost, hasGuessed }) => (
@@ -86,7 +89,7 @@ function Scoreboard(props) {
                             {username === userData.username ? (
                                 <div>
                                     <StyledText secondary>
-                                        {username} <br></br>
+                                        {username}
                                     </StyledText>
                                     <StyledText secondary>
                                         Score: {score}
@@ -100,9 +103,11 @@ function Scoreboard(props) {
                             )}
                             <UserImageDiv>
                                 {host && username !== userData.username && (
-                                <HoverButton onClick={() => kickPlayer(username)}>
-                                    Kick
-                                </HoverButton>
+                                    <HoverButton
+                                        onClick={() => kickPlayer(username)}
+                                    >
+                                        Kick
+                                    </HoverButton>
                                 )}
                                 <UserImage src={avatar} />
                             </UserImageDiv>
