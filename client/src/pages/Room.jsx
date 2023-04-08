@@ -95,6 +95,7 @@ function Room() {
         socket.off("kick-player");
         socket.on("kick-player", (room_id) => {
             socket.emit("leave-room", room_id);
+            window.alert("You were kicked from the server...");
             navigate(`/`);
         });
 
@@ -105,6 +106,8 @@ function Room() {
 
         socket.off("disconnect");
         socket.on("disconnect", (reason) => {
+            var txt;
+            window.alert("You disconnected from the server...");
             navigate(`/`);
         });
         

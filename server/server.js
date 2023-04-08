@@ -412,7 +412,7 @@ roomsNamespace.on("connection", async (socket) => {
         }
         if (rooms.has(roomId)) {
             game = games.find((game) => game.roomId == roomId);
-            if (game ===undefined ) {
+            if (game === undefined) {
                 roomsNamespace.to(socket.id).emit("join-room-fail", {
                     room,
                     msg: "Game is over",
@@ -464,18 +464,17 @@ roomsNamespace.on("connection", async (socket) => {
         });
         if (Object.keys(game).length > 0) {
             game.removePlayer(username);
-            game = {};
             currentRoom = "";
             host = false;
         }
         roomsNamespace.to(room).emit("players-data", game.players);
+        game = {};
     });
 
     socket.on("kick-player", async (username) => {
         const socket_id = game.players.find(
             (player) => player.username == username
         ).socketId;
-        var sockets = await io.in(game.roomID).fetchSockets();
         roomsNamespace.to(socket_id).emit("kick-player", game.roomId);
     });
 
