@@ -95,8 +95,6 @@ function Lobby(props) {
     const { userData, players, host } = { ...props };
     const isDesktop = Desktop();
 
-    socket.emit("get-players-data");
-
     function startGame() {
         socket.emit("start-game");
     }
