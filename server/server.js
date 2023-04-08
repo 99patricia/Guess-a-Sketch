@@ -108,12 +108,24 @@ function makeGame(
             let player = this.players.find(
                 (player) => player.username == username
             );
+
             let i = this.listGuessed.indexOf(username);
             if (i > -1) {
                 this.listGuessed.splice(i, 1);
             }
             let index = this.players.indexOf(player);
+
+            // Move host privileges to next user
             if (index > -1) {
+                if (player.isHost) {
+                    if (this.players.at(index + 1)) {
+                        let nextPlayer = this.players.at(index + 1);
+
+                        player.isHost = false;
+                        nextPlayer.isHost = true;
+                        this.host = nextPlayer.username;
+                    }
+                }
                 // if (this.players.length === 1 && this.currentTurn.length > 0) {
                 //     this.endGame();
                 //     return;
@@ -458,7 +470,7 @@ roomsNamespace.on("connection", async (socket) => {
     });
 
     socket.on("leave-room", (room) => {
-        console.log(`Socket ${socket.id} has left room ${room.roomId}`);
+        console.log(`Socket ${socket.id} has left room ${room}`);
         socket.leave(room);
         roomsNamespace.to(room).emit("chat-message", {
             message: username + " has left the game.",
@@ -491,8 +503,8 @@ roomsNamespace.on("connection", async (socket) => {
         }
     });
 
-    socket.on("start-game", (data) => {
-        if (username == game.host) {
+    socket.on("start-game", (host) => {
+        if (host.username == game.host) {
             game.startGame();
         }
     });

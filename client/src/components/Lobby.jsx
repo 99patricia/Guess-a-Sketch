@@ -92,11 +92,15 @@ const StyledText = styled.p`
 `;
 
 function Lobby(props) {
-    const { userData, players, host } = { ...props };
+    const { userData, players } = { ...props };
+    const host = players.find(
+        (player) => userData.username === player.username && player.isHost
+    );
+
     const isDesktop = Desktop();
 
     function startGame() {
-        socket.emit("start-game");
+        socket.emit("start-game", host);
     }
 
     function kickPlayer(username) {

@@ -52,7 +52,7 @@ function Room() {
     const { userData } = useUserData();
 
     const [players, setPlayers] = useState([]);
-    const [isHost, setHost] = useState(false);
+    const [isHost, setIsHost] = useState(false);
     const [isDrawing, setIsDrawing] = useState(false);
     const [word, setWord] = useState("");
     const [gameStart, setGameStart] = useState(false);
@@ -62,7 +62,7 @@ function Room() {
     const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
     const [timeLeft, setTimeLeft] = useState("0");
 
-    function openTab(e, tabName) {
+    function openTab(tabName, e) {
         var i, tabcontent, tablinks;
 
         tabcontent = document.getElementsByClassName("tabcontent");
@@ -80,9 +80,14 @@ function Room() {
             );
         }
 
-        document.getElementById(tabName).style.display = "block";
-        e.currentTarget.className += " selected";
+        if (e) {
+            document.getElementById(tabName).style.display = "block";
+            e.currentTarget.className += " selected";
+        } else if (gameStart) {
+            document.getElementById("Game").style.display = "block";
+        }
     }
+
     useEffect(() => {
         const userPerks = JSON.parse(localStorage.getItem("userPerks"));
         if (userPerks && userPerks.length > 0) {
@@ -105,6 +110,7 @@ function Room() {
 
         socket.on("game-start", (data) => {
             setGameStart(true);
+            openTab("Game");
             setGameData(data);
         });
 
@@ -117,7 +123,7 @@ function Room() {
         socket.on("players-data", (data) => {
             setPlayers(data);
             if (players?.length > 0) {
-                setHost(
+                setIsHost(
                     players.find(
                         (player) => player.username === userData.username
                     ).isHost
@@ -148,8 +154,7 @@ function Room() {
             setGameOver(true);
         });
 
-        socket.on("disconnect", (reason) => {
-            var txt;
+        socket.on("disconnect", () => {
             window.alert("You disconnected from the server...");
             navigate(`/`);
         });
@@ -210,7 +215,6 @@ function Room() {
                                     <Lobby
                                         userData={userData}
                                         players={players}
-                                        host={isHost}
                                     />
                                 )}
                             </>
@@ -228,7 +232,7 @@ function Room() {
                                 <>
                                     <StyledNavLink
                                         onClick={(e) => {
-                                            openTab(e, "Players");
+                                            openTab("Players", e);
                                         }}
                                     >
                                         PLAYERS
@@ -236,7 +240,7 @@ function Room() {
                                     <StyledNavLink
                                         className="selected"
                                         onClick={(e) => {
-                                            openTab(e, "Game");
+                                            openTab("Game", e);
                                         }}
                                     >
                                         GAME
@@ -246,7 +250,7 @@ function Room() {
                                 <StyledNavLink
                                     className="selected"
                                     onClick={(e) => {
-                                        openTab(e, "Lobby");
+                                        openTab("Lobby", e);
                                     }}
                                 >
                                     LOBBY
@@ -254,7 +258,7 @@ function Room() {
                             )}
                             <StyledNavLink
                                 onClick={(e) => {
-                                    openTab(e, "Chat");
+                                    openTab("Chat", e);
                                 }}
                             >
                                 CHAT
@@ -304,7 +308,6 @@ function Room() {
                                             <Lobby
                                                 userData={userData}
                                                 players={players}
-                                                host={isHost}
                                             />
                                         </div>
                                     )}

@@ -27,10 +27,9 @@ const StyledScoreboard = styled.div`
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     outline: ${(props) =>
-            props.currentTurn && "2px solid var(--secondary)" ||
-            props.hasGuessed && "2px solid var(--primary)" ||
-            "0"
-        };
+        (props.currentTurn && "2px solid var(--secondary)") ||
+        (props.hasGuessed && "2px solid var(--primary)") ||
+        "0"};
 `;
 const UserImageDiv = styled.div`
     display: flex;
@@ -83,41 +82,42 @@ function Scoreboard(props) {
     return (
         <ScoreboardContainer isDesktop={isDesktop}>
             <ScoreboardList>
-                {gameData.players.map(
-                    ({ username, avatar, score, isHost, hasGuessed }) => (
-                        <StyledScoreboard
-                            key={username}
-                            currentTurn={username === gameData.currentTurn}
-                            hasGuessed={hasGuessed}
-                        >
-                            {username === userData.username ? (
-                                <div>
-                                    <StyledText secondary>
-                                        {username}
-                                    </StyledText>
-                                    <StyledText secondary>
-                                        Score: {score}
-                                    </StyledText>
-                                </div>
-                            ) : (
-                                <div>
-                                    <StyledText>{username}</StyledText>
-                                    <StyledText>Score: {score}</StyledText>
-                                </div>
-                            )}
-                            <UserImageDiv>
-                                {host && username !== userData.username && (
-                                    <HoverButton
-                                        onClick={() => kickPlayer(username)}
-                                    >
-                                        Kick
-                                    </HoverButton>
+                {gameData.players &&
+                    gameData.players.map(
+                        ({ username, avatar, score, isHost, hasGuessed }) => (
+                            <StyledScoreboard
+                                key={username}
+                                currentTurn={username === gameData.currentTurn}
+                                hasGuessed={hasGuessed}
+                            >
+                                {username === userData.username ? (
+                                    <div>
+                                        <StyledText secondary>
+                                            {username}
+                                        </StyledText>
+                                        <StyledText secondary>
+                                            Score: {score}
+                                        </StyledText>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <StyledText>{username}</StyledText>
+                                        <StyledText>Score: {score}</StyledText>
+                                    </div>
                                 )}
-                                <UserImage src={avatar} />
-                            </UserImageDiv>
-                        </StyledScoreboard>
-                    )
-                )}
+                                <UserImageDiv>
+                                    {host && username !== userData.username && (
+                                        <HoverButton
+                                            onClick={() => kickPlayer(username)}
+                                        >
+                                            Kick
+                                        </HoverButton>
+                                    )}
+                                    <UserImage src={avatar} />
+                                </UserImageDiv>
+                            </StyledScoreboard>
+                        )
+                    )}
             </ScoreboardList>
         </ScoreboardContainer>
     );
