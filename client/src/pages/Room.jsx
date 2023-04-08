@@ -46,6 +46,11 @@ function Room() {
             );
         }
 
+        if (players?.length === 0) {
+            socket.emit("get-players-data");
+            socket.emit("get-game-data");
+        }
+
         socket.off("game-start");
         socket.on("game-start", (data) => {
             setGameStart(true);
@@ -55,6 +60,8 @@ function Room() {
         socket.off("game-data");
         socket.on("game-data", (data) => {
             setGameData(data);
+            setGameStart(data.gameStarted);
+            setGameOver(data.gameOver);
         });
 
         socket.off("players-data");
@@ -88,6 +95,7 @@ function Room() {
         socket.off("kick-player");
         socket.on("kick-player", (room_id) => {
             socket.emit("leave-room", room_id);
+            window.alert("You were kicked from the server...");
             navigate(`/`);
         });
 
@@ -95,7 +103,16 @@ function Room() {
         socket.on("game-over", () => {
             setGameOver(true);
         });
-    }, [players, isHost, isDrawing, gameStart, timeLeft, userData, word]);
+
+        socket.off("disconnect");
+        socket.on("disconnect", (reason) => {
+            var txt;
+            window.alert("You disconnected from the server...");
+            navigate(`/`);
+        });
+        
+        // console.log('useeffect');
+    }, [players, isHost, isDrawing, gameStart, timeLeft, userData, word, gameData]);
 
     return (
         <>

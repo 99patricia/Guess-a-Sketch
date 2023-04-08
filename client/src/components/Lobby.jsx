@@ -90,8 +90,6 @@ const StyledText = styled.p`
 function Lobby(props) {
     const { userData, players, host } = { ...props };
 
-    socket.emit("get-players-data");
-
     function startGame() {
         socket.emit("start-game");
     }

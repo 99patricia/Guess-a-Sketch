@@ -25,7 +25,10 @@ const StyledScoreboard = styled.div`
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 
     outline: ${(props) =>
-        props.currentTurn ? "2px solid var(--secondary)" : "0"};
+            props.currentTurn && "2px solid var(--secondary)" ||
+            props.hasGuessed && "2px solid var(--primary)" ||
+            "0"
+        };
 `;
 const UserImageDiv = styled.div`
     display: flex;
@@ -82,6 +85,7 @@ function Scoreboard(props) {
                         <StyledScoreboard
                             key={username}
                             currentTurn={username === gameData.currentTurn}
+                            hasGuessed={hasGuessed}
                         >
                             {username === userData.username ? (
                                 <div>
