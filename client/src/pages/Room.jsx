@@ -33,6 +33,10 @@ const StyledNavLink = styled.a`
     }
 `;
 
+const TabContainer = styled.div`
+    min-width: 90vw;
+`;
+
 function Room() {
     const isDesktop = Desktop();
     const navigate = useNavigate();
@@ -211,7 +215,7 @@ function Room() {
                             </StyledNavLink>
                         </NavBar>
 
-                        <div>
+                        <TabContainer>
                             {gameOver ? (
                                 <GameOver gameData={gameData} />
                             ) : (
@@ -224,6 +228,7 @@ function Room() {
                                                 host={isHost}
                                             />
                                             <Canvas
+                                                noContainer
                                                 ref={canvasRef}
                                                 gameData={gameData}
                                                 isDrawing={isDrawing}
@@ -256,7 +261,7 @@ function Room() {
                                     username={userData.username}
                                 />
                             </div>
-                        </div>
+                        </TabContainer>
                     </>
                 )}
             </Container>

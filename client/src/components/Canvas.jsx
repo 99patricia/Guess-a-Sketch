@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { CanvasFooter, CanvasHeader } from "components/Canvas/";
+import { Desktop } from "service/mediaQueries";
 
 const StyledCanvasContainer = styled.div`
     ${(props) =>
@@ -14,18 +15,20 @@ const StyledCanvasContainer = styled.div`
         padding-top: 0.25rem;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   `}
+
+    ${(props) => !props.isDesktop && `width: 100vw;`}
 `;
 
 const StyledCanvas = styled.canvas`
     background-color: var(--white);
     vertical-align: bottom;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
+    border-radius: ${(props) => (props.isDesktop ? "1rem 1rem 0 0" : "0")};
 `;
 
 const Canvas = React.forwardRef((props, ref) => {
+    const isDesktop = Desktop();
     const canvasRef = ref;
-    const { gameData, isDrawing, word, sendToSocket, timeLeft } = {
+    const { gameData, isDrawing, noContainer, word, sendToSocket, timeLeft } = {
         ...props,
     };
 
@@ -38,17 +41,11 @@ const Canvas = React.forwardRef((props, ref) => {
         const ctx = canvas.getContext("2d");
         const mainWindow = document.querySelector("html");
         const canDraw = isDrawing;
-        const resizeCanvas = gameData === undefined; // resize canvas if not used in game
 
         // Resize canvas
-        if (resizeCanvas) {
-            const canvasParentWidth = canvas.parentElement.clientWidth;
-            canvas.width = canvasParentWidth;
-            canvas.height = canvasParentWidth;
-        } else {
-            canvas.width = 500;
-            canvas.height = 340;
-        }
+        const canvasParentWidth = canvas.parentElement.clientWidth;
+        canvas.width = isDesktop ? "500" : canvasParentWidth;
+        canvas.height = isDesktop ? "340" : canvasParentWidth;
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -195,7 +192,8 @@ const Canvas = React.forwardRef((props, ref) => {
     return (
         <StyledCanvasContainer
             width={props.width}
-            noContainer={props.noContainer}
+            isDesktop={isDesktop}
+            noContainer={noContainer}
         >
             {sendToSocket && (
                 <CanvasHeader
@@ -205,7 +203,7 @@ const Canvas = React.forwardRef((props, ref) => {
                     word={word}
                 />
             )}
-            <StyledCanvas ref={canvasRef}></StyledCanvas>
+            <StyledCanvas isDesktop={isDesktop} ref={canvasRef}></StyledCanvas>
             <CanvasFooter
                 canvasRef={canvasRef}
                 sendToSocket={sendToSocket}
