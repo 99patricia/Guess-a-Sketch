@@ -6,11 +6,9 @@ const LeaderboardContainer = styled.div`
     padding: 1rem;
     padding-top: 0.5rem;
     border-radius: 1rem;
-    width: 500px;
-    min-width: 85vw;
-    max-width: 85vw;
-    min-height: 70vh;
-    max-height: 70vh;
+    width: 85vw;
+    max-width: 800px;
+    height: 70vh;
     display: flex;
     flex-flow: column;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
