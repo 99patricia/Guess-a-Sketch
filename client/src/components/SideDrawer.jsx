@@ -71,7 +71,8 @@ function SideDrawer(props) {
     const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
+    const handleLogout = async (e) => {
+        e.preventDefault();
         if (isLoggedIn) {
             await axios
                 .post("/logout", {}, { withCredentials: true })
@@ -103,16 +104,16 @@ function SideDrawer(props) {
                     </div>
                 )}
                 <div className="flex column">
-                    {isLoggedIn && 
+                    {isLoggedIn && (
                         <StyledNavLink to="/profile">Profile</StyledNavLink>
-                    }
+                    )}
                     <StyledNavLink to="/leaderboard">Leaderboard</StyledNavLink>
                     <StyledNavLink to="/">Join a game</StyledNavLink>
                     <StyledNavLink to="/createRoom">
                         Create a room
                     </StyledNavLink>
                     {isLoggedIn || loggedInAsGuest ? (
-                        <StyledNavLink onClick={handleLogout}>
+                        <StyledNavLink onClick={handleLogout} to="/login">
                             Logout
                         </StyledNavLink>
                     ) : (
