@@ -10,6 +10,7 @@ const StyledCanvasFooter = styled.div`
     padding: 1rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
+    margin-bottom: 1rem;
 `;
 
 const StyledToolbar = styled.div`
