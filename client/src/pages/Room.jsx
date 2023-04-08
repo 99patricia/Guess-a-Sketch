@@ -85,6 +85,8 @@ function Room() {
             e.currentTarget.className += " selected";
         } else if (gameStart) {
             document.getElementById("Game").style.display = "block";
+        } else if (gameOver) {
+            document.getElementById("Results").style.display = "block";
         }
     }
 
@@ -152,6 +154,7 @@ function Room() {
 
         socket.on("game-over", () => {
             setGameOver(true);
+            openTab("Results");
         });
 
         socket.on("disconnect", () => {
@@ -228,33 +231,48 @@ function Room() {
                 ) : (
                     <TabContainer>
                         <NavBar>
-                            {gameStart ? (
+                            {gameOver ? (
                                 <>
-                                    <StyledNavLink
-                                        onClick={(e) => {
-                                            openTab("Players", e);
-                                        }}
-                                    >
-                                        PLAYERS
-                                    </StyledNavLink>
                                     <StyledNavLink
                                         className="selected"
                                         onClick={(e) => {
-                                            openTab("Game", e);
+                                            openTab("Results", e);
                                         }}
                                     >
-                                        GAME
+                                        RESULTS
                                     </StyledNavLink>
                                 </>
                             ) : (
-                                <StyledNavLink
-                                    className="selected"
-                                    onClick={(e) => {
-                                        openTab("Lobby", e);
-                                    }}
-                                >
-                                    LOBBY
-                                </StyledNavLink>
+                                <>
+                                    {gameStart ? (
+                                        <>
+                                            <StyledNavLink
+                                                onClick={(e) => {
+                                                    openTab("Players", e);
+                                                }}
+                                            >
+                                                PLAYERS
+                                            </StyledNavLink>
+                                            <StyledNavLink
+                                                className="selected"
+                                                onClick={(e) => {
+                                                    openTab("Game", e);
+                                                }}
+                                            >
+                                                GAME
+                                            </StyledNavLink>
+                                        </>
+                                    ) : (
+                                        <StyledNavLink
+                                            className="selected"
+                                            onClick={(e) => {
+                                                openTab("Lobby", e);
+                                            }}
+                                        >
+                                            LOBBY
+                                        </StyledNavLink>
+                                    )}
+                                </>
                             )}
                             <StyledNavLink
                                 onClick={(e) => {
@@ -267,7 +285,9 @@ function Room() {
 
                         <TabContentContainer>
                             {gameOver ? (
-                                <GameOver gameData={gameData} />
+                                <div id="Results" className="tabcontent">
+                                    <GameOver gameData={gameData} />
+                                </div>
                             ) : (
                                 <>
                                     {gameStart ? (
