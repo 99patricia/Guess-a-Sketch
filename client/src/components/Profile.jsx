@@ -75,7 +75,6 @@ function Profile(props) {
             const games = profileData.gamehistory;
             if (games) {
                 var i;
-                let arr = [];
                 setGameHistory([]);
                 for (i=0; i<games.length; i++) {
                     await axios
@@ -86,6 +85,7 @@ function Profile(props) {
                 }
             }
         }
+        
         fetchGames()
             .catch(console.error);
     }, [profileData]);
