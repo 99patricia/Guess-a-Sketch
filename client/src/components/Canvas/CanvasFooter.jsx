@@ -3,18 +3,22 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { IconButton } from "components";
+import { Desktop } from "service/mediaQueries";
 
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
     padding: 1rem;
-    // margin-bottom: 1rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
 `;
 
 const StyledToolbar = styled.div`
+    max-width: 460px;
     display: grid;
     grid-auto-flow: column;
+    grid-template-columns: ${(props) => (props.isDesktop ? "1fr 2fr" : "auto")};
+    align-items: center;
+    justify-items: stretch;
 `;
 
 const StyledColor = styled.button`
@@ -70,6 +74,7 @@ const StyledRangeInput = styled.input`
 `;
 
 function CanvasFooter(props) {
+    const isDesktop = Desktop();
     const { canvasRef, sendToSocket, isDrawing, penSizeChoices, colorChoices } =
         { ...props };
 
@@ -149,7 +154,7 @@ function CanvasFooter(props) {
 
     return (
         <StyledCanvasFooter>
-            <StyledToolbar>
+            <StyledToolbar isDesktop={isDesktop}>
                 <div>
                     <IconButton
                         ref={clearButtonRef}
