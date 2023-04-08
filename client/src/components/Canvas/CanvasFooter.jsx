@@ -163,6 +163,10 @@ function CanvasFooter(props) {
                     <IconButton
                         iconClassName="bi-eraser-fill"
                         onClick={handleEraserTool}
+                        className={
+                            localStorage.getItem("penColor") === "white" &&
+                            "active"
+                        }
                     />
                     <IconButton
                         iconClassName="bi-pencil-fill"
@@ -190,6 +194,10 @@ function CanvasFooter(props) {
                             key={color}
                             color={color}
                             onClick={handleChangeColor}
+                            className={
+                                localStorage.getItem("penColor") === color &&
+                                "active"
+                            }
                         />
                     ))}
                 </div>
