@@ -63,30 +63,32 @@ function Room() {
     const [timeLeft, setTimeLeft] = useState("0");
 
     function openTab(tabName, e) {
-        var i, tabcontent, tablinks;
+        if (!isDesktop) {
+            var i, tabcontent, tablinks;
 
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
 
-        tablinks = document.getElementsByClassName(
-            StyledNavLink.styledComponentId
-        );
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(
-                " selected",
-                ""
+            tablinks = document.getElementsByClassName(
+                StyledNavLink.styledComponentId
             );
-        }
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(
+                    " selected",
+                    ""
+                );
+            }
 
-        if (e) {
-            document.getElementById(tabName).style.display = "block";
-            e.currentTarget.className += " selected";
-        } else if (gameStart) {
-            document.getElementById("Game").style.display = "block";
-        } else if (gameOver) {
-            document.getElementById("Results").style.display = "block";
+            if (e) {
+                document.getElementById(tabName).style.display = "block";
+                e.currentTarget.className += " selected";
+            } else if (gameStart) {
+                document.getElementById("Game").style.display = "block";
+            } else if (gameOver) {
+                document.getElementById("Results").style.display = "block";
+            }
         }
     }
 
