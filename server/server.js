@@ -83,6 +83,7 @@ function makeGame(
         currentTurn: "",
         currentRound: 0,
         gameOver: false,
+        gameStarted: false,
         wordBank: wordbankContent,
         currentWord: "",
         addPlayer: function (username, avatar, socketId) {
@@ -96,7 +97,7 @@ function makeGame(
                 avatar: avatar,
             };
             this.players.push(player);
-            if (this.currentTurn !== "") {
+            if (this.gameStarted) {
                 this.sendGameData();
             }
         },
@@ -105,6 +106,10 @@ function makeGame(
             let player = this.players.find(
                 (player) => player.username == username
             );
+            let i = this.listGuessed.indexOf(username);
+            if (i > -1) {
+                this.listGuessed.splice(i, 1);
+            }
             let index = this.players.indexOf(player);
             if (index > -1) {
                 // if (this.players.length === 1 && this.currentTurn.length > 0) {
@@ -120,6 +125,7 @@ function makeGame(
         },
         startGame: function () {
             if (this.gameOver) return;
+            this.gameStarted = true;
             const gameData = {
                 players: this.players,
                 host: this.host,
@@ -128,6 +134,8 @@ function makeGame(
                 numberOfRounds: this.numberOfRounds,
                 currentRound: this.currentRound,
                 currentTurn: this.currentTurn,
+                gameOver: this.gameOver,
+                gameStarted: this.gameStarted,
             };
             roomsNamespace.to(this.roomId).emit("game-start", gameData);
 
@@ -250,6 +258,8 @@ function makeGame(
                 numberOfRounds: this.numberOfRounds,
                 currentRound: this.currentRound,
                 currentTurn: this.currentTurn,
+                gameOver: this.gameOver,
+                gameStarted: this.gameStarted,
             };
             roomsNamespace.to(this.roomId).emit("game-data", gameData);
         },
@@ -402,7 +412,7 @@ roomsNamespace.on("connection", async (socket) => {
         }
         if (rooms.has(roomId)) {
             game = games.find((game) => game.roomId == roomId);
-            if (game.gameOver) {
+            if (game ===undefined ) {
                 roomsNamespace.to(socket.id).emit("join-room-fail", {
                     room,
                     msg: "Game is over",
@@ -469,8 +479,14 @@ roomsNamespace.on("connection", async (socket) => {
         roomsNamespace.to(socket_id).emit("kick-player", game.roomId);
     });
 
-    socket.on("get-players-data", (data) => {
+    socket.on("get-players-data", () => {
         roomsNamespace.to(socket.id).emit("players-data", game.players);
+    });
+
+    socket.on("get-game-data", () => {
+        if (game.gameStarted) {
+            game.sendGameData();
+        }
     });
 
     socket.on("start-game", (data) => {
@@ -490,8 +506,8 @@ roomsNamespace.on("connection", async (socket) => {
                 // current word is guessed
                 // get the time left from message data
                 let timeLeft = parseInt(msg.timeLeft);
-                game.addPoints(username, timeLeft);
                 player.hasGuessed = true;
+                game.addPoints(username, timeLeft);
                 game.listGuessed.push(username);
                 roomsNamespace.to(currentRoom).emit("chat-message", {
                     message: username + " has guessed the word!",
