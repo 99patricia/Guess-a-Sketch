@@ -159,10 +159,10 @@ function Room() {
             openTab("Results");
         });
 
-        socket.on("disconnect", () => {
-            window.alert("You disconnected from the server...");
-            navigate(`/`);
-        });
+        // socket.on("disconnect", () => {
+        //     window.alert("You disconnected from the server...");
+        //     navigate(`/`);
+        // });
 
         return () => {
             // Socket cleanup
@@ -174,7 +174,7 @@ function Room() {
             socket.off("timer");
             socket.off("kick-player");
             socket.off("game-over");
-            socket.off("disconnect");
+            // socket.off("disconnect");
         };
     }, [
         players,
