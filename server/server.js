@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import crypto from "crypto";
 import { Server } from "socket.io";
 
 import {
@@ -55,9 +56,14 @@ const roomsNamespace = io.of("/rooms");
 const rooms = roomsNamespace.adapter.rooms;
 const games = [];
 
+import { SessionStore } from "./sessionStore.js";
+const sessionStore = new SessionStore();
+const randomId = () => crypto.randomBytes(8).toString("hex");
+
 function makeGame(
     roomId,
     host,
+    hostID,
     hostAvatar,
     socketId,
     numberOfPlayers,
@@ -67,13 +73,14 @@ function makeGame(
 ) {
     let game = {
         roomId: roomId,
-        host: host, // username of host
+        host: hostID, // username of host
         maxNumPlayers: numberOfPlayers,
         drawTime: drawTime,
         numberOfRounds: numberOfRounds,
         players: [
             {
                 username: host,
+                userID: hostID,
                 isHost: true,
                 socketId,
                 score: 0,
@@ -88,10 +95,11 @@ function makeGame(
         gameStarted: false,
         wordBank: wordbankContent,
         currentWord: "",
-        addPlayer: function (username, avatar, socketId) {
+        addPlayer: function (username, userID, avatar, socketId) {
             if (this.gameOver) return;
             let player = {
                 username: username,
+                userID: userID,
                 isHost: false,
                 socketId,
                 score: 0,
@@ -103,13 +111,13 @@ function makeGame(
                 this.sendGameData();
             }
         },
-        removePlayer: function (username) {
+        removePlayer: function (userID) {
             if (this.gameOver) return;
             let player = this.players.find(
-                (player) => player.username == username
+                (player) => player.userID == userID
             );
 
-            let i = this.listGuessed.indexOf(username);
+            let i = this.listGuessed.indexOf(userID);
             if (i > -1) {
                 this.listGuessed.splice(i, 1);
             }
@@ -123,7 +131,7 @@ function makeGame(
 
                         player.isHost = false;
                         nextPlayer.isHost = true;
-                        this.host = nextPlayer.username;
+                        this.host = nextPlayer.userID;
                     }
                 }
                 // if (this.players.length === 1 && this.currentTurn.length > 0) {
@@ -131,7 +139,7 @@ function makeGame(
                 //     return;
                 // }
                 this.players.splice(index, 1);
-                if (this.currentTurn === username) {
+                if (this.currentTurn === userID) {
                     this.nextTurn(index);
                 }
             }
@@ -153,7 +161,7 @@ function makeGame(
             };
             roomsNamespace.to(this.roomId).emit("game-start", gameData);
 
-            this.currentTurn = this.players[0].username;
+            this.currentTurn = this.players[0].userID;
             this.currentRound = 1;
             this.currentWord =
                 this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
@@ -168,7 +176,7 @@ function makeGame(
             roomsNamespace
                 .to(
                     this.players.find(
-                        (player) => player.username == this.currentTurn
+                        (player) => player.userID == this.currentTurn
                     ).socketId
                 )
                 .emit("turn-start", this.currentWord);
@@ -178,7 +186,7 @@ function makeGame(
             let game = this;
             let timeleft = this.drawTime;
             let currentPlayer = game.players.find(
-                (player) => player.username == game.currentTurn
+                (player) => player.userID == game.currentTurn
             );
             this.sendGameData();
             roomsNamespace.to(this.roomId).emit("chat-message", {
@@ -191,7 +199,7 @@ function makeGame(
                 if (disconnected) {
                     return;
                 }
-                if (currentPlayer.username !== game.currentTurn) {
+                if (currentPlayer.userID !== game.currentTurn) {
                     timeleft = 0;
                     disconnected = true;
                     return;
@@ -242,12 +250,12 @@ function makeGame(
                 }
                 // new round
                 if (this.players.length > 0) {
-                    this.currentTurn = this.players[0].username;
+                    this.currentTurn = this.players[0].userID;
                 } else {
                     return;
                 }
             } else {
-                this.currentTurn = this.players[index].username;
+                this.currentTurn = this.players[index].userID;
             }
             this.players.map(function (x) {
                 // set all players hasGuessed to false so that they may earn points again
@@ -259,14 +267,15 @@ function makeGame(
                 this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
             this.startTurn();
         },
-        addPoints: function (username, timeLeft) {
+        addPoints: function (userID, timeLeft) {
             if (this.gameOver) return;
             // award guesser
             let guesserScore =
                 Math.floor(10 * (timeLeft / this.drawTime)) * 100;
-            this.players.find((player) => player.username == username).score +=
-                guesserScore;
-            console.log(`Player ${username} awarded ${guesserScore} points.`);
+            let player = this.players.find((player) => player.userID == userID);
+            player.score += guesserScore;
+
+            console.log(`Player ${player.username} awarded ${guesserScore} points.`);
             this.sendGameData();
         },
         sendGameData: function () {
@@ -288,11 +297,11 @@ function makeGame(
             this.gameOver = true;
             this.sendGameData();
             roomsNamespace.to(this.roomId).emit("game-over");
-            roomsNamespace.to(this.roomId).emit("chat-message", {
-                message: "Game over.",
-                username: "GAME",
-                id: `${this.currentTurn.socketId}${Math.random()}`,
-            });
+            // roomsNamespace.to(this.roomId).emit("chat-message", {
+            //     message: "Game over.",
+            //     username: "GAME",
+            //     id: `${this.currentTurn.socketId}${Math.random()}`,
+            // });
 
             const index = games.indexOf(this);
             games.splice(index, 1);
@@ -364,15 +373,59 @@ function makeGame(
     return game;
 }
 
+roomsNamespace.use((socket, next) => {
+    const sessionId = socket.handshake.auth.sessionID;
+    const username = socket.handshake.auth.username;
+    console.log(sessionStore.findAllSessions());
+    if (sessionId) {
+        // finds an existing session if it exists
+        const session = sessionStore.findSession(sessionId);
+        if (session) {
+            socket.sessionID = sessionId;
+            socket.userID = session.userID;
+            socket.username = username;
+            socket.roomId = session.roomId;
+            socket.game = games.find((game) => game.roomId == socket.roomId);
+            if (socket.game) {
+                socket.player = socket.game.players.find((player) => player.userID == socket.userID);
+                socket.player.socketId = socket.id;
+                socket.join(socket.roomId);
+            } else {
+                socket.players = {};
+            }
+            return next();
+        }
+    }
+    socket.sessionID = randomId();
+    socket.userID = randomId();
+    socket.username = username;
+    socket.roomId = "";
+    socket.game = {};
+    socket.player = {};
+    next();
+});
+
 // Socket functions
 roomsNamespace.on("connection", async (socket) => {
     // console.log("A user connected with id: " + socket.id);
-    let currentRoom = "";
-    let host;
-    let username = ""; // This will be the username of the host
-    let player = {};
-    let game = {};
 
+    let currentRoom = socket.roomId;
+    let host = false;
+    let username = socket.username; // This will be the username of the host
+    let player = socket.player;
+    let game = socket.game;
+
+    sessionStore.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        username: socket.username,
+        connected: true,
+        roomId: socket.roomId
+    });
+
+    socket.emit("session", {
+        sessionID: socket.sessionID,
+        userID: socket.userID,
+    });
     // takes in room_id and tries to create that room
     // returns ("create-room-fail") if the room already exists
     // on success the socket will create/join the room and emit
@@ -391,14 +444,15 @@ roomsNamespace.on("connection", async (socket) => {
 
             currentRoom = room.roomId;
             host = true;
-            username = room.username;
+            username = socket.username;
             // numberOfPlayers = room.numberOfPlayers;
             // drawTime = room.drawTime;
             // numberOfRounds = room.numberOfRounds;
 
             game = makeGame(
                 room.roomId,
-                room.username,
+                socket.username,
+                socket.userID,
                 room.avatar,
                 socket.id,
                 room.numberOfPlayers,
@@ -408,7 +462,7 @@ roomsNamespace.on("connection", async (socket) => {
             );
             games.push(game);
 
-            player = game.players.find((player) => player.username == username);
+            player = game.players.find((player) => player.userID == socket.userID);
 
             roomsNamespace.to(socket.id).emit("create-room-success", room);
             roomsNamespace.to(socket.id).emit("players-data", game.players);
@@ -423,6 +477,11 @@ roomsNamespace.on("connection", async (socket) => {
     // it has successfully joined a room
     socket.on("join-room", (room) => {
         let roomId = room.roomId.toLowerCase();
+        if (roomId === socket.roomId) {
+            console.log(`reconnecting user ${socket.username} to room ${socket.roomId}...`);
+            roomsNamespace.to(socket.id).emit("join-room-success", room.roomId);
+            return;
+        }
         if (socket.rooms.size > 1) {
             // user is already in a room
             for (let room of socket.rooms) {
@@ -454,9 +513,9 @@ roomsNamespace.on("connection", async (socket) => {
             currentRoom = roomId;
             host = false;
             username = room.username;
-            game.addPlayer(room.username, room.avatar, socket.id);
+            game.addPlayer(socket.username, socket.userID, room.avatar, socket.id);
 
-            player = game.players.find((player) => player.username == username);
+            player = game.players.find((player) => player.userID == socket.userID);
 
             roomsNamespace.to(roomId).emit("chat-message", {
                 message: username + " has joined the game.",
@@ -484,7 +543,7 @@ roomsNamespace.on("connection", async (socket) => {
             id: `${socket.id}${Math.random()}`,
         });
         if (Object.keys(game).length > 0) {
-            game.removePlayer(username);
+            game.removePlayer(socket.userID);
             currentRoom = "";
             host = false;
         }
@@ -492,9 +551,9 @@ roomsNamespace.on("connection", async (socket) => {
         game = {};
     });
 
-    socket.on("kick-player", async (username) => {
+    socket.on("kick-player", async (userID) => {
         const socket_id = game.players.find(
-            (player) => player.username == username
+            (player) => player.userID == userID
         ).socketId;
         roomsNamespace.to(socket_id).emit("kick-player", game.roomId);
     });
@@ -509,8 +568,8 @@ roomsNamespace.on("connection", async (socket) => {
         }
     });
 
-    socket.on("start-game", (host) => {
-        if (host.username == game.host) {
+    socket.on("start-game", () => {
+        if (socket.userID == game.host) {
             game.startGame();
         }
     });
@@ -520,15 +579,15 @@ roomsNamespace.on("connection", async (socket) => {
             !game.gameOver &&
             game.currentRound > 0 &&
             player.hasGuessed == false &&
-            !(game.currentTurn == username);
+            !(game.currentTurn == socket.userID);
         if (canGuess) {
             if (msg.message.toLowerCase() == game.currentWord.toLowerCase()) {
                 // current word is guessed
                 // get the time left from message data
                 let timeLeft = parseInt(msg.timeLeft);
                 player.hasGuessed = true;
-                game.addPoints(username, timeLeft);
-                game.listGuessed.push(username);
+                game.addPoints(socket.userID, timeLeft);
+                game.listGuessed.push(socket.userID);
                 roomsNamespace.to(currentRoom).emit("chat-message", {
                     message: username + " has guessed the word!",
                     username: "GAME",
@@ -541,13 +600,13 @@ roomsNamespace.on("connection", async (socket) => {
     });
 
     socket.on("draw", (data) => {
-        if (username == game.currentTurn) {
+        if (socket.userID == game.currentTurn) {
             roomsNamespace.to(currentRoom).emit("draw", data);
         }
     });
 
     socket.on("clear-canvas", (data) => {
-        if (username == game.currentTurn) {
+        if (socket.userID == game.currentTurn) {
             roomsNamespace.to(currentRoom).emit("clear-canvas", data);
         }
     });
@@ -557,20 +616,33 @@ roomsNamespace.on("connection", async (socket) => {
     });
 
     socket.on("disconnect", () => {
-        console.log(
-            `Socket ${socket.id} disconnected or has left room ${currentRoom}`
-        );
-        socket.leave(currentRoom);
-        roomsNamespace.to(currentRoom).emit("chat-message", {
-            message: username + " has left the game.",
-            username: "GAME",
-            id: `${socket.id}${Math.random()}`,
+        sessionStore.saveSession(socket.sessionID, {
+            userID: socket.userID,
+            username: socket.username,
+            connected: false,
+            roomId: currentRoom
         });
-
-        if (Object.keys(game).length > 0) {
-            game.removePlayer(username);
-        }
-        roomsNamespace.to(currentRoom).emit("players-data", game.players);
+        setTimeout(() => {
+            const session = sessionStore.findSession(socket.sessionID);
+            if (session?.connected == true) { // client has reconnected, do not leave game
+                return;
+            }
+            console.log(
+                `Socket ${socket.id} disconnected or has left room ${currentRoom}`
+            );
+            socket.leave(currentRoom);
+            roomsNamespace.to(currentRoom).emit("chat-message", {
+                message: username + " has left the game.",
+                username: "GAME",
+                id: `${socket.id}${Math.random()}`,
+            });
+    
+            if (Object.keys(game).length > 0) {
+                game.removePlayer(socket.userID);
+            }
+            sessionStore.removeSession(socket.sessionID);
+            roomsNamespace.to(currentRoom).emit("players-data", game.players);
+        }, 5000);
     });
 });
 
