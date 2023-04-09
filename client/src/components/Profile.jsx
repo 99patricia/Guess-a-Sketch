@@ -75,6 +75,7 @@ function Profile(props) {
     };
 
     const [gameHistory, setGameHistory] = useState([]);
+    const [friendList, setFriendList] = useState([]);
 
     useEffect(() => {
 
@@ -93,9 +94,25 @@ function Profile(props) {
 
             }
         }
+
+        const fetchFriends = () => {
+            const friends = userData.friendList;
+            if (friends) {
+                var i;
+                setFriendList([]);
+                for (i=0; i<friends.length; i++) {
+                    axios
+                        .get(`/profile/${friends[i]}`)
+                        .then((res) => {
+                            setFriendList(oldArray => [...oldArray, res.data]);
+                        });
+                }
+            }
+        }
         
         fetchGames()
             .catch(console.error);
+        fetchFriends();
     }, [profileData]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
@@ -176,7 +193,7 @@ function Profile(props) {
                                 className="tabcontent"
                                 style={{ display: "none" }}
                             >
-                                <Friends />
+                                <Friends friendList={friendList} />
                             </div>
                             <div
                                 id="games"
