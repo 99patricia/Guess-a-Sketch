@@ -55,7 +55,6 @@ function Home() {
                 sessionStorage.setItem("sessionID", sessionID);
                 socket.userID = userID;
             });
-            socket.connect();
             socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {
                 setShowErrorMessage(data.msg);
