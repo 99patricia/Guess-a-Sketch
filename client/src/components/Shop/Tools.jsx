@@ -221,11 +221,11 @@ function Tools(props) {
                                               id={perk.perk_id}
                                               onClick={(e) => handleEquip(e)}
                                               disabled={
-                                                  equippedItem.perkname ===
+                                                  equippedItem?.perkname ===
                                                   perk.perkname
                                               }
                                           >
-                                              {equippedItem.perkname ===
+                                              {equippedItem?.perkname ===
                                               perk.perkname
                                                   ? "Equipped"
                                                   : "Equip"}
