@@ -34,7 +34,7 @@ const StyledNavLink = styled.a`
 `;
 
 const TabContainer = styled.div`
-    height: 70vh;
+    height: 80vh;
     width: 100vw;
     padding: 0 1rem;
     -webkit-box-sizing: border-box;
