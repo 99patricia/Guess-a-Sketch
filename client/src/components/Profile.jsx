@@ -107,7 +107,6 @@ function Profile(props) {
                             setFriendList(oldArray => [...oldArray, res.data]);
                         });
                 }
-                console.log(friendList);
             }
         }
         
@@ -186,7 +185,7 @@ function Profile(props) {
                         </NavBar>
                         <ProfileNavContainer>
                             <div id="recentActivity" className="tabcontent">
-                                <RecentActivity />
+                                <Games gameHistory={gameHistory} />
                             </div>
                             <div
                                 id="friends"

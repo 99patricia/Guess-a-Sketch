@@ -15,7 +15,7 @@ const FriendsGrid = styled.div`
 const FriendCard = styled.div`
     display: grid;
     grid-template-columns: 0.5fr 2fr;
-    align-items: left;
+    align-items: center;
     text-align: left;
     vertical-align: middle;
 
