@@ -54,7 +54,7 @@ function Friends(props) {
                             <UserImage src={avatar} />
                         </UserImageDiv>
                         <p>
-                            {username}
+                            {username}<br/>
                         </p>
                     </FriendCard>
                 )

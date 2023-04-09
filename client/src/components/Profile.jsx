@@ -70,7 +70,7 @@ const StyledNavLink = styled.a`
 
 function Profile(props) {
     const isDesktop = Desktop();
-    const { userData, profileData, loggedInAsGuest, addFriendButtonRef } = {
+    const { userData, profileData, loggedInAsGuest } = {
         ...props,
     };
 
@@ -95,18 +95,19 @@ function Profile(props) {
             }
         }
 
-        const fetchFriends = () => {
+        const fetchFriends = async () => {
             const friends = userData.friendList;
             if (friends) {
                 var i;
                 setFriendList([]);
                 for (i=0; i<friends.length; i++) {
-                    axios
+                    await axios
                         .get(`/profile/${friends[i]}`)
                         .then((res) => {
                             setFriendList(oldArray => [...oldArray, res.data]);
                         });
                 }
+                console.log(friendList);
             }
         }
         
@@ -145,7 +146,6 @@ function Profile(props) {
                     userData={userData}
                     profileData={profileData}
                     loggedInAsGuest={loggedInAsGuest}
-                    addFriendButtonRef={addFriendButtonRef}
                 />
                 {!loggedInAsGuest && (
                     <>

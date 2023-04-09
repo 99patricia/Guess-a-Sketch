@@ -21,9 +21,35 @@ async function handleFriendRequest(app) {
         try {
             // Extract friend request data from request body
             const sender_id = req.body["sender_id"];
-            const recipient_id = req.body["recipient_id"];
+            const recipient_username = req.body["recipient_username"];
             const status = req.body["status"];
             const direction = req.body["direction"];
+
+            var recipient_id = "";
+
+            const q = query(
+                collection(db, "profiles"),
+                where("username", "==", recipient_username)
+            );
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                // player is a guest
+                res.status(400).json({
+                    error: "User not found"
+                });
+                return;
+            } else {
+                querySnapshot.forEach((docSnapshot) => {
+                    recipient_id = docSnapshot.data()?.id;
+                });
+            }
+
+            if (sender_id === recipient_id) {
+                res.status(400).json({
+                    error: "You cannot send a friend request to yourself"
+                });
+                return;
+            }
 
             // Create a new friend request document with auto-generated request_id
             const friendRequestData = {
