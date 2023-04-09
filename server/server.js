@@ -426,6 +426,13 @@ roomsNamespace.on("connection", async (socket) => {
         sessionID: socket.sessionID,
         userID: socket.userID,
     });
+
+    if (game?.currentTurn === socket.userID) {
+        setTimeout(() => {
+            roomsNamespace.to(socket.id).emit("turn-start", game.currentWord);
+        }, 200);
+    }
+
     // takes in room_id and tries to create that room
     // returns ("create-room-fail") if the room already exists
     // on success the socket will create/join the room and emit
@@ -480,6 +487,11 @@ roomsNamespace.on("connection", async (socket) => {
         if (roomId === socket.roomId) {
             console.log(`reconnecting user ${socket.username} to room ${socket.roomId}...`);
             roomsNamespace.to(socket.id).emit("join-room-success", room.roomId);
+            if (game?.currentTurn === socket.userID) {
+                setTimeout(() => {
+                    roomsNamespace.to(socket.id).emit("turn-start", game.currentWord);
+                }, 200);
+            }
             return;
         }
         if (socket.rooms.size > 1) {
