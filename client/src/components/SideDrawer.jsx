@@ -107,6 +107,7 @@ function SideDrawer(props) {
                     {isLoggedIn && (
                         <StyledNavLink to="/profile">Profile</StyledNavLink>
                     )}
+                    <StyledNavLink to="/shop">Marketplace</StyledNavLink>
                     <StyledNavLink to="/leaderboard">Leaderboard</StyledNavLink>
                     <StyledNavLink to="/">Join a game</StyledNavLink>
                     <StyledNavLink to="/createRoom">
