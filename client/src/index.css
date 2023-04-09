@@ -105,3 +105,11 @@ input {
 .grid-form > a {
     grid-column: 2/3;
 }
+
+.selected {
+    border-bottom: 5px solid var(--secondary);
+}
+
+.active {
+    outline: 2px solid var(--secondary);
+}

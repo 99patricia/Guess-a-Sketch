@@ -3,18 +3,23 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { IconButton } from "components";
+import { Desktop } from "service/mediaQueries";
 
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
     padding: 1rem;
-    margin-bottom: 1rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
+    margin-bottom: 1rem;
 `;
 
 const StyledToolbar = styled.div`
+    max-width: 460px;
     display: grid;
     grid-auto-flow: column;
+    grid-template-columns: ${(props) => (props.isDesktop ? "1fr 2fr" : "auto")};
+    align-items: center;
+    justify-items: stretch;
 `;
 
 const StyledColor = styled.button`
@@ -22,6 +27,7 @@ const StyledColor = styled.button`
     height: 20px;
     margin: 0.2rem;
     border-radius: 100%;
+    padding: 0;
     border: none;
     cursor: pointer;
     background-color: ${(props) => props.color};
@@ -69,6 +75,7 @@ const StyledRangeInput = styled.input`
 `;
 
 function CanvasFooter(props) {
+    const isDesktop = Desktop();
     const { canvasRef, sendToSocket, isDrawing, penSizeChoices, colorChoices } =
         { ...props };
 
@@ -120,7 +127,7 @@ function CanvasFooter(props) {
         const clearButton = clearButtonRef.current;
 
         const clearCanvas = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, 500, 500);
         };
 
         const handleClearCanvas = (e) => {
@@ -135,17 +142,20 @@ function CanvasFooter(props) {
         canvas.addEventListener("click", () => setShowPenSize(false));
         // If we receive clear-canvas from socket, clear the canvas
         if (sendToSocket) {
-            socket.off("clear-canvas");
             socket.on("clear-canvas", clearCanvas);
         }
+
         return () => {
+            //Socket cleanup
+            socket.off("clear-canvas");
+            // Event listener cleanup
             clearButton.removeEventListener("click", handleClearCanvas);
         };
     }, [canvasRef, sendToSocket, isDrawing, drawingInGame]);
 
     return (
         <StyledCanvasFooter>
-            <StyledToolbar>
+            <StyledToolbar isDesktop={isDesktop}>
                 <div>
                     <IconButton
                         ref={clearButtonRef}
@@ -154,6 +164,10 @@ function CanvasFooter(props) {
                     <IconButton
                         iconClassName="bi-eraser-fill"
                         onClick={handleEraserTool}
+                        className={
+                            localStorage.getItem("penColor") === "white" &&
+                            "active"
+                        }
                     />
                     <IconButton
                         iconClassName="bi-pencil-fill"
@@ -181,6 +195,10 @@ function CanvasFooter(props) {
                             key={color}
                             color={color}
                             onClick={handleChangeColor}
+                            className={
+                                localStorage.getItem("penColor") === color &&
+                                "active"
+                            }
                         />
                     ))}
                 </div>

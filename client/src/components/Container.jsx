@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Mobile } from "service/mediaQueries";
+import { Desktop } from "service/mediaQueries";
 
 const StyledContainer = styled.div`
     display: flex;
@@ -8,13 +8,16 @@ const StyledContainer = styled.div`
     align-items: center;
     flex-direction: column;
     width: 100%;
-    min-height: calc(100vh - 100px);
+    min-height: ${(props) =>
+        props.isDesktop ? "calc(100vh - 100px)" : "calc(100vh - 60px)"};
 `;
 
 function Container(props) {
-    const isMobile = Mobile();
+    const isDesktop = Desktop();
     return (
-        <StyledContainer isMobile={isMobile}>{props.children}</StyledContainer>
+        <StyledContainer isDesktop={isDesktop}>
+            {props.children}
+        </StyledContainer>
     );
 }
 

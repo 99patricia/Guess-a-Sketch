@@ -1,14 +1,14 @@
 import React from "react";
+import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
-import { socket } from "service/socket";
-
-import { Button } from "components";
 
 const LobbyContainer = styled.div`
     background-color: var(--light-beige);
     padding: 1rem;
     border-radius: 1rem;
-    width: 500px;
+    width: ${(props) => (props.isDesktop ? "500px" : "inherit")};
+    min-height: ${(props) => (props.isDesktop ? "0" : "70vh")};
+    max-height: 70vh;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-flow: column;
@@ -89,14 +89,18 @@ const StyledText = styled.p`
 `;
 
 function GameOver(props) {
+    const isDesktop = Desktop();
     const { gameData } = { ...props };
 
     const sortedPlayers = gameData.players.sort((a, b) => b.score - a.score);
-    const top3Players = sortedPlayers.slice(0, Math.min(3, sortedPlayers.length));
+    const top3Players = sortedPlayers.slice(
+        0,
+        Math.min(3, sortedPlayers.length)
+    );
     const leadeboardLabels = ["1st", "2nd", "3rd"];
 
     return (
-        <LobbyContainer>
+        <LobbyContainer isDesktop={isDesktop}>
             <GameOverHeader>
                 GAME OVER
                 <div className="winner">
@@ -106,30 +110,32 @@ function GameOver(props) {
             <UserCardList>
                 {top3Players.map(({ username, score, avatar }, index) => (
                     <>
-                    {index === 0 ? (
-                        <UserCard1 key={username}>
-                            <LeaderboardLabel >
-                            <div className="winner">
-                                {leadeboardLabels[index]}
-                            </div>
-                            </LeaderboardLabel>
-                            <UserImage src={avatar} />
-                            <StyledText secondary>{username}</StyledText>
-                            <StyledText>Score: {score}</StyledText>
-                        </UserCard1>
-                    ) : (
-                        <UserCard key={username}>
-                            <LeaderboardLabel >{leadeboardLabels[index]}</LeaderboardLabel> 
-                            <UserImage src={avatar} />
-                            <StyledText secondary>{username}</StyledText>
-                            <StyledText>Score: {score}</StyledText>
-                        </UserCard>
-                    )}
+                        {index === 0 ? (
+                            <UserCard1 key={username}>
+                                <LeaderboardLabel>
+                                    <div className="winner">
+                                        {leadeboardLabels[index]}
+                                    </div>
+                                </LeaderboardLabel>
+                                <UserImage src={avatar} />
+                                <StyledText secondary>{username}</StyledText>
+                                <StyledText>Score: {score}</StyledText>
+                            </UserCard1>
+                        ) : (
+                            <UserCard key={username}>
+                                <LeaderboardLabel>
+                                    {leadeboardLabels[index]}
+                                </LeaderboardLabel>
+                                <UserImage src={avatar} />
+                                <StyledText secondary>{username}</StyledText>
+                                <StyledText>Score: {score}</StyledText>
+                            </UserCard>
+                        )}
                     </>
                 ))}
             </UserCardList>
         </LobbyContainer>
-    )
+    );
 }
 
 export default GameOver;

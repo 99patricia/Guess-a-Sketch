@@ -1,4 +1,5 @@
 import React from "react";
+import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
 
 export const StyledLabel = styled.label`
@@ -63,6 +64,7 @@ const StyledSelect = styled.select`
     border: 1px solid var(--beige);
     font-size: 1.2rem;
     color: var(--primary);
+    margin-bottom: ${(props) => (props.isDesktop ? "0" : "2rem")};
 
     width: 100%;
     -webkit-box-sizing: border-box;
@@ -80,13 +82,15 @@ const StyledSelect = styled.select`
 `;
 
 function FormInput(props) {
+    const isDesktop = Desktop();
+
     return (
         <>
             <StyledLabel>{props.label}</StyledLabel>
             {props.textArea ? (
                 <StyledTextArea {...props} />
             ) : props.select ? (
-                <StyledSelect {...props} />
+                <StyledSelect {...props} isDesktop={isDesktop} />
             ) : (
                 <StyledInput {...props} />
             )}

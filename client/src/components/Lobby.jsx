@@ -3,15 +3,19 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { Button } from "components";
+import { Desktop } from "service/mediaQueries";
 
 const LobbyContainer = styled.div`
     background-color: var(--light-beige);
     padding: 1rem;
     border-radius: 1rem;
-    width: 500px;
+    min-width: ${(props) => (props.isDesktop ? "500px" : "80vw")};
+    min-height: ${(props) => (props.isDesktop ? "0" : "70vh")};
+    max-height: ${(props) => (props.isDesktop ? "100%" : "70vh")};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-flow: column;
+    justify-content: space-between;
 `;
 
 const UserCardList = styled.div`
@@ -88,74 +92,84 @@ const StyledText = styled.p`
 `;
 
 function Lobby(props) {
-    const { userData, players, host } = { ...props };
+    const { userData, players } = { ...props };
+    const host = players.find(
+        (player) => userData.username === player.username && player.isHost
+    );
+
+    const isDesktop = Desktop();
 
     function startGame() {
-        socket.emit("start-game");
+        socket.emit("start-game", host);
     }
 
     function kickPlayer(username) {
         socket.emit("kick-player", username);
     }
 
-    if (!players) {
-        return (
-            <LobbyContainer>
-                <h3>No players...</h3>
-            </LobbyContainer>
-        );
-    }
     return (
-        <LobbyContainer>
-            <UserCardList>
-                {players.map(({ username, isHost, avatar }) => (
-                    <UserCard key={username}>
-                        {host && username !== userData.username && (
-                            <HoverButton onClick={() => kickPlayer(username)}>
-                                Kick
-                            </HoverButton>
+        <LobbyContainer isDesktop={isDesktop}>
+            {!players ? (
+                <h3>No players...</h3>
+            ) : (
+                <>
+                    <UserCardList>
+                        {players.map(({ username, isHost, avatar }) => (
+                            <UserCard key={username}>
+                                {host && username !== userData.username && (
+                                    <HoverButton
+                                        onClick={() => kickPlayer(username)}
+                                    >
+                                        Kick
+                                    </HoverButton>
+                                )}
+                                {username === userData.username && (
+                                    <>
+                                        <ThisUserImage src={avatar} />
+                                        <h3 style={{ margin: "5px" }}>
+                                            {isHost ? (
+                                                <StyledText secondary>
+                                                    {username} (host)
+                                                </StyledText>
+                                            ) : (
+                                                <StyledText secondary>
+                                                    {username}
+                                                </StyledText>
+                                            )}
+                                        </h3>
+                                    </>
+                                )}
+                                {username !== userData.username && (
+                                    <>
+                                        <UserImage src={avatar} />
+                                        <h3 style={{ margin: "5px" }}>
+                                            {isHost ? (
+                                                <StyledText>
+                                                    {username} (host)
+                                                </StyledText>
+                                            ) : (
+                                                <StyledText>
+                                                    {username}
+                                                </StyledText>
+                                            )}
+                                        </h3>
+                                    </>
+                                )}
+                            </UserCard>
+                        ))}
+                    </UserCardList>
+                    <LobbyFooter>
+                        {host && (
+                            <Button noShadow onClick={startGame}>
+                                Start
+                            </Button>
                         )}
-                        {username === userData.username && (
-                            <>
-                                <ThisUserImage src={avatar} />
-                                <h3 style={{ margin: "5px" }}>
-                                    {isHost ? (
-                                        <StyledText secondary>
-                                            {username} (host)
-                                        </StyledText>
-                                    ) : (
-                                        <StyledText secondary>
-                                            {username}
-                                        </StyledText>
-                                    )}
-                                </h3>
-                            </>
+                        {!host && (
+                            <p>Waiting for the host to start the game...</p>
                         )}
-                        {username !== userData.username && (
-                            <>
-                                <UserImage src={avatar} />
-                                <h3 style={{ margin: "5px" }}>
-                                    {isHost ? (
-                                        <StyledText>
-                                            {username} (host)
-                                        </StyledText>
-                                    ) : (
-                                        <StyledText>{username}</StyledText>
-                                    )}
-                                </h3>
-                            </>
-                        )}
-                    </UserCard>
-                ))}
-            </UserCardList>
-            <LobbyFooter>
-                {host && (
-                    <Button noShadow onClick={startGame}>
-                        Start
-                    </Button>
-                )}
-                {!host && <p>Waiting for the host to start the game...</p>}
-            </LobbyFooter>
+                    </LobbyFooter>
+                </>
+            )}
         </LobbyContainer>
     );
 }

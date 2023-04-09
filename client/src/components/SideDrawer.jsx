@@ -4,12 +4,14 @@ import IconButton from "./IconButton";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserData } from "hooks";
 import axios from "axios";
+import { Desktop } from "service/mediaQueries";
 
 const StyledNavButton = styled(IconButton)`
     background-color: transparent;
     position: fixed;
-    top: 30px;
+    top: ${(props) => (props.isDesktop ? "30px" : "10px")};
     margin: 0;
+    z-index: 3;
 
     transition: transform 0.3s ease-in-out;
     transform: ${(props) =>
@@ -17,7 +19,7 @@ const StyledNavButton = styled(IconButton)`
 `;
 
 const StyledSideDrawer = styled.div`
-    z-index: 1;
+    z-index: 2;
     background-color: var(--light-beige);
     height: 100vh;
     padding: 3rem;
@@ -43,7 +45,7 @@ const StyledSideDrawer = styled.div`
 
 const StyledAvatar = styled.img`
     border-radius: 100%;
-    margin: 1rem;
+    margin: 1rem 0;
 `;
 
 const StyledUsername = styled.div`
@@ -64,11 +66,13 @@ const StyledNavLink = styled(Link)`
 `;
 
 function SideDrawer(props) {
+    const isDesktop = Desktop();
     const [open, setOpen] = useState(false);
     const { isLoggedIn, loggedInAsGuest, userData } = useUserData();
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
+    const handleLogout = async (e) => {
+        e.preventDefault();
         if (isLoggedIn) {
             await axios
                 .post("/logout", {}, { withCredentials: true })
@@ -87,6 +91,7 @@ function SideDrawer(props) {
         <>
             <StyledNavButton
                 iconClassName={open ? "bi-x-lg" : "bi-list"}
+                isDesktop={isDesktop}
                 onClick={() => setOpen(!open)}
                 open={open}
             />
@@ -99,16 +104,16 @@ function SideDrawer(props) {
                     </div>
                 )}
                 <div className="flex column">
-                    {isLoggedIn && 
+                    {isLoggedIn && (
                         <StyledNavLink to="/profile">Profile</StyledNavLink>
-                    }
+                    )}
                     <StyledNavLink to="/leaderboard">Leaderboard</StyledNavLink>
                     <StyledNavLink to="/">Join a game</StyledNavLink>
                     <StyledNavLink to="/createRoom">
                         Create a room
                     </StyledNavLink>
                     {isLoggedIn || loggedInAsGuest ? (
-                        <StyledNavLink onClick={handleLogout}>
+                        <StyledNavLink onClick={handleLogout} to="/login">
                             Logout
                         </StyledNavLink>
                     ) : (
