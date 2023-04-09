@@ -144,6 +144,9 @@ function Tools(props) {
     const [error, setError] = useState("");
     const [showBuyDialog, setShowBuyDialog] = useState(false);
     const [item, setItem] = useState("");
+    const [equippedItem, setEquippedItem] = useState(
+        JSON.parse(localStorage.getItem("equippedPerk"))
+    );
 
     const handleShowBuyDialog = (e) => {
         let itemName = e.target.id;
@@ -176,6 +179,7 @@ function Tools(props) {
         let perk_id = e.target.id;
         let perk = perks.find((perk) => perk.perk_id === perk_id);
         localStorage.setItem("equippedPerk", JSON.stringify(perk));
+        setEquippedItem(perk);
     };
 
     return (
@@ -214,8 +218,14 @@ function Tools(props) {
                                         secondary
                                         id={perk.perk_id}
                                         onClick={(e) => handleEquip(e)}
+                                        disabled={
+                                            equippedItem.perkname ===
+                                            perk.perkname
+                                        }
                                     >
-                                        Equip
+                                        {equippedItem.perkname === perk.perkname
+                                            ? "Equipped"
+                                            : "Equip"}
                                     </ShopButton>
                                 ) : (
                                     <ShopButton
