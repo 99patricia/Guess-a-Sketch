@@ -137,14 +137,20 @@ function Shop(props) {
                                     id="Tools and Colors"
                                     className="tabcontent"
                                 >
-                                    <Tools perks={allPerks} />
+                                    <Tools
+                                        perks={allPerks}
+                                        userData={userData}
+                                    />
                                 </div>
                                 <div
                                     id="My Inventory"
                                     className="tabcontent"
                                     style={{ display: "none" }}
                                 >
-                                    <Tools perks={userPerks} />
+                                    <Tools
+                                        userPerks={userPerks}
+                                        userData={userData}
+                                    />
                                 </div>
                             </TabContentContainer>
                         </TabContainer>

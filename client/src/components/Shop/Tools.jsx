@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
+
 import { Desktop } from "service/mediaQueries";
-import Button from "components/Button";
+import { Button, ErrorMessage } from "components";
 
 const ToolContainer = styled.div`
     display: grid;
@@ -120,35 +122,93 @@ const PenSizes = styled.div`
     background-color: black;
 `;
 
-const BuyDialog = styled.div``;
+const BuyDialog = styled.div`
+    display: grid;
+    justify-items: center;
+    height: 100%;
+
+    .text {
+        margin: 2rem 0;
+    }
+
+    .buttons {
+        display: flex;
+    }
+`;
 
 function Tool(props) {
     const isDesktop = Desktop();
-    const { perks } = { ...props };
+    const { perks, userData } = { ...props };
 
+    const [userPerks, setUserPerks] = useState([]);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
     const [showBuyDialog, setShowBuyDialog] = useState(false);
     const [item, setItem] = useState("");
+
+    useEffect(() => {
+        setUserPerks(props.userPerks);
+        console.log(userPerks);
+    }, [props.userPerks, userPerks]);
+
     const handleShowBuyDialog = (e) => {
         let itemName = e.target.id;
         setItem(perks.find((perk) => perk.perkname === itemName));
         setShowBuyDialog(true);
     };
 
+    const handleRedeemPerk = (e, item) => {
+        e.preventDefault();
+
+        let perk_id = item.perk_id;
+        const options = {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+        };
+
+        // Buy the perk
+        axios
+            .post(`/purchase/${userData.id}/${perk_id}`, options)
+            .then((res) => {
+                setMessage(res.data.message);
+                // Update user perks
+                setUserPerks(res.data.userPerks);
+            })
+            .catch((err) => {
+                setError(err.response.data.error);
+            });
+    };
+
     return (
         <>
             {showBuyDialog ? (
                 <BuyDialog>
-                    Are you sure you want to redeem {item.perkname} for{" "}
-                    {item.price} points?
-                    <Button secondary onClick={() => setShowBuyDialog(false)}>
-                        Back
-                    </Button>
-                    <Button>Buy</Button>
+                    {message && message}
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
+                    <div className="text">
+                        Are you sure you want to redeem {item.perkname} for{" "}
+                        {item.price} points?
+                    </div>
+                    <div className="buttons">
+                        <Button
+                            secondary
+                            onClick={() => {
+                                setMessage("");
+                                setError("");
+                                setShowBuyDialog(false);
+                            }}
+                        >
+                            Back
+                        </Button>
+                        <Button onClick={(e) => handleRedeemPerk(e, item)}>
+                            Buy
+                        </Button>
+                    </div>
                 </BuyDialog>
             ) : (
                 <>
                     <ToolContainer isDesktop={isDesktop}>
-                        {perks.map((perk) => (
+                        {(perks || userPerks).map((perk) => (
                             <ToolItemContainer key={perk.perk_id}>
                                 <BuyPerkButton
                                     secondary
