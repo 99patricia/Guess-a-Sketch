@@ -10,7 +10,7 @@ const ScoreboardContainer = styled.div`
 
 const ScoreboardList = styled.div`
     display: grid;
-    grid-template-rows: repeat(auto-fill, 4rem);
+    grid-template-rows: repeat(auto-fill, 70px);
     grid-gap: 1.5rem;
     height: 100%;
 `;

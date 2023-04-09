@@ -45,7 +45,7 @@ const ToolItemContainer = styled.div`
     transition: opacity 0.3s ease-in-out;
 `;
 
-const BuyPerkButton = styled(Button)`
+const ShopButton = styled(Button)`
     transition: opacity 0.1s ease-in-out;
     opacity: 0;
     position: absolute;
@@ -138,18 +138,12 @@ const BuyDialog = styled.div`
 
 function Tools(props) {
     const isDesktop = Desktop();
-    const { perks, userData } = { ...props };
+    const { perks, showUserPerks, userData } = { ...props };
 
-    const [userPerks, setUserPerks] = useState([]);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [showBuyDialog, setShowBuyDialog] = useState(false);
     const [item, setItem] = useState("");
-
-    useEffect(() => {
-        setUserPerks(props.userPerks);
-        console.log(userPerks);
-    }, [props.userPerks, userPerks]);
 
     const handleShowBuyDialog = (e) => {
         let itemName = e.target.id;
@@ -176,6 +170,12 @@ function Tools(props) {
                 setError(err.response.data.error);
             });
         window.location.reload();
+    };
+
+    const handleEquip = (e) => {
+        let perk_id = e.target.id;
+        let perk = perks.find((perk) => perk.perk_id === perk_id);
+        localStorage.setItem("equippedPerk", JSON.stringify(perk));
     };
 
     return (
@@ -207,15 +207,25 @@ function Tools(props) {
             ) : (
                 <>
                     <ToolContainer isDesktop={isDesktop}>
-                        {(perks || userPerks).map((perk) => (
+                        {perks.map((perk) => (
                             <ToolItemContainer key={perk.perk_id}>
-                                <BuyPerkButton
-                                    secondary
-                                    id={perk.perkname}
-                                    onClick={(e) => handleShowBuyDialog(e)}
-                                >
-                                    Redeem
-                                </BuyPerkButton>
+                                {showUserPerks ? (
+                                    <ShopButton
+                                        secondary
+                                        id={perk.perk_id}
+                                        onClick={(e) => handleEquip(e)}
+                                    >
+                                        Equip
+                                    </ShopButton>
+                                ) : (
+                                    <ShopButton
+                                        secondary
+                                        id={perk.perkname}
+                                        onClick={(e) => handleShowBuyDialog(e)}
+                                    >
+                                        Redeem
+                                    </ShopButton>
+                                )}
                                 <ToolItem>
                                     <div className="perkname">
                                         {perk.perkname}

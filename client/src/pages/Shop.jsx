@@ -148,7 +148,8 @@ function Shop(props) {
                                     style={{ display: "none" }}
                                 >
                                     <Tools
-                                        userPerks={userPerks}
+                                        perks={userPerks}
+                                        showUserPerks
                                         userData={userData}
                                     />
                                 </div>

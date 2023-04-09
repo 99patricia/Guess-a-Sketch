@@ -71,6 +71,7 @@ function GuestLogin() {
                         height={334}
                         noContainer
                     />
+                    <br />
                     <Button
                         column
                         onClick={handleGuestLogin}

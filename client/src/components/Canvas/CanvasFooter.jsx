@@ -8,18 +8,21 @@ import { Desktop } from "service/mediaQueries";
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
     padding: 1rem;
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
-    margin-bottom: 1rem;
+    border-radius: ${(props) => (props.isDesktop ? "0 0 1rem 1rem" : "0")};
+
+    min-width: ${(props) => (props.isDesktop ? "500px" : "100vw")};
+    max-width: 500px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 `;
 
 const StyledToolbar = styled.div`
-    max-width: 460px;
     display: grid;
     grid-auto-flow: column;
     grid-template-columns: ${(props) => (props.isDesktop ? "1fr 2fr" : "auto")};
     align-items: center;
-    justify-items: stretch;
+    justify-items: center;
 `;
 
 const StyledColor = styled.button`
@@ -154,7 +157,7 @@ function CanvasFooter(props) {
     }, [canvasRef, sendToSocket, isDrawing, drawingInGame]);
 
     return (
-        <StyledCanvasFooter>
+        <StyledCanvasFooter isDesktop={isDesktop}>
             <StyledToolbar isDesktop={isDesktop}>
                 <div>
                     <IconButton

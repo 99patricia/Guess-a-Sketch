@@ -8,7 +8,7 @@ const LobbyContainer = styled.div`
     border-radius: 1rem;
     width: ${(props) => (props.isDesktop ? "500px" : "inherit")};
     min-height: ${(props) => (props.isDesktop ? "0" : "70vh")};
-    max-height: 70vh;
+    max-height: 680px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-flow: column;

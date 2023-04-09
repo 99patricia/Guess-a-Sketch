@@ -8,6 +8,10 @@ const CanvasHeaderContainer = styled.div`
     align-items: center;
     justify-items: stretch;
     height: 80px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 
     padding: ${(props) => (props.isDesktop ? "0 2rem" : "0.25rem 1rem")};
     background-color: ${(props) =>
