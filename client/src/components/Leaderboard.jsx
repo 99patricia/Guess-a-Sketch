@@ -96,7 +96,7 @@ function Leaderboard(props) {
                                     <TR
                                         key={username}
                                         style={
-                                            userData.username == username &&
+                                            userData.username === username &&
                                             !loggedInAsGuest
                                                 ? { color: "var(--secondary)" }
                                                 : { color: "var(--primary)" }

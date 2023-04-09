@@ -54,7 +54,8 @@ function GameHeader(props) {
     const isDesktop = Desktop();
     const { gameData, isDrawing, timeLeft, word } = { ...props };
 
-    const currentTurn = gameData.currentTurn;
+    const currentTurnID = gameData.currentTurn;
+    const currentTurn = gameData.players.find((player) => player.userID == currentTurnID)?.username;
     const numRounds = gameData.numberOfRounds;
     const currentRound = gameData.currentRound;
 

@@ -100,11 +100,11 @@ function Lobby(props) {
     const isDesktop = Desktop();
 
     function startGame() {
-        socket.emit("start-game", host);
+        socket.emit("start-game");
     }
 
-    function kickPlayer(username) {
-        socket.emit("kick-player", username);
+    function kickPlayer(userID) {
+        socket.emit("kick-player", userID);
     }
 
     return (
@@ -114,16 +114,16 @@ function Lobby(props) {
             ) : (
                 <>
                     <UserCardList>
-                        {players.map(({ username, isHost, avatar }) => (
-                            <UserCard key={username}>
-                                {host && username !== userData.username && (
+                        {players.map(({ username, userID, isHost, avatar }) => (
+                            <UserCard key={userID}>
+                                {host && userID !== socket.userID && (
                                     <HoverButton
                                         onClick={() => kickPlayer(username)}
                                     >
                                         Kick
                                     </HoverButton>
                                 )}
-                                {username === userData.username && (
+                                {userID === socket.userID && (
                                     <>
                                         <ThisUserImage src={avatar} />
                                         <h3 style={{ margin: "5px" }}>
@@ -139,7 +139,7 @@ function Lobby(props) {
                                         </h3>
                                     </>
                                 )}
-                                {username !== userData.username && (
+                                {userID !== socket.userID && (
                                     <>
                                         <UserImage src={avatar} />
                                         <h3 style={{ margin: "5px" }}>

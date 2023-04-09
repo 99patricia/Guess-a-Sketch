@@ -75,8 +75,8 @@ function Scoreboard(props) {
     const isDesktop = Desktop();
     const { userData, gameData, host } = { ...props };
 
-    function kickPlayer(username) {
-        socket.emit("kick-player", username);
+    function kickPlayer(userID) {
+        socket.emit("kick-player", userID);
     }
 
     return (
@@ -84,13 +84,13 @@ function Scoreboard(props) {
             <ScoreboardList>
                 {gameData.players &&
                     gameData.players.map(
-                        ({ username, avatar, score, isHost, hasGuessed }) => (
+                        ({ username, userID, avatar, score, isHost, hasGuessed }) => (
                             <StyledScoreboard
-                                key={username}
-                                currentTurn={username === gameData.currentTurn}
+                                key={userID}
+                                currentTurn={userID === gameData.currentTurn}
                                 hasGuessed={hasGuessed}
                             >
-                                {username === userData.username ? (
+                                {userID === socket.userID ? (
                                     <div>
                                         <StyledText secondary>
                                             {username}
@@ -106,9 +106,9 @@ function Scoreboard(props) {
                                     </div>
                                 )}
                                 <UserImageDiv>
-                                    {host && username !== userData.username && (
+                                    {host && userID !== socket.userID && (
                                         <HoverButton
-                                            onClick={() => kickPlayer(username)}
+                                            onClick={() => kickPlayer(userID)}
                                         >
                                             Kick
                                         </HoverButton>

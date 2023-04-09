@@ -36,7 +36,25 @@ function Home() {
             };
 
             // Manually connect socket when joining room
+            const sessionID = sessionStorage.getItem("sessionID");
+
+            if (sessionID) {
+                socket.auth = { 
+                    username: userData.username,
+                    sessionID 
+                };
+            } else {
+                socket.auth = { username: userData.username };
+            }
             socket.connect();
+            socket.on("session", ({ sessionID, userID }) => {
+                socket.auth = { 
+                    username: userData.username,
+                    sessionID 
+                };
+                sessionStorage.setItem("sessionID", sessionID);
+                socket.userID = userID;
+            });
             socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {
                 setShowErrorMessage(data.msg);

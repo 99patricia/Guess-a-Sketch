@@ -77,16 +77,25 @@ function Profile(props) {
     const [gameHistory, setGameHistory] = useState([]);
 
     useEffect(() => {
-        const games = profileData.gamehistory;
-        if (games) {
-            var i;
-            setGameHistory([]);
-            for (i = 0; i < games.length; i++) {
-                axios.get(`/games/${games[i]}`).then((res) => {
-                    setGameHistory((oldArray) => [...oldArray, res.data]);
-                });
+
+        const fetchGames = async () => {
+            const games = profileData.gamehistory;
+            if (games) {
+                var i;
+                setGameHistory([]);
+                for (i=0; i<games.length; i++) {
+                    await axios
+                        .get(`/games/${games[i]}`)
+                        .then((res) => {
+                            setGameHistory(oldArray => [...oldArray, res.data]);
+                        });
+                }
+
             }
         }
+        
+        fetchGames()
+            .catch(console.error);
     }, [profileData]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
