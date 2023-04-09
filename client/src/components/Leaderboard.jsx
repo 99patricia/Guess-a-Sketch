@@ -6,10 +6,12 @@ const LeaderboardContainer = styled.div`
     padding: 1rem;
     padding-top: 0.5rem;
     border-radius: 1rem;
-    width: 500px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    width: 85vw;
+    max-width: 800px;
+    height: 70vh;
     display: flex;
     flex-flow: column;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const LeaderboardHeader = styled.div`
@@ -21,8 +23,6 @@ const LeaderboardHeader = styled.div`
 `;
 
 const LeaderboardTableDiv = styled.div`
-    border-radius: 1rem;
-    border: 2px solid var(--primary);
     overflow: hidden;
     height: 100%;
     overflow-y: auto;
@@ -33,7 +33,7 @@ const LeaderboardTableDiv = styled.div`
 
     ::-webkit-scrollbar-thumb {
         background-clip: padding-box;
-        background-color: #AAAAAA;
+        background-color: #aaaaaa;
         border-radius: 9999px;
         border: 4px solid rgba(0, 0, 0, 0);
     }
@@ -42,6 +42,7 @@ const LeaderboardTableDiv = styled.div`
 const LeaderboardTable = styled.table`
     text-align: center;
     border-collapse: collapse;
+    table-layout: fixed;
     width: 100%;
 `;
 
@@ -51,8 +52,6 @@ const THead = styled.thead`
 `;
 
 const TR = styled.tr`
-
-
     :nth-child(even) {
         background-color: var(--light-beige);
     }
@@ -62,6 +61,7 @@ const TR = styled.tr`
 `;
 
 const TH = styled.th`
+    text-transform: uppercase;
     position: sticky;
     padding: 0.5rem;
     color: var(--secondary);
@@ -69,20 +69,16 @@ const TH = styled.th`
 `;
 
 const TD = styled.td`
-    // border: 1px solid black;
-    padding-left: 0.5rem;
+    padding: 0.5rem 0;
 `;
 
 function Leaderboard(props) {
-
     const { leaderboardData, userData, loggedInAsGuest } = { ...props };
 
     return (
         <>
             <LeaderboardContainer>
-                <LeaderboardHeader>
-                    Leaderboard
-                </LeaderboardHeader>
+                <LeaderboardHeader>Leaderboard</LeaderboardHeader>
                 <LeaderboardTableDiv>
                     <LeaderboardTable>
                         <THead>
@@ -95,32 +91,39 @@ function Leaderboard(props) {
                             </TR>
                         </THead>
                         <tbody>
-                        {leaderboardData.map(({ username, wins, losses }, index) => (
-                            <TR key={username} style={userData.username == username && !loggedInAsGuest ? {color: "var(--secondary)"} : {color: "var(--primary)"}}>
-                                <TD>
-                                    {index+1}
-                                </TD>
-                                <TD>
-                                    {username}
-                                </TD>
-                                <TD>
-                                    {wins}
-                                </TD>
-                                <TD>
-                                    {losses}
-                                </TD>
-                                <TD>
-                                    {isFinite(wins/losses) ? (Math.round((wins/losses) * 100)/100).toFixed(2)
-                                    : wins}
-                                </TD>
-                            </TR>
-                        ))}
+                            {leaderboardData.map(
+                                ({ username, wins, losses }, index) => (
+                                    <TR
+                                        key={username}
+                                        style={
+                                            userData.username == username &&
+                                            !loggedInAsGuest
+                                                ? { color: "var(--secondary)" }
+                                                : { color: "var(--primary)" }
+                                        }
+                                    >
+                                        <TD>{index + 1}</TD>
+                                        <TD>{username}</TD>
+                                        <TD>{wins}</TD>
+                                        <TD>{losses}</TD>
+                                        <TD>
+                                            {isFinite(wins / losses)
+                                                ? (
+                                                      Math.round(
+                                                          (wins / losses) * 100
+                                                      ) / 100
+                                                  ).toFixed(2)
+                                                : wins}
+                                        </TD>
+                                    </TR>
+                                )
+                            )}
                         </tbody>
                     </LeaderboardTable>
                 </LeaderboardTableDiv>
             </LeaderboardContainer>
         </>
-    )
+    );
 }
 
 export default Leaderboard;

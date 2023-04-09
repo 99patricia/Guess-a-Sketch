@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { socket } from "service/socket";
 
 import { CanvasFooter, CanvasHeader } from "components/Canvas/";
+import { Desktop } from "service/mediaQueries";
 
 const StyledCanvasContainer = styled.div`
     ${(props) =>
@@ -13,21 +14,34 @@ const StyledCanvasContainer = styled.div`
         padding: 1rem;
         padding-top: 0.25rem;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  `}
+    `}
+
+    ${(props) =>
+        !props.isDesktop &&
+        props.inGame &&
+        `width: 100vw;
+        margin-left: -1rem;
+    `}
 `;
 
 const StyledCanvas = styled.canvas`
     background-color: var(--white);
     vertical-align: bottom;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
+    border-radius: ${(props) => (props.isDesktop ? "1rem 1rem 0 0" : "0")};
 `;
 
 const Canvas = React.forwardRef((props, ref) => {
+    const isDesktop = Desktop();
     const canvasRef = ref;
-    const { gameData, isDrawing, word, sendToSocket, timeLeft } = {
-        ...props,
-    };
+    const {
+        noContainer,
+        gameData,
+        isDrawing,
+        word,
+        sendToSocket,
+        timeLeft,
+        inGame,
+    } = { ...props };
 
     const penSizeChoices = props.penSizeChoices || [10, 50];
     const colorChoices = props.colorChoices || ["black", "red", "blue"];
@@ -38,16 +52,20 @@ const Canvas = React.forwardRef((props, ref) => {
         const ctx = canvas.getContext("2d");
         const mainWindow = document.querySelector("html");
         const canDraw = isDrawing;
-        const resizeCanvas = gameData === undefined; // resize canvas if not used in game
 
         // Resize canvas
-        if (resizeCanvas) {
+        if (inGame) {
+            // Resize the canvas to fit screen width
+            canvas.width = !isDesktop || !gameData ? window.outerWidth : 500;
+            canvas.height =
+                !isDesktop || !gameData
+                    ? window.outerWidth
+                    : canvas.parentElement.clientHeight - 190;
+        } else {
+            // Resize the draw avatar canvas to fit form
             const canvasParentWidth = canvas.parentElement.clientWidth;
             canvas.width = canvasParentWidth;
             canvas.height = canvasParentWidth;
-        } else {
-            canvas.width = 500;
-            canvas.height = 340;
         }
 
         // Stores the initial position of the cursor
@@ -164,7 +182,6 @@ const Canvas = React.forwardRef((props, ref) => {
 
         // If we receive coordinates from socket, draw them
         if (sendToSocket) {
-            socket.off("draw");
             socket.on("draw", (data) => {
                 // Only receive if we are not the person currently drawing
                 if (!canDraw)
@@ -180,6 +197,10 @@ const Canvas = React.forwardRef((props, ref) => {
         }
 
         return () => {
+            // Socket cleanup
+            socket.off("draw");
+
+            // Event listener cleanup
             canvas.removeEventListener("mousedown", onMouseDown);
             canvas.removeEventListener("mouseup", onMouseUp);
             canvas.removeEventListener("mouseout", onMouseUp);
@@ -195,7 +216,9 @@ const Canvas = React.forwardRef((props, ref) => {
     return (
         <StyledCanvasContainer
             width={props.width}
-            noContainer={props.noContainer}
+            isDesktop={isDesktop}
+            inGame={inGame}
+            noContainer={noContainer}
         >
             {sendToSocket && (
                 <CanvasHeader
@@ -205,7 +228,7 @@ const Canvas = React.forwardRef((props, ref) => {
                     word={word}
                 />
             )}
-            <StyledCanvas ref={canvasRef}></StyledCanvas>
+            <StyledCanvas isDesktop={isDesktop} ref={canvasRef}></StyledCanvas>
             <CanvasFooter
                 canvasRef={canvasRef}
                 sendToSocket={sendToSocket}

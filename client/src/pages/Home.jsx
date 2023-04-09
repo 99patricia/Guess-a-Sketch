@@ -34,6 +34,9 @@ function Home() {
                 username: userData.username,
                 avatar: userData.avatar,
             };
+
+            // Manually connect socket when joining room
+            socket.connect();
             socket.emit("join-room", room);
             socket.on("join-room-fail", (data) => {
                 setShowErrorMessage(data.msg);

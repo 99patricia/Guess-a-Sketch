@@ -7,9 +7,10 @@ const StyledIconButton = styled.button`
     color: var(--secondary);
     width: 40px;
     height: 40px;
+    padding: 0;
     font-size: 1.5rem;
     cursor: pointer;
-    z-index: 3;
+    z-index: 1;
     position: relative;
     margin: 0.3rem;
 `;
