@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+
 import { Container, Header } from "components";
 import { useUserData } from "hooks";
-import { Tools, Inventory } from "components/Shop/";
+import { Tools } from "components/Shop/";
 import { Desktop } from "service/mediaQueries";
+import axios from "axios";
 
 const StyledShopContainer = styled.div`
     background-color: var(--light-beige);
@@ -64,6 +66,10 @@ const TabContentContainer = styled.div``;
 function Shop(props) {
     const isDesktop = Desktop();
     const { userData, loggedInAsGuest } = useUserData();
+
+    const [userPerks, setUserPerks] = useState([]);
+    const [allPerks, setAllPerks] = useState([]);
+
     function openTab(tabName, e) {
         var i, tabcontent, tablinks;
 
@@ -85,6 +91,18 @@ function Shop(props) {
         document.getElementById(tabName).style.display = "block";
         e.currentTarget.className += " selected";
     }
+
+    useEffect(() => {
+        if (!loggedInAsGuest && userData.id) {
+            axios.get("/perks").then((res) => {
+                setAllPerks(res.data);
+            });
+
+            axios.get(`/user_perks/${userData.id}`).then((res) => {
+                setUserPerks(res.data.userPerks);
+            });
+        }
+    }, [loggedInAsGuest, userData]);
 
     return (
         <>
@@ -119,14 +137,14 @@ function Shop(props) {
                                     id="Tools and Colors"
                                     className="tabcontent"
                                 >
-                                    <Tools />
+                                    <Tools perks={allPerks} />
                                 </div>
                                 <div
                                     id="My Inventory"
                                     className="tabcontent"
                                     style={{ display: "none" }}
                                 >
-                                    <Inventory />
+                                    <Tools perks={userPerks} />
                                 </div>
                             </TabContentContainer>
                         </TabContainer>

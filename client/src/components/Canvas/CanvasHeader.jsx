@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import { socket } from "service/socket";
 import { Desktop } from "service/mediaQueries";
 
 const CanvasHeaderContainer = styled.div`

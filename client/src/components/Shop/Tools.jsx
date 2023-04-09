@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import { useUserData } from "hooks";
-import axios from "axios";
 import { Desktop } from "service/mediaQueries";
 
 const ToolContainer = styled.div`
@@ -77,20 +75,11 @@ const PenSizes = styled.div`
 
 function Tool(props) {
     const isDesktop = Desktop();
-    const { loggedInAsGuest } = useUserData();
-    const [perksData, setPerksData] = useState([]);
-
-    useEffect(() => {
-        if (!loggedInAsGuest) {
-            axios.get("/perks").then((res) => {
-                setPerksData(res.data);
-            });
-        }
-    }, []);
+    const { perks } = { ...props };
 
     return (
         <ToolContainer isDesktop={isDesktop}>
-            {perksData.map((perk) => (
+            {perks.map((perk) => (
                 <ToolItem key={perk.perk_id}>
                     <div className="perkname">{perk.perkname}</div>
                     <div className="description">{perk.description}</div>
