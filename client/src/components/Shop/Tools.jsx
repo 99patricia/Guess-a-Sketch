@@ -49,8 +49,8 @@ const ShopButton = styled(Button)`
     transition: opacity 0.1s ease-in-out;
     opacity: 0;
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 45%;
+    left: 45%;
     transform: translate(-50%, -50%);
     text-align: center;
     z-index: 2;
@@ -128,6 +128,7 @@ const BuyDialog = styled.div`
     height: 100%;
 
     .text {
+        text-align: center;
         margin: 2rem 0;
     }
 
@@ -211,62 +212,69 @@ function Tools(props) {
             ) : (
                 <>
                     <ToolContainer isDesktop={isDesktop}>
-                        {perks.map((perk) => (
-                            <ToolItemContainer key={perk.perk_id}>
-                                {showUserPerks ? (
-                                    <ShopButton
-                                        secondary
-                                        id={perk.perk_id}
-                                        onClick={(e) => handleEquip(e)}
-                                        disabled={
-                                            equippedItem.perkname ===
-                                            perk.perkname
-                                        }
-                                    >
-                                        {equippedItem.perkname === perk.perkname
-                                            ? "Equipped"
-                                            : "Equip"}
-                                    </ShopButton>
-                                ) : (
-                                    <ShopButton
-                                        secondary
-                                        id={perk.perkname}
-                                        onClick={(e) => handleShowBuyDialog(e)}
-                                    >
-                                        Redeem
-                                    </ShopButton>
-                                )}
-                                <ToolItem>
-                                    <div className="perkname">
-                                        {perk.perkname}
-                                    </div>
-                                    <div className="description">
-                                        {perk.description}
-                                    </div>
-                                    <div className="colors">
-                                        {perk.colors.map((color) => (
-                                            <ColorChoices
-                                                key={color}
-                                                color={color}
-                                            />
-                                        ))}
-                                    </div>
-                                    <div className="pensizes">
-                                        {perk.pen_sizes
-                                            .sort((a, b) => a - b)
-                                            .map((size) => (
-                                                <PenSizes
-                                                    key={size}
-                                                    size={size}
-                                                />
-                                            ))}
-                                    </div>
-                                    <div className="price">
-                                        {perk.price} pts
-                                    </div>
-                                </ToolItem>
-                            </ToolItemContainer>
-                        ))}
+                        {perks?.length > 0
+                            ? perks.map((perk) => (
+                                  <ToolItemContainer key={perk.perk_id}>
+                                      {showUserPerks ? (
+                                          <ShopButton
+                                              secondary
+                                              id={perk.perk_id}
+                                              onClick={(e) => handleEquip(e)}
+                                              disabled={
+                                                  equippedItem.perkname ===
+                                                  perk.perkname
+                                              }
+                                          >
+                                              {equippedItem.perkname ===
+                                              perk.perkname
+                                                  ? "Equipped"
+                                                  : "Equip"}
+                                          </ShopButton>
+                                      ) : (
+                                          <ShopButton
+                                              secondary
+                                              id={perk.perkname}
+                                              onClick={(e) =>
+                                                  handleShowBuyDialog(e)
+                                              }
+                                          >
+                                              Redeem
+                                          </ShopButton>
+                                      )}
+                                      <ToolItem>
+                                          <div className="perkname">
+                                              {perk.perkname}
+                                          </div>
+                                          <div className="description">
+                                              {perk.description}
+                                          </div>
+                                          <div className="colors">
+                                              {perk.colors.map((color) => (
+                                                  <ColorChoices
+                                                      key={color}
+                                                      color={color}
+                                                  />
+                                              ))}
+                                          </div>
+                                          <div className="pensizes">
+                                              {perk.pen_sizes
+                                                  .sort((a, b) => a - b)
+                                                  .map((size) => (
+                                                      <PenSizes
+                                                          key={size}
+                                                          size={size}
+                                                      />
+                                                  ))}
+                                          </div>
+                                          {!showUserPerks && (
+                                              <div className="price">
+                                                  {perk.price} pts
+                                              </div>
+                                          )}
+                                      </ToolItem>
+                                  </ToolItemContainer>
+                              ))
+                            : "No perks available"}
                     </ToolContainer>
                 </>
             )}

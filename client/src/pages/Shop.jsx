@@ -68,7 +68,7 @@ function Shop(props) {
     const { userData, loggedInAsGuest } = useUserData();
 
     const [userPerks, setUserPerks] = useState([]);
-    const [allPerks, setAllPerks] = useState([]);
+    const [unownedPerks, setUnownedPerks] = useState([]);
 
     function openTab(tabName, e) {
         var i, tabcontent, tablinks;
@@ -94,12 +94,21 @@ function Shop(props) {
 
     useEffect(() => {
         if (!loggedInAsGuest && userData.id) {
-            axios.get("/perks").then((res) => {
-                setAllPerks(res.data);
-            });
-
             axios.get(`/user_perks/${userData.id}`).then((res) => {
-                setUserPerks(res.data.userPerks);
+                const userPerks = res.data.userPerks;
+                setUserPerks(userPerks);
+
+                axios.get("/perks").then((res) => {
+                    const perks = res.data;
+
+                    // Get ids of all perks user owns
+                    const userPerksIds = userPerks.map((perk) => perk.perk_id);
+                    // Get all perks which user does not own
+                    const filteredPerks = perks.filter(
+                        (perk) => !userPerksIds.includes(perk.perk_id)
+                    );
+                    setUnownedPerks(filteredPerks);
+                });
             });
         }
     }, [loggedInAsGuest, userData]);
@@ -138,7 +147,7 @@ function Shop(props) {
                                     className="tabcontent"
                                 >
                                     <Tools
-                                        perks={allPerks}
+                                        perks={unownedPerks}
                                         userData={userData}
                                     />
                                 </div>
