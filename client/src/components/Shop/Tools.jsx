@@ -136,7 +136,7 @@ const BuyDialog = styled.div`
     }
 `;
 
-function Tool(props) {
+function Tools(props) {
     const isDesktop = Desktop();
     const { perks, userData } = { ...props };
 
@@ -171,12 +171,11 @@ function Tool(props) {
             .post(`/purchase/${userData.id}/${perk_id}`, options)
             .then((res) => {
                 setMessage(res.data.message);
-                // Update user perks
-                setUserPerks(res.data.userPerks);
             })
             .catch((err) => {
                 setError(err.response.data.error);
             });
+        window.location.reload();
     };
 
     return (
@@ -255,4 +254,4 @@ function Tool(props) {
     );
 }
 
-export default Tool;
+export default Tools;

@@ -171,19 +171,8 @@ async function purchasePerk(app) {
                 inventory: updatedInventory,
             });
 
-            // Fetch the perk data from user's new inventory
-            const userPerks = [];
-            for (let i = 0; i < updatedInventory.length; i++) {
-                const perkId = updatedInventory[i];
-                await getDoc(doc(db, "perks", perkId)).then((docsnap) => {
-                    const perkData = docsnap.data();
-                    userPerks.push(perkData);
-                });
-            }
-
             res.status(200).json({
                 message: "Perk purchased successfully",
-                userPerks,
             });
         } catch (error) {
             console.error(error);
