@@ -12,6 +12,7 @@ const CanvasHeaderContainer = styled.div`
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    z-index: 2;
 
     padding: ${(props) => (props.isDesktop ? "0 2rem" : "0.25rem 1rem")};
     background-color: ${(props) =>

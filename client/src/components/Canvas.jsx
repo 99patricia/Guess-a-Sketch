@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
-import { CanvasFooter, CanvasHeader } from "components/Canvas/";
+import { CanvasFooter, CanvasHeader, ScoreCard } from "components/Canvas/";
 import { Desktop } from "service/mediaQueries";
 
 const StyledCanvasContainer = styled.div`
@@ -19,6 +19,7 @@ const StyledCanvasContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    z-index: 2;
 
     ${(props) =>
         !props.isDesktop &&
@@ -46,6 +47,9 @@ const Canvas = React.forwardRef((props, ref) => {
         sendToSocket,
         timeLeft,
         inGame,
+        showScoreCard,
+        playersData,
+        prevWord,
     } = { ...props };
 
     const penSizeChoices = props.penSizeChoices || [10, 50];
@@ -230,6 +234,12 @@ const Canvas = React.forwardRef((props, ref) => {
             inGame={inGame}
             noContainer={noContainer}
         >
+            <ScoreCard
+                showScoreCard={showScoreCard}
+                playersData={playersData}
+                width={width}
+                prevWord={prevWord}
+            />
             {sendToSocket && (
                 <CanvasHeader
                     gameData={gameData}
