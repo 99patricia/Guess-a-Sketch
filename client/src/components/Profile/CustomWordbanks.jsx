@@ -32,6 +32,10 @@ const WordbankContent = styled.div`
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `;
 
+const StyledMessage = styled.div`
+    text-align: center;
+`;
+
 function CustomWordbanks(props) {
     const { userData } = { ...props };
 
@@ -57,6 +61,9 @@ function CustomWordbanks(props) {
                 withCredentials: true,
                 headers: { "Content-Type": "application/json" },
             };
+
+            if (newCategoryName === "")
+                return setError("Category name must not be empty.");
 
             // Create the wordbank
             axios
@@ -85,7 +92,7 @@ function CustomWordbanks(props) {
         <WordbankContainer>
             {showCreate ? (
                 <>
-                    {message && message}
+                    {message && <StyledMessage>{message}</StyledMessage>}
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                     <FormInput
                         label="Category"
