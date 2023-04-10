@@ -75,27 +75,33 @@ function Profile(props) {
     };
 
     const [gameHistory, setGameHistory] = useState([]);
+    const [wordbanks, setWordbanks] = useState([]);
 
     useEffect(() => {
-
         const fetchGames = async () => {
             const games = profileData.gamehistory;
             if (games) {
                 var i;
                 setGameHistory([]);
-                for (i=0; i<games.length; i++) {
-                    await axios
-                        .get(`/games/${games[i]}`)
-                        .then((res) => {
-                            setGameHistory(oldArray => [...oldArray, res.data]);
-                        });
+                for (i = 0; i < games.length; i++) {
+                    await axios.get(`/games/${games[i]}`).then((res) => {
+                        setGameHistory((oldArray) => [...oldArray, res.data]);
+                    });
                 }
-
             }
-        }
-        
-        fetchGames()
-            .catch(console.error);
+        };
+
+        const fetchWordbanks = async () => {
+            if (userData.id) {
+                // Fetch user's wordbanks
+                await axios
+                    .get(`/wordbank/${userData.id}`)
+                    .then((res) => setWordbanks(res.data));
+            }
+        };
+
+        fetchGames().catch(console.error);
+        fetchWordbanks().catch((error) => console.error(error));
     }, [profileData]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
@@ -190,7 +196,7 @@ function Profile(props) {
                                 className="tabcontent"
                                 style={{ display: "none" }}
                             >
-                                <CustomWordbanks />
+                                <CustomWordbanks wordbanks={wordbanks} />
                             </div>
                         </ProfileNavContainer>
                     </>
