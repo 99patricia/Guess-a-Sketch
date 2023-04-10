@@ -207,6 +207,7 @@ function CanvasFooter(props) {
                             key={color}
                             color={color}
                             onClick={handleChangeColor}
+                            type="button"
                             className={
                                 localStorage.getItem("penColor") === color &&
                                 "active"

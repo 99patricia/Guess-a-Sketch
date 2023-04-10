@@ -17,7 +17,7 @@ const StyledIconButton = styled.button`
 
 const IconButton = React.forwardRef((props, ref) => {
     return (
-        <StyledIconButton {...props} ref={ref}>
+        <StyledIconButton {...props} ref={ref} type="button">
             <i className={`bi ${props.iconClassName}`}></i>
         </StyledIconButton>
     );
