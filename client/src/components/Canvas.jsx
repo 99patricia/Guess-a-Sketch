@@ -2,23 +2,26 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
-import { CanvasFooter, CanvasHeader } from "components/Canvas/";
+import { CanvasFooter, CanvasHeader, ScoreCard } from "components/Canvas/";
 import { Desktop } from "service/mediaQueries";
 
 const StyledCanvasContainer = styled.div`
     ${(props) =>
         !props.noContainer &&
         `
-        padding: 1rem;
-        padding-top: 0.25rem;
+        padding: 0 1rem 1rem;
+        min-width: 450px;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
         border-radius: 1rem;
         `}
 
+    position: relative;
+    overflow: hidden;
     background-color: var(--light-beige);
     display: flex;
     flex-direction: column;
     align-items: center;
+    z-index: 2;
 
     ${(props) =>
         !props.isDesktop &&
@@ -46,6 +49,9 @@ const Canvas = React.forwardRef((props, ref) => {
         sendToSocket,
         timeLeft,
         inGame,
+        showScoreCard,
+        playersData,
+        prevWord,
     } = { ...props };
 
     const penSizeChoices = props.penSizeChoices || [10, 50];
@@ -62,13 +68,13 @@ const Canvas = React.forwardRef((props, ref) => {
         // Resize canvas
         if (inGame) {
             // Resize the canvas to fit screen width
-            if (window.innerWidth <= 500) {
+            if (window.innerWidth <= 450) {
                 canvas.width =
-                    !isDesktop || !gameData ? window.innerWidth : 500;
+                    !isDesktop || !gameData ? window.innerWidth : 450;
             } else {
-                canvas.width = 500;
+                canvas.width = 450;
             }
-            canvas.height = 500;
+            canvas.height = 450;
         } else {
             // Resize the draw avatar canvas to fit form
             const canvasParentWidth = canvas.parentElement.clientWidth;
@@ -84,8 +90,12 @@ const Canvas = React.forwardRef((props, ref) => {
 
         // Update the position of the cursor on canvas
         const updateCoords = (e) => {
-            coord.x = (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
-            coord.y = (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
+            coord.x =
+                (e.clientX || e.touches[0].clientX) -
+                (canvas.offsetLeft + canvas.parentElement.offsetLeft);
+            coord.y =
+                (e.clientY || e.touches[0].clientY) -
+                (canvas.offsetTop + canvas.parentElement.offsetTop);
         };
 
         const draw = (x0, y0, x1, y1, color, size, emit) => {
@@ -124,9 +134,11 @@ const Canvas = React.forwardRef((props, ref) => {
             drawing = true;
             updateCoords(e);
             lastCoord.x =
-                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
+                (e.clientX || e.touches[0].clientX) -
+                (canvas.offsetLeft + canvas.parentElement.offsetLeft);
             lastCoord.y =
-                (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
+                (e.clientY || e.touches[0].clientY) -
+                (canvas.offsetTop + canvas.parentElement.offsetTop);
         };
 
         const onMouseUp = (e) => {
@@ -142,9 +154,11 @@ const Canvas = React.forwardRef((props, ref) => {
                 coord.x,
                 coord.y,
                 lastCoord.x ||
-                    (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
+                    (e.clientX || e.touches[0].clientX) -
+                        (canvas.offsetLeft + canvas.parentElement.offsetLeft),
                 lastCoord.y ||
-                    (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
+                    (e.clientY || e.touches[0].clientY) -
+                        (canvas.offsetTop + canvas.parentElement.offsetTop),
                 penColor,
                 penSize,
                 sendToSocket
@@ -160,8 +174,10 @@ const Canvas = React.forwardRef((props, ref) => {
             draw(
                 coord.x,
                 coord.y,
-                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft,
-                (e.clientY || e.touches[0].clientY) - canvas.offsetTop,
+                (e.clientX || e.touches[0].clientX) -
+                    (canvas.offsetLeft + canvas.parentElement.offsetLeft),
+                (e.clientY || e.touches[0].clientY) -
+                    (canvas.offsetTop + canvas.parentElement.offsetTop),
                 penColor,
                 penSize,
                 sendToSocket
@@ -169,9 +185,11 @@ const Canvas = React.forwardRef((props, ref) => {
             // Update coordinates as mouse is moving
             updateCoords(e);
             lastCoord.x =
-                (e.clientX || e.touches[0].clientX) - canvas.offsetLeft;
+                (e.clientX || e.touches[0].clientX) -
+                (canvas.offsetLeft + canvas.parentElement.offsetLeft);
             lastCoord.y =
-                (e.clientY || e.touches[0].clientY) - canvas.offsetTop;
+                (e.clientY || e.touches[0].clientY) -
+                (canvas.offsetTop + canvas.parentElement.offsetTop);
         };
 
         canvas.removeEventListener("mousedown", onMouseDown);
@@ -231,19 +249,27 @@ const Canvas = React.forwardRef((props, ref) => {
             noContainer={noContainer}
         >
             {sendToSocket && (
-                <CanvasHeader
-                    gameData={gameData}
-                    isDrawing={isDrawing}
-                    timeLeft={timeLeft}
-                    word={word}
-                    width={width}
-                />
+                <>
+                    <ScoreCard
+                        showScoreCard={showScoreCard}
+                        playersData={playersData}
+                        width={width}
+                        prevWord={prevWord}
+                    />
+                    <CanvasHeader
+                        gameData={gameData}
+                        isDrawing={isDrawing}
+                        timeLeft={timeLeft}
+                        word={word}
+                        width={width}
+                    />
+                </>
             )}
             <StyledCanvas
                 isDesktop={isDesktop}
                 ref={canvasRef}
                 inGame={inGame}
-            ></StyledCanvas>
+            />
             <CanvasFooter
                 canvasRef={canvasRef}
                 sendToSocket={sendToSocket}
