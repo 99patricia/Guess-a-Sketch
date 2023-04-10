@@ -169,11 +169,11 @@ function Tools(props) {
             .post(`/purchase/${userData.id}/${perk_id}`, options)
             .then((res) => {
                 setMessage(res.data.message);
+                window.location.reload();
             })
             .catch((err) => {
                 setError(err.response.data.error);
             });
-        window.location.reload();
     };
 
     const handleEquip = (e) => {

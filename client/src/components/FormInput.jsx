@@ -41,8 +41,9 @@ const StyledTextArea = styled.textarea`
     font-family: var(--font);
     font-weight: 900;
     color: var(--primary);
-    margin-bottom: 2rem;
     width: 100%;
+    resize: none;
+    height: 200px;
 
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
