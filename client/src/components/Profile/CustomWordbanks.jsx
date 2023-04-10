@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { Button, FormInput } from "components";
-import { Form } from "react-router-dom";
-import axios from 'axios';
+import { Button, ErrorMessage, FormInput } from "components";
+import axios from "axios";
 
 const WordbankContainer = styled.div`
     display: grid;
@@ -34,24 +33,61 @@ const WordbankContent = styled.div`
 `;
 
 function CustomWordbanks(props) {
-    const { wordbanks } = { ...props };
+    const { userData } = { ...props };
+
+    const [wordbanks, setWordbanks] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [showCreate, setShowCreate] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState("");
-    const [newWords, setNewWords] = useState([]);
+    const [newWordsString, setNewWordsString] = useState("");
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
 
-    const handleCreateWordbank = () => {
-        let newWordsArray = newWords.split(",");
-        newWordsArray = newWordsArray.map((word) => word.trim());
-        setNewWords(newWordsArray);
+    useEffect(() => {
+        setWordbanks([...props.wordbanks]);
+    }, [props.wordbanks]);
 
-        
-    };
+    const handleCreateWordbank = useCallback(
+        (e) => {
+            e.preventDefault();
+
+            const words = newWordsString.split(",").map((word) => word.trim());
+            const body = { words };
+            const options = {
+                withCredentials: true,
+                headers: { "Content-Type": "application/json" },
+            };
+
+            // Create the wordbank
+            axios
+                .post(
+                    `/wordbank/${newCategoryName}/${userData.id}`,
+                    body,
+                    options
+                )
+                .then((res) => {
+                    setError("");
+                    setMessage(res.data.message);
+                    setWordbanks((prev) => [
+                        ...prev,
+                        { name: newCategoryName, isGlobal: false, words },
+                    ]);
+                })
+                .catch((err) => {
+                    setMessage("");
+                    console.error(err.response.data.error);
+                    setError(err.response.data.error);
+                });
+        },
+        [wordbanks, newCategoryName, newWordsString, userData.id]
+    );
 
     return (
         <WordbankContainer>
             {showCreate ? (
                 <>
+                    {message && message}
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
                     <FormInput
                         label="Category"
                         placeholder="Enter category name"
@@ -62,15 +98,19 @@ function CustomWordbanks(props) {
                     <FormInput
                         label="Words"
                         placeholder="Enter a comma (,) separated list of words"
-                        value={newWords}
-                        onChange={(e) => setNewWords(e.target.value)}
+                        value={newWordsString}
+                        onChange={(e) => setNewWordsString(e.target.value)}
                         textArea
                     />
                     <div className="buttons">
                         <Button
                             type="button"
                             secondary
-                            onClick={() => setShowCreate(false)}
+                            onClick={() => {
+                                setMessage("");
+                                setError("");
+                                setShowCreate(false);
+                            }}
                         >
                             Back
                         </Button>
@@ -88,7 +128,7 @@ function CustomWordbanks(props) {
                     >
                         Create New Wordbank
                     </Button>
-                    {wordbanks.map((wordbank) => (
+                    {wordbanks?.map((wordbank) => (
                         <div key={wordbank.name}>
                             <WordbankName
                                 id={wordbank.name}

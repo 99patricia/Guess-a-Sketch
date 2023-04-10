@@ -106,7 +106,7 @@ function Profile(props) {
 
         fetchGames().catch(console.error);
         fetchWordbanks().catch((error) => console.error(error));
-    }, [profileData]);
+    }, [profileData, userData.id]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
     function openTab(e, tabName) {
@@ -200,7 +200,7 @@ function Profile(props) {
                                 className="tabcontent"
                                 style={{ display: "none" }}
                             >
-                                <CustomWordbanks wordbanks={wordbanks} />
+                                <CustomWordbanks userData={userData} wordbanks={wordbanks} />
                             </div>
                         </ProfileNavContainer>
                     </>

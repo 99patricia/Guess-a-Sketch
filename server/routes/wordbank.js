@@ -85,7 +85,9 @@ async function createWordBank(app) {
             // Check if the document already exists
             const snapshot = await getDoc(wordBankDocRef);
             if (snapshot.exists()) {
-                res.status(400).json({ error: "Word bank already exists" });
+                res.status(400).json({
+                    error: "Word bank with that name already exists",
+                });
                 return;
             }
 
