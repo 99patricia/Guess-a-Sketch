@@ -20,6 +20,7 @@ const WordbankSection = styled.div`
 const WordbankContent = styled(FormInput)`
     resize: none;
     border-radius: 0 0 1rem 1rem;
+    margin-bottom: 0;
 `;
 
 function CustomWordbanks(props) {
@@ -29,17 +30,13 @@ function CustomWordbanks(props) {
     return (
         <WordbankContainer>
             {wordbanks.map((wordbank) => (
-                <>
-                    {!wordbank.isGlobal && (
-                        <div key={wordbank.name}>
-                            <WordbankSection>{wordbank.name} </WordbankSection>
-                            <WordbankContent
-                                textArea
-                                defaultValue={wordbank.words}
-                            ></WordbankContent>
-                        </div>
-                    )}
-                </>
+                <div key={wordbank.name}>
+                    <WordbankSection>{wordbank.name} </WordbankSection>
+                    <WordbankContent
+                        textArea
+                        defaultValue={wordbank.words}
+                    ></WordbankContent>
+                </div>
             ))}
         </WordbankContainer>
     );

@@ -96,7 +96,11 @@ function Profile(props) {
                 // Fetch user's wordbanks
                 await axios
                     .get(`/wordbank/${userData.id}`)
-                    .then((res) => setWordbanks(res.data));
+                    .then((res) =>
+                        setWordbanks(
+                            res.data.filter((wordbank) => !wordbank.isGlobal)
+                        )
+                    );
             }
         };
 
