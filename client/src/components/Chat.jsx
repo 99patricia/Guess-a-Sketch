@@ -14,7 +14,7 @@ const StyledChat = styled.div`
     justify-content: space-between;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     min-height: ${(props) => (props.isDesktop ? "0" : "70vh")};
-    max-height: 680px;
+    max-height: 620px;
 `;
 
 const StyledRoomCode = styled.div`

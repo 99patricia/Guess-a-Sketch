@@ -11,7 +11,7 @@ const StyledNavButton = styled(IconButton)`
     position: fixed;
     top: ${(props) => (props.isDesktop ? "30px" : "10px")};
     margin: 0;
-    z-index: 3;
+    z-index: 4;
 
     transition: transform 0.3s ease-in-out;
     transform: ${(props) =>
@@ -19,7 +19,7 @@ const StyledNavButton = styled(IconButton)`
 `;
 
 const StyledSideDrawer = styled.div`
-    z-index: 2;
+    z-index: 3;
     background-color: var(--light-beige);
     height: 100vh;
     padding: 3rem;

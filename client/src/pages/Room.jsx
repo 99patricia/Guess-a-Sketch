@@ -15,9 +15,9 @@ import { socket } from "service/socket";
 import { useUserData } from "hooks";
 import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
+
 const NavBar = styled.div`
     padding-bottom: 1rem;
-    // border: 1px solid purple;
 `;
 
 const StyledNavLink = styled.a`
@@ -52,15 +52,18 @@ function Room() {
     const { userData } = useUserData();
 
     const [players, setPlayers] = useState([]);
+    const [playersData, setPlayersData] = useState([]);
     const [isHost, setIsHost] = useState(false);
     const [isDrawing, setIsDrawing] = useState(false);
     const [word, setWord] = useState("");
+    const [prevWord, setPrevWord] = useState("");
     const [gameStart, setGameStart] = useState(false);
     const [gameData, setGameData] = useState({});
     const [gameOver, setGameOver] = useState(false);
     const [colorChoices, setColorChoices] = useState(["black", "red", "blue"]);
     const [penSizeChoices, setPenSizeChoices] = useState([10, 50]);
     const [timeLeft, setTimeLeft] = useState("0");
+    const [showScoreCard, setShowScoreCard] = useState(false);
 
     function openTab(tabName, e) {
         if (!isDesktop) {
@@ -140,6 +143,16 @@ function Room() {
             setIsDrawing(false);
         });
 
+        socket.on("turn-start-all", () => {
+            setShowScoreCard(false);
+        });
+
+        socket.on("turn-end-all", (data) => {
+            setShowScoreCard(true);
+            setPrevWord(data.prevWord);
+            setPlayersData(data.players);
+        });
+
         socket.on("timer", (data) => {
             setTimeLeft(data);
         });
@@ -167,6 +180,8 @@ function Room() {
             socket.off("players-data");
             socket.off("turn-start");
             socket.off("turn-end");
+            socket.off("turn-start-all");
+            socket.off("turn-end-all");
             socket.off("timer");
             socket.off("kick-player");
             socket.off("game-over");
@@ -210,6 +225,9 @@ function Room() {
                                             colorChoices={colorChoices}
                                             timeLeft={timeLeft}
                                             inGame
+                                            showScoreCard={showScoreCard}
+                                            playersData={playersData}
+                                            prevWord={prevWord}
                                         />
                                     </>
                                 ) : (
@@ -318,6 +336,11 @@ function Room() {
                                                     colorChoices={colorChoices}
                                                     timeLeft={timeLeft}
                                                     inGame
+                                                    showScoreCard={
+                                                        showScoreCard
+                                                    }
+                                                    playersData={playersData}
+                                                    prevWord={prevWord}
                                                 />
                                             </div>
                                         </>

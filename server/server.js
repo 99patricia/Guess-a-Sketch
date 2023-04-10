@@ -84,6 +84,7 @@ function makeGame(
                 isHost: true,
                 socketId,
                 score: 0,
+                turnScore: 0,
                 hasGuessed: false,
                 avatar: hostAvatar,
             },
@@ -103,6 +104,7 @@ function makeGame(
                 isHost: false,
                 socketId,
                 score: 0,
+                turnScore: 0,
                 hasGuessed: false,
                 avatar: avatar,
             };
@@ -113,9 +115,7 @@ function makeGame(
         },
         removePlayer: function (userID) {
             if (this.gameOver) return;
-            let player = this.players.find(
-                (player) => player.userID == userID
-            );
+            let player = this.players.find((player) => player.userID == userID);
 
             let i = this.listGuessed.indexOf(userID);
             if (i > -1) {
@@ -181,6 +181,9 @@ function makeGame(
                 )
                 .emit("turn-start", this.currentWord);
 
+            // Emit new turn to room for clearing score card
+            roomsNamespace.to(this.roomId).emit("turn-start-all");
+
             // maybe create async function to manage the timer
             let disconnected = false;
             let game = this;
@@ -212,6 +215,7 @@ function makeGame(
                     let multiplyer = playersNotGuessed / numberOfGuessers;
                     let drawerScore =
                         multiplyer === 1 ? 0 : Math.round(multiplyer * 30) * 10;
+                    currentPlayer.turnScore += drawerScore;
                     currentPlayer.score += drawerScore;
 
                     clearInterval(gameTimer);
@@ -221,13 +225,15 @@ function makeGame(
                             .emit("turn-end");
                         game.sendGameData();
                     }
+
                     timeleft = 0;
                     let index = game.players.indexOf(currentPlayer);
-                    game.nextTurn(index+1);
+                    game.nextTurn(index + 1);
                 } else if (game.listGuessed) {
                     if (game.listGuessed.length == numberOfGuessers) {
                         // Award the drawer max points
                         currentPlayer.score += 300;
+                        currentPlayer.turnScore += 300;
                         timeleft = 0;
                     }
                 }
@@ -238,6 +244,12 @@ function makeGame(
             }, 1000);
         },
         nextTurn: function (index) {
+            // Emit to all players for displaying score card
+            roomsNamespace.to(this.roomId).emit("turn-end-all", {
+                prevWord: game.currentWord,
+                players: game.players,
+            });
+
             if (this.gameOver) return;
             roomsNamespace.to(this.roomId).emit("clear-canvas");
             if (index >= this.players.length) {
@@ -245,7 +257,10 @@ function makeGame(
                 this.currentRound += 1;
                 if (this.currentRound > numberOfRounds) {
                     // end of game
-                    this.endGame();
+                    // delay for 5 seconds before ending game
+                    setTimeout(() => {
+                        this.endGame();
+                    }, 5000);
                     return;
                 }
                 // new round
@@ -259,13 +274,19 @@ function makeGame(
             }
             this.players.map(function (x) {
                 // set all players hasGuessed to false so that they may earn points again
+                // set all players turnScore back to 0
                 x.hasGuessed = false;
+                x.turnScore = 0;
             });
             this.listGuessed = [];
             // select new word
             this.currentWord =
                 this.wordBank[Math.floor(Math.random() * this.wordBank.length)];
-            this.startTurn();
+
+            // delay for 5 seconds before starting next turn
+            setTimeout(() => {
+                this.startTurn();
+            }, 5000);
         },
         addPoints: function (userID, timeLeft) {
             if (this.gameOver) return;
@@ -273,9 +294,12 @@ function makeGame(
             let guesserScore =
                 Math.floor(10 * (timeLeft / this.drawTime)) * 100;
             let player = this.players.find((player) => player.userID == userID);
+            player.turnScore += guesserScore;
             player.score += guesserScore;
 
-            console.log(`Player ${player.username} awarded ${guesserScore} points.`);
+            console.log(
+                `Player ${player.username} awarded ${guesserScore} points.`
+            );
             this.sendGameData();
         },
         sendGameData: function () {
@@ -387,7 +411,9 @@ roomsNamespace.use((socket, next) => {
             socket.roomId = session.roomId;
             socket.game = games.find((game) => game.roomId == socket.roomId);
             if (socket.game) {
-                socket.player = socket.game.players.find((player) => player.userID == socket.userID);
+                socket.player = socket.game.players.find(
+                    (player) => player.userID == socket.userID
+                );
                 socket.player.socketId = socket.id;
                 socket.join(socket.roomId);
             } else {
@@ -419,7 +445,7 @@ roomsNamespace.on("connection", async (socket) => {
         userID: socket.userID,
         username: socket.username,
         connected: true,
-        roomId: socket.roomId
+        roomId: socket.roomId,
     });
 
     socket.emit("session", {
@@ -469,7 +495,9 @@ roomsNamespace.on("connection", async (socket) => {
             );
             games.push(game);
 
-            player = game.players.find((player) => player.userID == socket.userID);
+            player = game.players.find(
+                (player) => player.userID == socket.userID
+            );
 
             roomsNamespace.to(socket.id).emit("create-room-success", room);
             roomsNamespace.to(socket.id).emit("players-data", game.players);
@@ -485,11 +513,15 @@ roomsNamespace.on("connection", async (socket) => {
     socket.on("join-room", (room) => {
         let roomId = room.roomId.toLowerCase();
         if (roomId === socket.roomId) {
-            console.log(`reconnecting user ${socket.username} to room ${socket.roomId}...`);
+            console.log(
+                `reconnecting user ${socket.username} to room ${socket.roomId}...`
+            );
             roomsNamespace.to(socket.id).emit("join-room-success", room.roomId);
             if (game?.currentTurn === socket.userID) {
                 setTimeout(() => {
-                    roomsNamespace.to(socket.id).emit("turn-start", game.currentWord);
+                    roomsNamespace
+                        .to(socket.id)
+                        .emit("turn-start", game.currentWord);
                 }, 200);
             }
             return;
@@ -525,9 +557,16 @@ roomsNamespace.on("connection", async (socket) => {
             currentRoom = roomId;
             host = false;
             username = room.username;
-            game.addPlayer(socket.username, socket.userID, room.avatar, socket.id);
+            game.addPlayer(
+                socket.username,
+                socket.userID,
+                room.avatar,
+                socket.id
+            );
 
-            player = game.players.find((player) => player.userID == socket.userID);
+            player = game.players.find(
+                (player) => player.userID == socket.userID
+            );
 
             roomsNamespace.to(roomId).emit("chat-message", {
                 message: username + " has joined the game.",
@@ -632,11 +671,12 @@ roomsNamespace.on("connection", async (socket) => {
             userID: socket.userID,
             username: socket.username,
             connected: false,
-            roomId: currentRoom
+            roomId: currentRoom,
         });
         setTimeout(() => {
             const session = sessionStore.findSession(socket.sessionID);
-            if (session?.connected == true) { // client has reconnected, do not leave game
+            if (session?.connected == true) {
+                // client has reconnected, do not leave game
                 return;
             }
             console.log(
@@ -648,7 +688,7 @@ roomsNamespace.on("connection", async (socket) => {
                 username: "GAME",
                 id: `${socket.id}${Math.random()}`,
             });
-    
+
             if (Object.keys(game).length > 0) {
                 game.removePlayer(socket.userID);
             }

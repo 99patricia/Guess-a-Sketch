@@ -9,9 +9,10 @@ const ScoreboardContainer = styled.div`
 `;
 
 const ScoreboardList = styled.div`
+    margin-top: 2px;
     display: grid;
     grid-template-rows: repeat(auto-fill, 70px);
-    grid-gap: 1.5rem;
+    grid-gap: 1rem;
     height: 100%;
 `;
 
@@ -84,7 +85,14 @@ function Scoreboard(props) {
             <ScoreboardList>
                 {gameData.players &&
                     gameData.players.map(
-                        ({ username, userID, avatar, score, isHost, hasGuessed }) => (
+                        ({
+                            username,
+                            userID,
+                            avatar,
+                            score,
+                            isHost,
+                            hasGuessed,
+                        }) => (
                             <StyledScoreboard
                                 key={userID}
                                 currentTurn={userID === gameData.currentTurn}

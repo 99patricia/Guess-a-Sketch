@@ -9,9 +9,9 @@ const LobbyContainer = styled.div`
     background-color: var(--light-beige);
     padding: 1rem;
     border-radius: 1rem;
-    min-width: ${(props) => (props.isDesktop ? "500px" : "80vw")};
-    min-height: ${(props) => (props.isDesktop ? "680px" : "70vh")};
-    max-height: ${(props) => (props.isDesktop ? "680px" : "70vh")};
+    min-width: ${(props) => (props.isDesktop ? "450px" : "80vw")};
+    min-height: ${(props) => (props.isDesktop ? "620px" : "70vh")};
+    max-height: ${(props) => (props.isDesktop ? "620px" : "70vh")};
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-flow: column;
