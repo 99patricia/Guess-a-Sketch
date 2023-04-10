@@ -23,13 +23,19 @@ const StyledButton = styled.button`
     -o-transition: background-color 0.05s ease-out;
     transition: background-color 0.05s ease-out;
 
-    :active {
+    not(:disabled):active {
         background-color: ${(props) =>
             props.secondary ? "var(--primary)" : "var(--secondary)"};
     }
-    
+
     :not(:last-child) {
         margin: ${(props) => (props.column ? "1rem 0" : "0 1rem")};
+    }
+
+    :disabled {
+        cursor: default;
+        background-color: var(--light-beige);
+        color: var(--dark-beige);
     }
 `;
 

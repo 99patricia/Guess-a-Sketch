@@ -65,12 +65,8 @@ function GuestLogin() {
                         onChange={(e) => setNickname(e.target.value)}
                     ></FormInput>
                     <StyledLabel>Avatar</StyledLabel>
-                    <Canvas
-                        ref={canvasRef}
-                        width={334}
-                        height={334}
-                        noContainer
-                    />
+                    <Canvas ref={canvasRef} noContainer />
+                    <br />
                     <Button
                         column
                         onClick={handleGuestLogin}

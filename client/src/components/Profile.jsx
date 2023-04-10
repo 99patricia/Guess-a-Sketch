@@ -80,21 +80,21 @@ function Profile(props) {
     const [friendIDList, setFriendIDList] = useState([]);
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
+    const [wordbanks, setWordbanks] = useState([]);
 
     useEffect(() => {
         const fetchGames = async () => {
             const games = profileData.gamehistory;
             if (games && gameHistory?.length == 0) { // only grab game history on profile load
                 var i;
+                var gamehistory = [];
                 setGameHistory([]);
-                for (i=0; i<games.length; i++) {
-                    await axios
-                        .get(`/games/${games[i]}`)
-                        .then((res) => {
-                            setGameHistory(oldArray => [...oldArray, res.data]);
-                        });
+                for (i = 0; i < games.length; i++) {
+                    await axios.get(`/games/${games[i]}`).then((res) => {
+                        gamehistory.push(res.data);
+                    });
                 }
-
+                setGameHistory(gamehistory);
             }
         }
 
@@ -148,11 +148,24 @@ function Profile(props) {
             }
         }
 
+        const fetchWordbanks = async () => {
+            if (userData.id) {
+                // Fetch user's wordbanks
+                await axios
+                    .get(`/wordbank/${userData.id}`)
+                    .then((res) =>
+                        setWordbanks(
+                            res.data.filter((wordbank) => !wordbank.isGlobal)
+                        )
+                    );
+            }
+        };
+
         fetchFriendRequests();
-        fetchGames()
-            .catch(console.error);
+        fetchGames().catch(console.error);
+        fetchWordbanks().catch((error) => console.error(error));
         fetchFriends();
-    }, [profileData, update, userData]);
+    }, [profileData, update, userData.id]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
     function openTab(e, tabName) {
@@ -249,7 +262,7 @@ function Profile(props) {
                                 className="tabcontent"
                                 style={{ display: "none" }}
                             >
-                                <CustomWordbanks />
+                                <CustomWordbanks userData={userData} wordbanks={wordbanks} />
                             </div>
                         </ProfileNavContainer>
                     </>

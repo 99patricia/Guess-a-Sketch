@@ -91,7 +91,11 @@ function Register() {
                     <StyledMessage>{message}</StyledMessage>
                 ) : (
                     <>
-                        <Form className={`${isDesktop ? "grid-form" : "flex-form"}`}>
+                        <Form
+                            className={`${
+                                isDesktop ? "grid-form" : "flex-form"
+                            }`}
+                        >
                             {errorMessage && (
                                 <ErrorMessage>{errorMessage}</ErrorMessage>
                             )}
@@ -101,6 +105,7 @@ function Register() {
                                 isDrawing={true}
                                 noContainer
                             />
+                            <br />
                             <FormInput
                                 label="E-mail"
                                 placeholder="Enter e-mail"

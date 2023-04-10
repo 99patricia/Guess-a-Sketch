@@ -15,14 +15,20 @@ function CreateRoom() {
     const [drawTime, setDrawTime] = useState(90); // Default to 90 seconds
     const [numberOfRounds, setNumberOfRounds] = useState(3); // Default to 3 rounds
     const { userData } = useUserData();
-    const [wordbankNames, setWordbankNames] = useState([]);
+    const [wordbanks, setWordbanks] = useState([]);
+    const [chosenCategoryId, setChosenCategoryId] = useState("");
     const [chosenCategory, setChosenCategory] = useState("");
 
     useEffect(() => {
-        axios
-            .get(`/wordbank/${userData.uid}`)
-            .then((res) => setWordbankNames(res.data));
-    }, [setWordbankNames, userData]);
+        axios.get(`/wordbank/${userData.id}`).then((res) => {
+            setWordbanks(res.data);
+            setChosenCategoryId(
+                res.data[0].isGlobal
+                    ? `${res.data[0].name}__GLOBAL`
+                    : `${res.data[0].name}__${userData.id}`
+            );
+        });
+    }, [setWordbanks, userData.id]);
 
     var roomId = "";
     const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -30,48 +36,55 @@ function CreateRoom() {
         roomId += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
+    const handleSelectWordbank = (e) => {
+        const index = e.target.selectedIndex;
+        const el = e.target.childNodes[index];
+        const categoryId = el.getAttribute("id");
+
+        setChosenCategory(e.target.value);
+        setChosenCategoryId(categoryId);
+    };
+
     const handleCreateRoom = (e) => {
         e.preventDefault();
 
-        axios
-            .get(`/wordbankcontent/${chosenCategory || wordbankNames[0]}`)
-            .then((res) => {
-                const wordbankContent = res.data;
-                const room = {
-                    roomId,
+        axios.get(`/wordbankcontent/${chosenCategoryId}`).then((res) => {
+            const wordbankContent = res.data;
+            const room = {
+                roomId,
+                username: userData.username,
+                avatar: userData.avatar,
+                numberOfPlayers,
+                drawTime,
+                numberOfRounds,
+                wordbankContent,
+            };
+
+            // Manually connect socket when creating room
+            const sessionID = sessionStorage.getItem("sessionID");
+
+            if (sessionID) {
+                socket.auth = {
                     username: userData.username,
-                    avatar: userData.avatar,
-                    numberOfPlayers,
-                    drawTime,
-                    numberOfRounds,
-                    wordbankContent,
+                    sessionID,
                 };
-
-                // Manually connect socket when creating room
-                const sessionID = sessionStorage.getItem("sessionID");
-
-                if (sessionID) {
-                    socket.auth = { 
-                        username: userData.username,
-                        sessionID 
-                    };
-                } else {
-                    socket.auth = { username: userData.username };
-                }
-                socket.connect();
-                socket.on("session", ({ sessionID, userID }) => {
-                    socket.auth = { 
-                        username: userData.username,
-                        sessionID 
-                    };
-                    sessionStorage.setItem("sessionID", sessionID);
-                    socket.userID = userID;
-                });
-                socket.emit("create-room", room);
-                socket.on("create-room-success", () => {
-                    navigate(`/room/${roomId}`);
-                });
+            } else {
+                socket.auth = { username: userData.username };
+            }
+            socket.connect();
+            socket.on("session", ({ sessionID, userID }) => {
+                socket.auth = {
+                    username: userData.username,
+                    sessionID,
+                };
+                sessionStorage.setItem("sessionID", sessionID);
+                socket.userID = userID;
             });
+            socket.emit("create-room", room);
+            socket.on("create-room-success", () => {
+                navigate(`/room/${roomId}`);
+            });
+        });
     };
 
     return (
@@ -112,14 +125,21 @@ function CreateRoom() {
                     <FormInput
                         label="Category"
                         value={chosenCategory}
-                        onChange={(e) => setChosenCategory(e.target.value)}
+                        onChange={handleSelectWordbank}
                         select
                     >
-                        {wordbankNames.map((name) => {
-                            const displayName = name.replace("__GLOBAL", "");
+                        {wordbanks.map((wordbank) => {
                             return (
-                                <option key={name} label={displayName}>
-                                    {name}
+                                <option
+                                    key={wordbank.name}
+                                    label={wordbank.name}
+                                    id={
+                                        wordbank.isGlobal
+                                            ? `${wordbank.name}__GLOBAL`
+                                            : `${wordbank.name}__${userData.id}`
+                                    }
+                                >
+                                    {wordbank.name}
                                 </option>
                             );
                         })}
