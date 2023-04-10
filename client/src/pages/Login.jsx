@@ -46,10 +46,18 @@ function Login() {
             .then((res) => {
                 setShowErrorMessage("");
                 localStorage.setItem("userData", JSON.stringify(res.data.data));
-                localStorage.setItem(
-                    "userPerks",
-                    JSON.stringify(res.data.userPerks)
-                );
+                const userPerks = res.data.userPerks;
+                if (userPerks && userPerks.length > 0) {
+                    // User may have unlocked more than one perk, equip their best perk on login
+                    const bestPerk = userPerks.reduce((prev, current) => {
+                        return prev.rank > current.rank ? prev : current;
+                    });
+                    localStorage.setItem(
+                        "equippedPerk",
+                        JSON.stringify(bestPerk)
+                    );
+                }
+
                 navigate("/");
             })
             .catch((err) => {

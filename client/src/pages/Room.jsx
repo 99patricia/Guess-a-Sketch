@@ -93,15 +93,11 @@ function Room() {
     }
 
     useEffect(() => {
-        const userPerks = JSON.parse(localStorage.getItem("userPerks"));
-        if (userPerks && userPerks.length > 0) {
-            // User may have unlocked more than one perk, use their best one
-            const bestPerk = userPerks.reduce((prev, current) => {
-                return prev.rank > current.rank ? prev : current;
-            });
-            setColorChoices(bestPerk["colors"]);
+        const equippedPerk = JSON.parse(localStorage.getItem("equippedPerk"));
+        if (equippedPerk) {
+            setColorChoices(equippedPerk["colors"]);
             setPenSizeChoices(
-                bestPerk["pen_sizes"].sort(function (a, b) {
+                equippedPerk["pen_sizes"].sort(function (a, b) {
                     return a - b;
                 })
             );
