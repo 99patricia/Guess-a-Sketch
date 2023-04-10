@@ -15,6 +15,8 @@ const StyledCanvasContainer = styled.div`
         border-radius: 1rem;
         `}
 
+    position: relative;
+    overflow: hidden;
     background-color: var(--light-beige);
     display: flex;
     flex-direction: column;
