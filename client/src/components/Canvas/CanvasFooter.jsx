@@ -10,7 +10,7 @@ const StyledCanvasFooter = styled.div`
     padding: 1rem;
     border-radius: ${(props) =>
         props.inGame && !props.isDesktop ? "0" : "0 0 1rem 1rem"};
-    min-width: ${(props) => props.width};
+    width: ${(props) => props.width};
 
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -139,7 +139,7 @@ function CanvasFooter(props) {
         setWidth(canvas.width + "px");
 
         const clearCanvas = () => {
-            ctx.clearRect(0, 0, 500, 500);
+            ctx.clearRect(0, 0, 450, 450);
         };
 
         const handleClearCanvas = (e) => {

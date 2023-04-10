@@ -9,8 +9,8 @@ const StyledCanvasContainer = styled.div`
     ${(props) =>
         !props.noContainer &&
         `
-        padding: 1rem;
-        padding-top: 0.25rem;
+        padding: 0 1rem 1rem;
+        min-width: 450px;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
         border-radius: 1rem;
         `}
@@ -68,13 +68,13 @@ const Canvas = React.forwardRef((props, ref) => {
         // Resize canvas
         if (inGame) {
             // Resize the canvas to fit screen width
-            if (window.innerWidth <= 500) {
+            if (window.innerWidth <= 450) {
                 canvas.width =
-                    !isDesktop || !gameData ? window.innerWidth : 500;
+                    !isDesktop || !gameData ? window.innerWidth : 450;
             } else {
-                canvas.width = 500;
+                canvas.width = 450;
             }
-            canvas.height = 500;
+            canvas.height = 450;
         } else {
             // Resize the draw avatar canvas to fit form
             const canvasParentWidth = canvas.parentElement.clientWidth;

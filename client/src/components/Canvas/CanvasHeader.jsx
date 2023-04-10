@@ -14,9 +14,8 @@ const CanvasHeaderContainer = styled.div`
     box-sizing: border-box;
     z-index: 2;
 
-    padding: ${(props) => (props.isDesktop ? "0 2rem" : "0.25rem 1rem")};
-    background-color: ${(props) =>
-        props.isDesktop ? "transparent" : "var(--light-beige)"};
+    padding: ${(props) => (props.isDesktop ? "0 2rem" : "0 1rem")};
+    background-color: var(--light-beige);
 `;
 
 const StyledTimer = styled.div`
@@ -36,11 +35,9 @@ const StyledTimer = styled.div`
 const StyledWord = styled.div`
     text-align: center;
     text-transform: uppercase;
-    font-size: 1.2rem;
 
     div.word {
-        font-size: 1.8rem;
-        line-height: 2rem;
+        font-size: 140%;
         color: var(--secondary);
     }
 `;
@@ -59,7 +56,9 @@ function GameHeader(props) {
     const { gameData, isDrawing, timeLeft, word, width } = { ...props };
 
     const currentTurnID = gameData.currentTurn;
-    const currentTurn = gameData.players.find((player) => player.userID == currentTurnID)?.username;
+    const currentTurn = gameData.players.find(
+        (player) => player.userID == currentTurnID
+    )?.username;
     const numRounds = gameData.numberOfRounds;
     const currentRound = gameData.currentRound;
 

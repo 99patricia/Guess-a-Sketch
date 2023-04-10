@@ -151,7 +151,6 @@ function Room() {
             setShowScoreCard(true);
             setPrevWord(data.prevWord);
             setPlayersData(data.players);
-            console.log(data)
         });
 
         socket.on("timer", (data) => {

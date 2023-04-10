@@ -11,7 +11,7 @@ const StyledScoreCard = styled.div`
     z-index: 0;
 
     width: ${(props) => props.width};
-    height: ${(props) => props.width};
+    height: 450px;
     margin-top: 80px;
     transition: all 1s cubic-bezier(0.3, 0.3, 0, 1);
 
