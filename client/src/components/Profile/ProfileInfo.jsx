@@ -160,7 +160,6 @@ function ProfileInfo(props) {
     const { userData, profileData, loggedInAsGuest } = { ...props };
 
     const addFriendButtonRef = useRef();
-    const addFriendContainerRef = useRef();
     const [addFriend, setAddFriend] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 

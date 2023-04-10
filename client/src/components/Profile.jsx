@@ -70,18 +70,21 @@ const StyledNavLink = styled.a`
 
 function Profile(props) {
     const isDesktop = Desktop();
+    const [update, updateState] = useState();
+    const forceUpdate = React.useCallback(() => updateState({}), []);
     const { userData, profileData, loggedInAsGuest } = {
         ...props,
     };
 
     const [gameHistory, setGameHistory] = useState([]);
+    const [friendIDList, setFriendIDList] = useState([]);
     const [friendList, setFriendList] = useState([]);
+    const [friendRequestList, setFriendRequestList] = useState([]);
 
     useEffect(() => {
-
         const fetchGames = async () => {
             const games = profileData.gamehistory;
-            if (games) {
+            if (games && gameHistory?.length == 0) { // only grab game history on profile load
                 var i;
                 setGameHistory([]);
                 for (i=0; i<games.length; i++) {
@@ -95,8 +98,43 @@ function Profile(props) {
             }
         }
 
+        const fetchFriendRequests = async () => {
+            let friendRequests = [];
+            await axios
+                .get(`/friend_requests/${userData.id}`)
+                .then((res) => {
+                    friendRequests = res.data;
+                });
+            if (friendRequests) {
+                var i;
+                for (i=0; i<friendRequests.length; i++) {
+                    await axios
+                        .get(`/profile/${friendRequests[i].sender_id}`)
+                        .then((res) => {
+                            friendRequests[i].sender_id = {
+                                sender_id: friendRequests[i].sender_id,
+                                username: res.data.username,
+                                avatar: res.data.avatar,
+                            }
+                        });
+                }
+                setFriendRequestList(friendRequests);
+            }
+        }
+
+        const fetchFriendsList = async () => {
+            if (userData?.id) {
+                await axios
+                    .get(`/users/${userData.id}`)
+                    .then((res) => {
+                        setFriendIDList(res.data.friendList);
+                    });
+            }
+        }
+
         const fetchFriends = async () => {
-            const friends = userData.friendList;
+            await fetchFriendsList();
+            const friends = friendIDList;
             if (friends) {
                 var i;
                 setFriendList([]);
@@ -109,11 +147,12 @@ function Profile(props) {
                 }
             }
         }
-        
+
+        fetchFriendRequests();
         fetchGames()
             .catch(console.error);
         fetchFriends();
-    }, [profileData]);
+    }, [profileData, update, userData]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
     function openTab(e, tabName) {
@@ -192,7 +231,11 @@ function Profile(props) {
                                 className="tabcontent"
                                 style={{ display: "none" }}
                             >
-                                <Friends friendList={friendList} />
+                                <Friends 
+                                    friendList={friendList}
+                                    friendRequestList={friendRequestList}
+                                    forceUpdate={forceUpdate}
+                                />
                             </div>
                             <div
                                 id="games"
