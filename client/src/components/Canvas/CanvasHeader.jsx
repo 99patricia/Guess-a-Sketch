@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import { socket } from "service/socket";
 import { Desktop } from "service/mediaQueries";
 
 const CanvasHeaderContainer = styled.div`
@@ -9,6 +8,10 @@ const CanvasHeaderContainer = styled.div`
     align-items: center;
     justify-items: stretch;
     height: 80px;
+    width: ${(props) => props.width};
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 
     padding: ${(props) => (props.isDesktop ? "0 2rem" : "0.25rem 1rem")};
     background-color: ${(props) =>
@@ -52,7 +55,7 @@ const StyledRound = styled.div`
 
 function GameHeader(props) {
     const isDesktop = Desktop();
-    const { gameData, isDrawing, timeLeft, word } = { ...props };
+    const { gameData, isDrawing, timeLeft, word, width } = { ...props };
 
     const currentTurnID = gameData.currentTurn;
     const currentTurn = gameData.players.find((player) => player.userID == currentTurnID)?.username;
@@ -60,7 +63,7 @@ function GameHeader(props) {
     const currentRound = gameData.currentRound;
 
     return (
-        <CanvasHeaderContainer isDesktop={isDesktop}>
+        <CanvasHeaderContainer isDesktop={isDesktop} width={width}>
             <StyledTimer>{timeLeft}</StyledTimer>
             <StyledWord>
                 {isDrawing ? "Your word is:" : `${currentTurn} is drawing...`}
