@@ -8,7 +8,7 @@ const StyledFlexContainer = styled.div`
     flex-direction: ${(props) => (props.isDesktop ? "row" : "column")};
 
     > div {
-        margin: 0.5rem;
+        margin: 0 0.5rem;
     }
 `;
 

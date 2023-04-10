@@ -15,9 +15,9 @@ import { socket } from "service/socket";
 import { useUserData } from "hooks";
 import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
+
 const NavBar = styled.div`
     padding-bottom: 1rem;
-    // border: 1px solid purple;
 `;
 
 const StyledNavLink = styled.a`
