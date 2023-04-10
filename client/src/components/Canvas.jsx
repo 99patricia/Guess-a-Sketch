@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
@@ -11,8 +11,8 @@ const StyledCanvasContainer = styled.div`
         `
         padding: 1rem;
         padding-top: 0.25rem;
-        border-radius: 1rem;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 1rem;
         `}
 
     background-color: var(--light-beige);
@@ -31,7 +31,8 @@ const StyledCanvasContainer = styled.div`
 const StyledCanvas = styled.canvas`
     background-color: var(--white);
     vertical-align: bottom;
-    border-radius: ${(props) => (props.isDesktop ? "1rem 1rem 0 0" : "0")};
+    border-radius: ${(props) =>
+        props.inGame && !props.isDesktop ? "0" : "1rem 1rem 0 0"};
 `;
 
 const Canvas = React.forwardRef((props, ref) => {
@@ -49,6 +50,7 @@ const Canvas = React.forwardRef((props, ref) => {
 
     const penSizeChoices = props.penSizeChoices || [10, 50];
     const colorChoices = props.colorChoices || ["black", "red", "blue"];
+    const [width, setWidth] = useState("auto");
 
     useEffect(() => {
         var drawing = false;
@@ -60,9 +62,9 @@ const Canvas = React.forwardRef((props, ref) => {
         // Resize canvas
         if (inGame) {
             // Resize the canvas to fit screen width
-            if (window.outerWidth <= 500) {
+            if (window.innerWidth <= 500) {
                 canvas.width =
-                    !isDesktop || !gameData ? window.outerWidth : 500;
+                    !isDesktop || !gameData ? window.innerWidth : 500;
             } else {
                 canvas.width = 500;
             }
@@ -73,6 +75,8 @@ const Canvas = React.forwardRef((props, ref) => {
             canvas.width = canvasParentWidth;
             canvas.height = canvasParentWidth;
         }
+        // For header CSS
+        setWidth(canvas.width + "px");
 
         // Stores the initial position of the cursor
         let coord = { x: 0, y: 0 };
@@ -232,13 +236,19 @@ const Canvas = React.forwardRef((props, ref) => {
                     isDrawing={isDrawing}
                     timeLeft={timeLeft}
                     word={word}
+                    width={width}
                 />
             )}
-            <StyledCanvas isDesktop={isDesktop} ref={canvasRef}></StyledCanvas>
+            <StyledCanvas
+                isDesktop={isDesktop}
+                ref={canvasRef}
+                inGame={inGame}
+            ></StyledCanvas>
             <CanvasFooter
                 canvasRef={canvasRef}
                 sendToSocket={sendToSocket}
                 isDrawing={isDrawing}
+                inGame={inGame}
                 penSizeChoices={penSizeChoices}
                 colorChoices={colorChoices}
             />

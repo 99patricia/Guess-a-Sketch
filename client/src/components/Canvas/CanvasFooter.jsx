@@ -8,10 +8,10 @@ import { Desktop } from "service/mediaQueries";
 const StyledCanvasFooter = styled.div`
     background-color: var(--beige);
     padding: 1rem;
-    border-radius: ${(props) => (props.isDesktop ? "0 0 1rem 1rem" : "0")};
+    border-radius: ${(props) =>
+        props.inGame && !props.isDesktop ? "0" : "0 0 1rem 1rem"};
+    min-width: ${(props) => props.width};
 
-    min-width: ${(props) => (props.isDesktop ? "500px" : "100vw")};
-    max-width: 500px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -20,7 +20,6 @@ const StyledCanvasFooter = styled.div`
 const StyledToolbar = styled.div`
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: ${(props) => (props.isDesktop ? "1fr 2fr" : "auto")};
     align-items: center;
     justify-items: center;
 `;
@@ -79,8 +78,14 @@ const StyledRangeInput = styled.input`
 
 function CanvasFooter(props) {
     const isDesktop = Desktop();
-    const { canvasRef, sendToSocket, isDrawing, penSizeChoices, colorChoices } =
-        { ...props };
+    const {
+        canvasRef,
+        sendToSocket,
+        isDrawing,
+        inGame,
+        penSizeChoices,
+        colorChoices,
+    } = { ...props };
 
     const drawingInGame = isDrawing || !sendToSocket;
 
@@ -91,6 +96,7 @@ function CanvasFooter(props) {
     );
     const [showPenSize, setShowPenSize] = useState();
     const [penSizeIndex, setPenSizeIndex] = useState(0);
+    const [width, setWidth] = useState("auto");
 
     const handleChangePenSize = (e) => {
         if (!drawingInGame) return;
@@ -129,6 +135,9 @@ function CanvasFooter(props) {
         const ctx = canvas.getContext("2d");
         const clearButton = clearButtonRef.current;
 
+        // Resize footer to fit canvas
+        setWidth(canvas.width + "px");
+
         const clearCanvas = () => {
             ctx.clearRect(0, 0, 500, 500);
         };
@@ -154,10 +163,10 @@ function CanvasFooter(props) {
             // Event listener cleanup
             clearButton.removeEventListener("click", handleClearCanvas);
         };
-    }, [canvasRef, sendToSocket, isDrawing, drawingInGame]);
+    }, [canvasRef, sendToSocket, isDrawing, drawingInGame, width]);
 
     return (
-        <StyledCanvasFooter isDesktop={isDesktop}>
+        <StyledCanvasFooter isDesktop={isDesktop} width={width} inGame={inGame}>
             <StyledToolbar isDesktop={isDesktop}>
                 <div>
                     <IconButton

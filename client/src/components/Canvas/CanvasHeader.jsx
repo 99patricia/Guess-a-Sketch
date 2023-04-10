@@ -8,7 +8,7 @@ const CanvasHeaderContainer = styled.div`
     align-items: center;
     justify-items: stretch;
     height: 80px;
-    width: 100%;
+    width: ${(props) => props.width};
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -55,14 +55,14 @@ const StyledRound = styled.div`
 
 function GameHeader(props) {
     const isDesktop = Desktop();
-    const { gameData, isDrawing, timeLeft, word } = { ...props };
+    const { gameData, isDrawing, timeLeft, word, width } = { ...props };
 
     const currentTurn = gameData.currentTurn;
     const numRounds = gameData.numberOfRounds;
     const currentRound = gameData.currentRound;
 
     return (
-        <CanvasHeaderContainer isDesktop={isDesktop}>
+        <CanvasHeaderContainer isDesktop={isDesktop} width={width}>
             <StyledTimer>{timeLeft}</StyledTimer>
             <StyledWord>
                 {isDrawing ? "Your word is:" : `${currentTurn} is drawing...`}
