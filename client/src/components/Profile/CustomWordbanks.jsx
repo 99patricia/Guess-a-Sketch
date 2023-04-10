@@ -75,11 +75,10 @@ function CustomWordbanks(props) {
                 })
                 .catch((err) => {
                     setMessage("");
-                    console.error(err.response.data.error);
                     setError(err.response.data.error);
                 });
         },
-        [wordbanks, newCategoryName, newWordsString, userData.id]
+        [newCategoryName, newWordsString, userData.id]
     );
 
     return (
