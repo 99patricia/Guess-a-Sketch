@@ -11,25 +11,29 @@ import {
 
 import { db } from "../service/firebase.js";
 
-///////////////////////////// getWordBankNames /////////////////////////////
-async function getWordBankNames(app) {
+///////////////////////////// getUserWordbanks /////////////////////////////
+async function getUserWordbanks(app) {
     app.get("/wordbank/:user_id", async (req, res) => {
         try {
             const user_id = req.params.user_id;
 
-            const wordQuery = query(    
+            const wordQuery = query(
                 collection(db, "wordBank"),
                 where("user_id", "in", [user_id, "GLOBAL"])
             );
 
             const [wordSnapshot] = await Promise.all([getDocs(wordQuery)]);
 
-            const wordBankNames = wordSnapshot.docs.map((doc) => {
+            const wordbanks = wordSnapshot.docs.map((doc) => {
                 const wordBankData = doc.data();
-                return wordBankData.bankname + "__" + wordBankData.user_id;
+                return {
+                    name: wordBankData.bankname,
+                    isGlobal: wordBankData.user_id === "GLOBAL",
+                    words: wordBankData.words,
+                };
             });
 
-            res.status(200).json(wordBankNames);
+            res.status(200).json(wordbanks);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "Failed to fetch word bank names" });
@@ -97,7 +101,6 @@ async function createWordBank(app) {
 }
 
 async function deleteWordBank(app) {
-
     // Example function to delete a word bank
     app.delete("/wordbank/:name_wordbank/:user_id", async (req, res) => {
         try {
@@ -128,9 +131,8 @@ async function deleteWordBank(app) {
 }
 
 export function init(app) {
-    getWordBankNames(app),
+    getUserWordbanks(app),
         getWordBankContent(app),
         deleteWordBank(app),
         createWordBank(app);
-
 }
