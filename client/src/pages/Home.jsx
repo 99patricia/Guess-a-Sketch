@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "service/socket";
 
+import { playSound } from "service/playSound";
+import joinSound from "assets/join.m4a";
+
 import {
     Button,
     Header,
@@ -39,18 +42,18 @@ function Home() {
             const sessionID = sessionStorage.getItem("sessionID");
 
             if (sessionID) {
-                socket.auth = { 
+                socket.auth = {
                     username: userData.username,
-                    sessionID 
+                    sessionID,
                 };
             } else {
                 socket.auth = { username: userData.username };
             }
             socket.connect();
             socket.on("session", ({ sessionID, userID }) => {
-                socket.auth = { 
+                socket.auth = {
                     username: userData.username,
-                    sessionID 
+                    sessionID,
                 };
                 sessionStorage.setItem("sessionID", sessionID);
                 socket.userID = userID;
@@ -60,6 +63,7 @@ function Home() {
                 setShowErrorMessage(data.msg);
             });
             socket.on("join-room-success", (roomId) => {
+                playSound(joinSound);
                 navigate(`/room/${roomId}`);
             });
         }

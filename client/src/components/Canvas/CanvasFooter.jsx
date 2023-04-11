@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { socket } from "service/socket";
+
+import { playSound } from "service/playSound";
 import selectSound from "assets/select.m4a";
 import eraseSound from "assets/erase.m4a";
-import { socket } from "service/socket";
 
 import { IconButton } from "components";
 import { Desktop } from "service/mediaQueries";
@@ -99,10 +101,6 @@ function CanvasFooter(props) {
     const [showPenSize, setShowPenSize] = useState();
     const [penSizeIndex, setPenSizeIndex] = useState(0);
     const [width, setWidth] = useState("auto");
-
-    const playSound = (sound) => {
-        new Audio(sound).play();
-    };
 
     const handleChangePenSize = (e) => {
         if (!drawingInGame) return;
