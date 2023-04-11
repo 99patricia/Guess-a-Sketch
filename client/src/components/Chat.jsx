@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
+import { playSound } from "service/playSound";
+import correctSound from "assets/correct.m4a";
+
 import { ChatBody, ChatFooter } from "components/Chat/";
 import { Desktop } from "service/mediaQueries";
 
@@ -37,6 +40,9 @@ function Chat(props) {
 
     useEffect(() => {
         socket.on("chat-message", (msg) => {
+            // Play sound if answer was correct
+            if (msg.guessed) playSound(correctSound);
+
             // Append existing message with incoming message
             setMessages([...messages, msg]);
         });

@@ -2,6 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
+import { playSound } from "service/playSound";
+import selectSound from "assets/select.m4a";
+import eraseSound from "assets/erase.m4a";
+
 import { IconButton } from "components";
 import { Desktop } from "service/mediaQueries";
 
@@ -108,6 +112,7 @@ function CanvasFooter(props) {
     const handleChangeColor = (e) => {
         if (!drawingInGame) return;
         e.preventDefault();
+        playSound(selectSound);
         setPenColor(e.target.getAttribute("color"));
         localStorage.setItem("penColor", e.target.getAttribute("color"));
     };
@@ -115,6 +120,7 @@ function CanvasFooter(props) {
     const handlePenTool = (e) => {
         if (!drawingInGame) return;
         e.preventDefault();
+        playSound(selectSound);
         if (penColor === "white") {
             setPenColor("black");
             localStorage.setItem("penColor", "black");
@@ -125,6 +131,7 @@ function CanvasFooter(props) {
     const handleEraserTool = (e) => {
         if (!drawingInGame) return;
         e.preventDefault();
+        playSound(selectSound);
         setPenColor("white");
         localStorage.setItem("penColor", "white");
         setShowPenSize(!showPenSize);
@@ -145,6 +152,7 @@ function CanvasFooter(props) {
         const handleClearCanvas = (e) => {
             if (!drawingInGame) return;
             e.preventDefault();
+            playSound(eraseSound);
             clearCanvas();
             // Tell socket to clear the canvas
             if (sendToSocket) socket.emit("clear-canvas");
