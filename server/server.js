@@ -643,6 +643,7 @@ roomsNamespace.on("connection", async (socket) => {
                     message: username + " has guessed the word!",
                     username: "GAME",
                     id: `${socket.id}${Math.random()}`,
+                    guessed: true,
                 });
                 return;
             }
