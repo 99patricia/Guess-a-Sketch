@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
+import { playSound } from "service/playSound";
+import joinSound from "assets/join.m4a";
+import gameOverSound from "assets/game_over.m4a";
+import leaveSound from "assets/leave.m4a";
+import turnEndSound from "assets/turn_end.m4a";
+
 import {
     Canvas,
     Chat,
@@ -144,11 +150,13 @@ function Room() {
         });
 
         socket.on("turn-start-all", () => {
+            playSound(joinSound);
             setShowScoreCard(false);
         });
 
         socket.on("turn-end-all", (data) => {
             setShowScoreCard(true);
+            playSound(turnEndSound);
             setPrevWord(data.prevWord);
             setPlayersData(data.players);
         });
@@ -159,12 +167,14 @@ function Room() {
 
         socket.on("kick-player", (room_id) => {
             socket.emit("leave-room", room_id);
+            playSound(leaveSound);
             window.alert("You were kicked from the server...");
             navigate(`/`);
         });
 
         socket.on("game-over", () => {
             setGameOver(true);
+            playSound(gameOverSound);
             openTab("Results");
         });
 

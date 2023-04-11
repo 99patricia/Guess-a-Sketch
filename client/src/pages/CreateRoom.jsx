@@ -3,6 +3,9 @@ import { socket } from "service/socket";
 import { Desktop } from "service/mediaQueries";
 import { useNavigate } from "react-router-dom";
 
+import { playSound } from "service/playSound";
+import joinSound from "assets/join.m4a";
+
 import { Button, Header, Container, Form, FormInput } from "components";
 import { useUserData } from "hooks";
 import axios from "axios";
@@ -82,6 +85,7 @@ function CreateRoom() {
             });
             socket.emit("create-room", room);
             socket.on("create-room-success", () => {
+                playSound(joinSound);
                 navigate(`/room/${roomId}`);
             });
         });

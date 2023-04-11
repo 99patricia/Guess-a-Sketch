@@ -2,6 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";
 
+import { playSound } from "service/playSound";
+import joinSound from "assets/join.m4a";
+import leaveSound from "assets/leave.m4a";
+
 import { Button } from "components";
 import { Desktop } from "service/mediaQueries";
 
@@ -100,10 +104,12 @@ function Lobby(props) {
     const isDesktop = Desktop();
 
     function startGame() {
+        playSound(joinSound);
         socket.emit("start-game");
     }
 
     function kickPlayer(userID) {
+        playSound(leaveSound);
         socket.emit("kick-player", userID);
     }
 
@@ -118,7 +124,7 @@ function Lobby(props) {
                             <UserCard key={userID}>
                                 {host && userID !== socket.userID && (
                                     <HoverButton
-                                        onClick={() => kickPlayer(username)}
+                                        onClick={() => kickPlayer(userID)}
                                     >
                                         Kick
                                     </HoverButton>
