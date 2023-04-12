@@ -2,12 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 import { StyledLabel } from "components/FormInput";
-import {
-    Button,
-    Canvas,
-    Container,
-    Form,
-} from "components";
+import { Button, Canvas, Container, Form } from "components";
 
 function EditAvatar(props) {
     const { setEditAvatar, userData } = { ...props };
@@ -55,17 +50,11 @@ function EditAvatar(props) {
             withCredentials: true,
             headers: { "Content-Type": "application/json" },
         };
-        axios
-            .post(`/profile/${userData.id}`, body, options)
-            .then((res) => {
-                setEditAvatar(false);
-            });
-        
-        userData.avatar = avatar;
-        localStorage.setItem("userData", JSON.stringify(userData));
-
-
-        window.location.reload(true);
+        axios.post(`/profile/${userData.id}`, body, options).then((res) => {
+            setEditAvatar(false);
+            userData.avatar = avatar;
+            localStorage.setItem("userData", JSON.stringify(userData));
+        });
     };
 
     const handleBack = (e) => {
@@ -77,8 +66,8 @@ function EditAvatar(props) {
             <Container>
                 <Form className="flex-form">
                     <StyledLabel>Avatar</StyledLabel>
-                    <Canvas 
-                        ref={canvasRef} 
+                    <Canvas
+                        ref={canvasRef}
                         noContainer
                         penSizeChoices={penSizeChoices}
                         colorChoices={colorChoices}
@@ -93,10 +82,7 @@ function EditAvatar(props) {
                     >
                         Confirm
                     </Button>
-                    <Button
-                        column
-                        onClick={handleBack}
-                    >
+                    <Button column onClick={handleBack}>
                         Back
                     </Button>
                 </Form>
