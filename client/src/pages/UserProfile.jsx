@@ -11,12 +11,10 @@ import {
 } from "components";
 
 function UserProfile(props) {
-
+    
     const { userData, loggedInAsGuest } = useUserData();
 
     const [ profileData, setProfileData ] = useState({});
-
-    const addFriendButtonRef = useRef();
 
     useEffect(() => {
         if (!loggedInAsGuest && userData.id) {
@@ -26,21 +24,6 @@ function UserProfile(props) {
                     setProfileData(res.data);
                 });
         }
-        const button = addFriendButtonRef.current;
-
-        function addFriend(e) {
-            console.log("click");
-        }
-
-        if (!loggedInAsGuest) {
-            button.addEventListener("click", addFriend);
-        }
-
-        return () => {
-            if (!loggedInAsGuest) {
-                button.removeEventListener("click", addFriend);
-            }
-        };
     }, [userData]);
 
     return (
@@ -52,7 +35,6 @@ function UserProfile(props) {
                         userData={userData}
                         profileData={profileData}
                         loggedInAsGuest={loggedInAsGuest}
-                        addFriendButtonRef={addFriendButtonRef}
                     />
                 </FlexContainer>
             </Container>

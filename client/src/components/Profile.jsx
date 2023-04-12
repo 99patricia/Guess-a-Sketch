@@ -70,26 +70,83 @@ const StyledNavLink = styled.a`
 
 function Profile(props) {
     const isDesktop = Desktop();
-    const { userData, profileData, loggedInAsGuest, addFriendButtonRef } = {
+    const [update, updateState] = useState();
+    const forceUpdate = React.useCallback(() => updateState({}), []);
+    const { userData, profileData, loggedInAsGuest } = {
         ...props,
     };
 
     const [gameHistory, setGameHistory] = useState([]);
+    const [friendIDList, setFriendIDList] = useState([]);
+    const [friendList, setFriendList] = useState([]);
+    const [friendRequestList, setFriendRequestList] = useState([]);
     const [wordbanks, setWordbanks] = useState([]);
 
     useEffect(() => {
         const fetchGames = async () => {
             const games = profileData.gamehistory;
-            if (games) {
+            if (games && gameHistory?.length == 0) { // only grab game history on profile load
                 var i;
+                var gamehistory = [];
                 setGameHistory([]);
                 for (i = 0; i < games.length; i++) {
                     await axios.get(`/games/${games[i]}`).then((res) => {
-                        setGameHistory((oldArray) => [...oldArray, res.data]);
+                        gamehistory.push(res.data);
                     });
                 }
+                setGameHistory(gamehistory);
             }
-        };
+        }
+
+        const fetchFriendRequests = async () => {
+            let friendRequests = [];
+            await axios
+                .get(`/friend_requests/${userData.id}`)
+                .then((res) => {
+                    friendRequests = res.data;
+                });
+            if (friendRequests) {
+                var i;
+                for (i=0; i<friendRequests.length; i++) {
+                    await axios
+                        .get(`/profile/${friendRequests[i].sender_id}`)
+                        .then((res) => {
+                            friendRequests[i].sender_id = {
+                                sender_id: friendRequests[i].sender_id,
+                                username: res.data.username,
+                                avatar: res.data.avatar,
+                            }
+                        });
+                }
+                setFriendRequestList(friendRequests);
+            }
+        }
+
+        const fetchFriendsList = async () => {
+            if (userData?.id) {
+                await axios
+                    .get(`/users/${userData.id}`)
+                    .then((res) => {
+                        setFriendIDList(res.data.friendList);
+                    });
+            }
+        }
+
+        const fetchFriends = async () => {
+            await fetchFriendsList();
+            const friends = friendIDList;
+            if (friends) {
+                var i;
+                setFriendList([]);
+                for (i=0; i<friends.length; i++) {
+                    await axios
+                        .get(`/profile/${friends[i]}`)
+                        .then((res) => {
+                            setFriendList(oldArray => [...oldArray, res.data]);
+                        });
+                }
+            }
+        }
 
         const fetchWordbanks = async () => {
             if (userData.id) {
@@ -104,9 +161,11 @@ function Profile(props) {
             }
         };
 
+        fetchFriendRequests();
         fetchGames().catch(console.error);
         fetchWordbanks().catch((error) => console.error(error));
-    }, [profileData, userData.id]);
+        fetchFriends();
+    }, [profileData, update, userData.id]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
     function openTab(e, tabName) {
@@ -138,7 +197,6 @@ function Profile(props) {
                     userData={userData}
                     profileData={profileData}
                     loggedInAsGuest={loggedInAsGuest}
-                    addFriendButtonRef={addFriendButtonRef}
                 />
                 {!loggedInAsGuest && (
                     <>
@@ -179,14 +237,18 @@ function Profile(props) {
                         </NavBar>
                         <ProfileNavContainer>
                             <div id="recentActivity" className="tabcontent">
-                                <RecentActivity />
+                                <Games gameHistory={gameHistory} />
                             </div>
                             <div
                                 id="friends"
                                 className="tabcontent"
                                 style={{ display: "none" }}
                             >
-                                <Friends />
+                                <Friends 
+                                    friendList={friendList}
+                                    friendRequestList={friendRequestList}
+                                    forceUpdate={forceUpdate}
+                                />
                             </div>
                             <div
                                 id="games"
