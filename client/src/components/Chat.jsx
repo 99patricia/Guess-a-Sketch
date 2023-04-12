@@ -1,3 +1,7 @@
+/**
+ * FR18 - Chat.Lobby
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";

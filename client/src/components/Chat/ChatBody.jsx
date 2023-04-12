@@ -1,3 +1,7 @@
+/**
+ * FR18 - Chat.Lobby
+ */
+
 import React from "react";
 import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";

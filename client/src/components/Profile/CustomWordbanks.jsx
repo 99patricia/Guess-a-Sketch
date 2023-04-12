@@ -1,3 +1,8 @@
+/**
+ * FR7 - Select.Wordbank
+ * FR8 - Create.Wordbank
+ */
+
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 

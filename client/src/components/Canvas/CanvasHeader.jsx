@@ -1,3 +1,7 @@
+/**
+ * FR12 - Draw.Canvas
+ */
+
 import React from "react";
 import styled from "styled-components";
 import { Desktop } from "service/mediaQueries";

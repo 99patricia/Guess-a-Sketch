@@ -1,3 +1,8 @@
+/**
+ * FR9 - Award.Guesser.Points
+ * FR10 - Award.Drawer.Points
+ */
+
 import React from "react";
 import { Desktop } from "service/mediaQueries";
 import styled from "styled-components";
