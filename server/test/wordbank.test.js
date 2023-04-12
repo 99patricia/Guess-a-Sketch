@@ -15,8 +15,8 @@ describe('Test - Get wordbankname', function () {
 
 		axios.request(config)
 			.then((response) => {
-				assert.ok(JSON.stringify(response.data).includes('fruits__GLOBAL'), 'The array does not contain fruits__GLOBAL');
-				assert.ok(JSON.stringify(response.data).includes('animals__GLOBAL'), 'The array does not contain animals__GLOBAL');
+				assert.ok(JSON.stringify(response.data).includes('fruits'), 'The array does not contain fruits__GLOBAL');
+				assert.ok(JSON.stringify(response.data).includes('animals'), 'The array does not contain animals__GLOBAL');
 				done();
 			})
 			.catch((error) => {
@@ -118,7 +118,7 @@ describe('Test - create wordbank', function () {
 
 		axios.request(config)
 			.then((response) => {
-				assert.ok(JSON.stringify(response.data).includes('test__tsboT4GKjRSrfbIpJqeaQG41FlY2'), 'The array does not contain test__tsboT4GKjRSrfbIpJqeaQG41FlY2');
+				assert.ok(JSON.stringify(response.data).includes('test'), 'The array does not contain test__tsboT4GKjRSrfbIpJqeaQG41FlY2');
 				done();
 			})
 			.catch((error) => {

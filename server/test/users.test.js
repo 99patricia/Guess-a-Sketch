@@ -47,7 +47,7 @@ describe('Test - Login', function () {
     it('should return user information', function (done) {
         let data = JSON.stringify({
             "email": "wzh412000@gmail.com",
-            "password": "Thisistest"
+            "password": "wzh412000"
           });
 
           let config = {
