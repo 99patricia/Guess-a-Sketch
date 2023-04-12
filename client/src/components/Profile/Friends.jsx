@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { Link } from 'react-router-dom';
 
 const FriendsGrid = styled.div`
     display: grid;
@@ -128,9 +129,9 @@ function Friends(props) {
                         <UserImageDiv>
                             <UserImage src={sender_id.avatar} />
                         </UserImageDiv>
-                        <p>
+                        <Link to={`/profile/${sender_id.sender_id}`}>
                             {sender_id.username}
-                        </p>
+                        </Link>
                         <RequestButton 
                             onClick={() => accept(request_id, sender_id.sender_id, recipient_id)}
                         >
