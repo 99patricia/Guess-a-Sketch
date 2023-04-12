@@ -131,7 +131,7 @@ function Leaderboard(props) {
                                                           (wins / losses) * 100
                                                       ) / 100
                                                   ).toFixed(2)
-                                                : wins}
+                                                : wins.toFixed(2)}
                                         </TD>
                                     </TR>
                                 )
