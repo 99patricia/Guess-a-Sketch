@@ -1,7 +1,10 @@
+/*
+* Test the game API and also the database 
+*/
+
+
 import axios from "axios";
 import assert from "assert";
-
-
 
 describe('Test - Get Game by ID', function () {
     const validGameId = 'sample_valid_game_id'; // Replace this with a valid game ID from your database

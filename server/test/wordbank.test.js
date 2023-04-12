@@ -1,3 +1,7 @@
+/*
+* Test the wordbank API and also the database 
+*/
+
 import axios from "axios";
 import assert from "assert";
 

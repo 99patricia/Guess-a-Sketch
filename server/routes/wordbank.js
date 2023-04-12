@@ -1,3 +1,10 @@
+/*
+* API file for the Functional Requirments
+* FR7 - Select.Wordbank
+* FR8 - Create.Wordbank 
+*/
+
+
 import {
     doc,
     collection,
