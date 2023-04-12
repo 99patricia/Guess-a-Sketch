@@ -32,3 +32,15 @@ npm start
 ```
 
 The client will be running on `http://localhost:3000/`.
+
+Running the Test case:
+```
+
+// running server locally
+cd server
+npm start run
+
+// running the test cases
+cd server
+npm run test
+```
