@@ -22,8 +22,6 @@ async function getAllgames(app) {
 
             // Convert the query results to an array of perk objects
             const games = gamesSnapshot.docs.map((doc) => doc.data());
-            console.log(games);
-
 
             res.status(200).json(games);
         } catch (error) {

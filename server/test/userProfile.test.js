@@ -1,6 +1,9 @@
+/*
+* Test the game API and also the database 
+*/
+
 import axios from "axios";
 import assert from "assert";
-
 
 describe('Test - Get User Profile', function () {
     it('should get user profile information', function (done) {
