@@ -155,13 +155,9 @@ const ErrorMessage = styled.div`
 `;
 
 function ProfileInfo(props) {
-    const {
-        viewingOwnProfile,
-        userData,
-        profileData,
-        loggedInAsGuest,
-        setEditAvatar,
-    } = { ...props };
+    const { viewingOwnProfile, userData, profileData, setEditAvatar } = {
+        ...props,
+    };
 
     const addFriendButtonRef = useRef();
     const [addFriend, setAddFriend] = useState(false);
@@ -214,18 +210,14 @@ function ProfileInfo(props) {
     };
 
     useEffect(() => {
-        if (!loggedInAsGuest && addFriend) {
+        if (addFriend) {
             document.addEventListener("click", hideAddFriend);
-            // document.addEventListener("click", hideAddFriend);
         }
 
         return () => {
-            if (!loggedInAsGuest) {
-                document.removeEventListener("click", hideAddFriend);
-                // document.removeEventListener("click", hideAddFriend);
-            }
+            document.removeEventListener("click", hideAddFriend);
         };
-    }, [userData, addFriend]);
+    }, [addFriend]);
 
     return (
         <>
@@ -238,28 +230,20 @@ function ProfileInfo(props) {
                 <UserImage src={userData.avatar} />
                 <div>
                     <UserInfoText>
-                        {loggedInAsGuest ? (
-                            <>
-                                Guest user: {userData.username} <br />
-                                <br />
-                                Create an account to see your profile...
-                            </>
-                        ) : (
-                            <>
-                                {userData.username} <br />
-                                WINS: {profileData.win} <br />
-                                POINTS: {profileData.currency} <br />
-                                {viewingOwnProfile && (
-                                    <AddFriendButton
-                                        id="addFriendButton"
-                                        ref={addFriendButtonRef}
-                                        onClick={showAddFriend}
-                                    >
-                                        ADD FRIEND
-                                    </AddFriendButton>
-                                )}
-                            </>
-                        )}
+                        <>
+                            {userData.username} <br />
+                            WINS: {profileData.win} <br />
+                            POINTS: {profileData.currency} <br />
+                            {viewingOwnProfile && (
+                                <AddFriendButton
+                                    id="addFriendButton"
+                                    ref={addFriendButtonRef}
+                                    onClick={showAddFriend}
+                                >
+                                    ADD FRIEND
+                                </AddFriendButton>
+                            )}
+                        </>
                     </UserInfoText>
                     {addFriend ? (
                         <StyledInputContainer id="addFriendContainer">

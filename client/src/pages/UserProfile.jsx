@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 function UserProfile(props) {
     const { userId } = useParams();
-    const { userData, loggedInAsGuest } = useUserData();
+    const { userData } = useUserData();
 
     const [profileData, setProfileData] = useState({});
     const [profileUserData, setProfileUserData] = useState({});
@@ -19,7 +19,7 @@ function UserProfile(props) {
             if (userId === userData.id) {
                 setViewingOwnProfile(true);
                 setProfileUserData(userData);
-            } else if (!loggedInAsGuest) {
+            } else {
                 axios.get(`/users/${userId}`).then((res) => {
                     setProfileUserData(res.data);
                 });
@@ -29,7 +29,7 @@ function UserProfile(props) {
                 setProfileData(res.data);
             });
         }
-    }, [userId, loggedInAsGuest, userData.id]);
+    }, [userId, userData.id]);
 
     return (
         <>
@@ -40,7 +40,6 @@ function UserProfile(props) {
                         viewingOwnProfile={viewingOwnProfile}
                         userData={profileUserData}
                         profileData={profileData}
-                        loggedInAsGuest={loggedInAsGuest}
                     />
                 </FlexContainer>
             </Container>

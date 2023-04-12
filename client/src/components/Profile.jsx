@@ -72,7 +72,7 @@ function Profile(props) {
     const isDesktop = Desktop();
     const [update, updateState] = useState();
     const forceUpdate = React.useCallback(() => updateState({}), []);
-    const { viewingOwnProfile, userData, profileData, loggedInAsGuest } = {
+    const { viewingOwnProfile, userData, profileData } = {
         ...props,
     };
 
@@ -182,21 +182,20 @@ function Profile(props) {
                         viewingOwnProfile={viewingOwnProfile}
                         userData={userData}
                         profileData={profileData}
-                        loggedInAsGuest={loggedInAsGuest}
                         setEditAvatar={setEditAvatar}
                     />
-                    {!loggedInAsGuest && (
-                        <>
-                            <NavBar>
-                                <StyledNavLink
-                                    isDesktop={isDesktop}
-                                    className="selected"
-                                    onClick={(e) => {
-                                        openTab(e, "recentActivity");
-                                    }}
-                                >
-                                    RECENT ACTIVITY
-                                </StyledNavLink>
+                    <>
+                        <NavBar>
+                            <StyledNavLink
+                                isDesktop={isDesktop}
+                                className="selected"
+                                onClick={(e) => {
+                                    openTab(e, "recentActivity");
+                                }}
+                            >
+                                RECENT ACTIVITY
+                            </StyledNavLink>
+                            {viewingOwnProfile && (
                                 <StyledNavLink
                                     isDesktop={isDesktop}
                                     onClick={(e) => {
@@ -205,14 +204,16 @@ function Profile(props) {
                                 >
                                     FRIENDS
                                 </StyledNavLink>
-                                <StyledNavLink
-                                    isDesktop={isDesktop}
-                                    onClick={(e) => {
-                                        openTab(e, "games");
-                                    }}
-                                >
-                                    GAMES
-                                </StyledNavLink>
+                            )}
+                            <StyledNavLink
+                                isDesktop={isDesktop}
+                                onClick={(e) => {
+                                    openTab(e, "games");
+                                }}
+                            >
+                                GAMES
+                            </StyledNavLink>
+                            {viewingOwnProfile && (
                                 <StyledNavLink
                                     isDesktop={isDesktop}
                                     onClick={(e) => {
@@ -221,11 +222,13 @@ function Profile(props) {
                                 >
                                     CUSTOM WORDBANKS
                                 </StyledNavLink>
-                            </NavBar>
-                            <ProfileNavContainer>
-                                <div id="recentActivity" className="tabcontent">
-                                    <Games gameHistory={gameHistory} />
-                                </div>
+                            )}
+                        </NavBar>
+                        <ProfileNavContainer>
+                            <div id="recentActivity" className="tabcontent">
+                                <Games gameHistory={gameHistory} />
+                            </div>
+                            {viewingOwnProfile && (
                                 <div
                                     id="friends"
                                     className="tabcontent"
@@ -238,13 +241,15 @@ function Profile(props) {
                                         forceUpdate={forceUpdate}
                                     />
                                 </div>
-                                <div
-                                    id="games"
-                                    className="tabcontent"
-                                    style={{ display: "none" }}
-                                >
-                                    <Games gameHistory={gameHistory} />
-                                </div>
+                            )}
+                            <div
+                                id="games"
+                                className="tabcontent"
+                                style={{ display: "none" }}
+                            >
+                                <Games gameHistory={gameHistory} />
+                            </div>
+                            {viewingOwnProfile && (
                                 <div
                                     id="customWordbanks"
                                     className="tabcontent"
@@ -256,9 +261,9 @@ function Profile(props) {
                                         wordbanks={wordbanks}
                                     />
                                 </div>
-                            </ProfileNavContainer>
-                        </>
-                    )}
+                            )}
+                        </ProfileNavContainer>
+                    </>
                 </ProfileContainer>
             )}
         </>
