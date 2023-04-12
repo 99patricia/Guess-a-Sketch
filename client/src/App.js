@@ -33,7 +33,7 @@ function App() {
             <Route exact path="/createRoom" element={<CreateRoom />} />
             <Route exact path="/room/:roomId" element={<Room />} />
             <Route exact path="/leaderboard" element={<Leaderboard />} />
-            <Route exact path="/profile" element={<UserProfile />} />
+            <Route exact path="/profile/:userId" element={<UserProfile />} />
             <Route exact path="/shop" element={<Shop />} />
         </Routes>
     );

@@ -17,6 +17,7 @@ async function getLeaderboard(app) {
             const orderedProfiles = querySnapshot.docs.map(doc => doc.data());
             const leaderboardData = orderedProfiles.map(data => {
                 return {
+                    id: data['id'],
                     username: data['username'],
                     wins: data['win'],
                     losses: data['loss'],

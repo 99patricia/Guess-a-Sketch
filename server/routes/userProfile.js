@@ -33,14 +33,24 @@ async function upsertUserProfile(app) {
 
             const currency = req.body["currency"];
 
+            const avatar = req.body["avatar"];
+
             const profileDocRef = doc(db, "profiles", id);
+            const userDocRef = doc(db, "users", id);
 
             const snapshot = await getDoc(profileDocRef);
+            const userSnapshot = await getDoc(userDocRef);
             let profileData = {};
-            if (snapshot.exists()) {
+            let userData = {};
+            if (snapshot.exists() && userSnapshot.exists()) {
                 // Get the existing profile data and add the new win, loss, and currency values
                 profileData = snapshot.data();
+                userData = userSnapshot.data();
                 profileData.currency += currency;
+                if (avatar) {
+                    profileData.avatar = avatar;
+                    userData.avatar = avatar;
+                }
             } else {
                 // If the profile doesn't exist, create a new one
                 res.status(400).json({ error: "Profile not exists" });
@@ -49,6 +59,7 @@ async function upsertUserProfile(app) {
 
             // Update the profile if it exists or create a new one if it doesn't
             await setDoc(profileDocRef, profileData, { merge: true });
+            await setDoc(userDocRef, userData, { merge: true });
 
             res.status(200).json({ message: "Profile upserted successfully" });
         } catch (error) {
@@ -95,8 +106,50 @@ async function UpdateProfileEndgame(app) {
     });
 }
 
+async function getGames(app) {
+    app.get("/profile/games/:id", async (req, res) => {
+        try {
+            const profileId = req.params.id;
+            const docRef = doc(db, "profiles", profileId);
+
+            await getDoc(docRef)
+                .then(async (docsnap) => {
+                    if (docsnap.exists()) {
+                        const userData = docsnap.data();
+                        const gamesIdsList = userData.gamehistory;
+
+                        // Fetch data for user's games
+                        const gamesList = [];
+                        for (let i = 0; i < gamesIdsList.length; i++) {
+                            const gameID = gamesIdsList[i];
+                            await getDoc(doc(db, "games", gameID)).then(
+                                (docsnap) => {
+                                    const gameData = docsnap.data();
+                                    gamesList.push(gameData);
+                                }
+                            );
+                        }
+                        // Send response to client with user data
+
+                        res.status(200).json({ games: gamesList });
+                    } else {
+                        res.status(404).json({ error: "No data found" });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    res.status(404).json({ error: "No data found" });
+                });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Server error" });
+        }
+    });
+}
+
 export function init(app) {
     getUserProfile(app),
         upsertUserProfile(app),
-        UpdateProfileEndgame(app);
+        UpdateProfileEndgame(app),
+        getGames(app);
 }

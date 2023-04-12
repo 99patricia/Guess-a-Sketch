@@ -21,9 +21,37 @@ async function handleFriendRequest(app) {
         try {
             // Extract friend request data from request body
             const sender_id = req.body["sender_id"];
-            const recipient_id = req.body["recipient_id"];
+            const recipient_username = req.body["recipient_username"];
             const status = req.body["status"];
             const direction = req.body["direction"];
+
+            var recipient_id = "";
+
+            {
+                const q = query(
+                    collection(db, "profiles"),
+                    where("username", "==", recipient_username)
+                );
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    // player is a guest
+                    res.status(400).json({
+                        error: "User not found"
+                    });
+                    return;
+                } else {
+                    querySnapshot.forEach((docSnapshot) => {
+                        recipient_id = docSnapshot.data()?.id;
+                    });
+                }
+            }
+
+            if (sender_id === recipient_id) {
+                res.status(400).json({
+                    error: "You cannot send a friend request to yourself"
+                });
+                return;
+            }
 
             // Create a new friend request document with auto-generated request_id
             const friendRequestData = {
@@ -32,6 +60,23 @@ async function handleFriendRequest(app) {
                 status,
                 direction,
             };
+
+            {
+                const friendRequestsRef = collection(db, "friendRequests");
+                const q = query(
+                    collection(db, "friendRequests"),
+                    where("sender_id", "==", sender_id),
+                    where("recipient_id", "==", recipient_id),
+                    where("status", "==", "pending")
+                );
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) { // request already exists
+                    res.status(400).json({
+                        error: "Request already exists"
+                    });
+                    return;
+                }
+            }
 
             const senderDocRef = doc(db, "users", sender_id);
             const senderSnapshot = await getDoc(senderDocRef);
@@ -51,7 +96,7 @@ async function handleFriendRequest(app) {
                 receiverSnapshot.data().friendList.includes(sender_id)
             ) {
                 res.status(400).json({
-                    error: "User are already friends"
+                    error: "Users are already friends"
                 });
                 return;
             }
