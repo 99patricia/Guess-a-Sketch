@@ -11,6 +11,7 @@ import {
     CustomWordbanks,
 } from "components/Profile/";
 import { Desktop } from "service/mediaQueries";
+import EditAvatar from "./EditAvatar";
 
 const ProfileContainer = styled.div`
     background-color: var(--light-beige);
@@ -81,6 +82,8 @@ function Profile(props) {
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
     const [wordbanks, setWordbanks] = useState([]);
+
+    const [editAvatar, setEditAvatar] = useState(false);
 
     useEffect(() => {
         const fetchGames = async () => {
@@ -192,11 +195,18 @@ function Profile(props) {
 
     return (
         <>
+        {editAvatar? (
+            <EditAvatar 
+                setEditAvatar = {setEditAvatar}
+                userData = {userData}
+            />
+        ) : (
             <ProfileContainer isDesktop={isDesktop}>
                 <ProfileInfo
                     userData={userData}
                     profileData={profileData}
                     loggedInAsGuest={loggedInAsGuest}
+                    setEditAvatar={setEditAvatar}
                 />
                 {!loggedInAsGuest && (
                     <>
@@ -268,6 +278,7 @@ function Profile(props) {
                     </>
                 )}
             </ProfileContainer>
+        )}
         </>
     );
 }
