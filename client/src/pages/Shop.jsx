@@ -24,6 +24,14 @@ const NavBar = styled.div`
     margin: 2rem 0;
 `;
 
+const Currency = styled.div`
+    font-size: 1.2rem;
+    margin: 1rem 1rem 0;
+    color: var(--secondary);
+    text-align: right;
+    text-transform: uppercase;
+`;
+
 const StyledNavLink = styled.a`
     margin: 1rem;
     padding-bottom: 0.2rem;
@@ -67,6 +75,7 @@ function Shop(props) {
     const isDesktop = Desktop();
     const { userData, loggedInAsGuest } = useUserData();
 
+    const [currency, setCurrency] = useState(0);
     const [userPerks, setUserPerks] = useState([]);
     const [unownedPerks, setUnownedPerks] = useState([]);
 
@@ -94,6 +103,9 @@ function Shop(props) {
 
     useEffect(() => {
         if (!loggedInAsGuest && userData.id) {
+            axios.get(`/profile/${userData.id}`).then((res) => {
+                setCurrency(res.data.currency);
+            });
             axios.get(`/user_perks/${userData.id}`).then((res) => {
                 const userPerks = res.data.userPerks;
                 setUserPerks(userPerks);
@@ -121,49 +133,54 @@ function Shop(props) {
                     {loggedInAsGuest ? (
                         "Create an account to redeem items!"
                     ) : (
-                        <TabContainer>
-                            <NavBar>
-                                <StyledNavLink
-                                    isDesktop={isDesktop}
-                                    className="selected"
-                                    onClick={(e) => {
-                                        openTab("Tools and Colors", e);
-                                    }}
-                                >
-                                    TOOLS AND COLORS
-                                </StyledNavLink>
-                                <StyledNavLink
-                                    isDesktop={isDesktop}
-                                    onClick={(e) => {
-                                        openTab("My Inventory", e);
-                                    }}
-                                >
-                                    MY INVENTORY
-                                </StyledNavLink>
-                            </NavBar>
-                            <TabContentContainer>
-                                <div
-                                    id="Tools and Colors"
-                                    className="tabcontent"
-                                >
-                                    <Tools
-                                        perks={unownedPerks}
-                                        userData={userData}
-                                    />
-                                </div>
-                                <div
-                                    id="My Inventory"
-                                    className="tabcontent"
-                                    style={{ display: "none" }}
-                                >
-                                    <Tools
-                                        perks={userPerks}
-                                        showUserPerks
-                                        userData={userData}
-                                    />
-                                </div>
-                            </TabContentContainer>
-                        </TabContainer>
+                        <>
+                            <Currency>
+                                <i className="bi bi-star-fill" /> {currency} pts
+                            </Currency>
+                            <TabContainer>
+                                <NavBar>
+                                    <StyledNavLink
+                                        isDesktop={isDesktop}
+                                        className="selected"
+                                        onClick={(e) => {
+                                            openTab("Tools and Colors", e);
+                                        }}
+                                    >
+                                        TOOLS AND COLORS
+                                    </StyledNavLink>
+                                    <StyledNavLink
+                                        isDesktop={isDesktop}
+                                        onClick={(e) => {
+                                            openTab("My Inventory", e);
+                                        }}
+                                    >
+                                        MY INVENTORY
+                                    </StyledNavLink>
+                                </NavBar>
+                                <TabContentContainer>
+                                    <div
+                                        id="Tools and Colors"
+                                        className="tabcontent"
+                                    >
+                                        <Tools
+                                            perks={unownedPerks}
+                                            userData={userData}
+                                        />
+                                    </div>
+                                    <div
+                                        id="My Inventory"
+                                        className="tabcontent"
+                                        style={{ display: "none" }}
+                                    >
+                                        <Tools
+                                            perks={userPerks}
+                                            showUserPerks
+                                            userData={userData}
+                                        />
+                                    </div>
+                                </TabContentContainer>
+                            </TabContainer>
+                        </>
                     )}
                 </StyledShopContainer>
             </Container>
