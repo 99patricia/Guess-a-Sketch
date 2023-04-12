@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import { useUserData } from "hooks";
@@ -8,21 +8,26 @@ import { useParams } from "react-router-dom";
 
 function UserProfile(props) {
     const { userId } = useParams();
-    const { loggedInAsGuest } = useUserData();
+    const { userData, loggedInAsGuest } = useUserData();
 
     const [profileData, setProfileData] = useState({});
-    const [userData, setUserData] = useState({});
+    const [profileUserData, setProfileUserData] = useState({});
+    const [viewingOwnProfile, setViewingOwnProfile] = useState(false);
 
     useEffect(() => {
         if (!loggedInAsGuest && userId) {
             axios.get(`/users/${userId}`).then((res) => {
-                setUserData(res.data);
+                setProfileUserData(res.data);
             });
             axios.get(`/profile/${userId}`).then((res) => {
                 setProfileData(res.data);
             });
         }
-    }, [userId]);
+        if (userId && userId === userData.id) {
+            setViewingOwnProfile(true);
+            setProfileUserData(userData);
+        }
+    }, [userId, loggedInAsGuest, userData.id]);
 
     return (
         <>
@@ -30,7 +35,8 @@ function UserProfile(props) {
             <Container>
                 <FlexContainer>
                     <Profile
-                        userData={userData}
+                        viewingOwnProfile={viewingOwnProfile}
+                        userData={profileUserData}
                         profileData={profileData}
                         loggedInAsGuest={loggedInAsGuest}
                     />

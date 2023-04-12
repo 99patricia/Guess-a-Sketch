@@ -5,7 +5,6 @@ import axios from "axios";
 import "components/Profile/profile.css";
 import {
     ProfileInfo,
-    RecentActivity,
     Friends,
     Games,
     CustomWordbanks,
@@ -73,7 +72,7 @@ function Profile(props) {
     const isDesktop = Desktop();
     const [update, updateState] = useState();
     const forceUpdate = React.useCallback(() => updateState({}), []);
-    const { userData, profileData, loggedInAsGuest } = {
+    const { viewingOwnProfile, userData, profileData, loggedInAsGuest } = {
         ...props,
     };
 
@@ -88,7 +87,8 @@ function Profile(props) {
     useEffect(() => {
         const fetchGames = async () => {
             const games = profileData.gamehistory;
-            if (games && gameHistory?.length == 0) { // only grab game history on profile load
+            if (games && gameHistory?.length === 0) {
+                // only grab game history on profile load
                 var i;
                 var gamehistory = [];
                 setGameHistory([]);
@@ -99,18 +99,16 @@ function Profile(props) {
                 }
                 setGameHistory(gamehistory);
             }
-        }
+        };
 
         const fetchFriendRequests = async () => {
             let friendRequests = [];
-            await axios
-                .get(`/friend_requests/${userData.id}`)
-                .then((res) => {
-                    friendRequests = res.data;
-                });
+            await axios.get(`/friend_requests/${userData.id}`).then((res) => {
+                friendRequests = res.data;
+            });
             if (friendRequests) {
                 var i;
-                for (i=0; i<friendRequests.length; i++) {
+                for (i = 0; i < friendRequests.length; i++) {
                     await axios
                         .get(`/profile/${friendRequests[i].sender_id}`)
                         .then((res) => {
@@ -118,22 +116,20 @@ function Profile(props) {
                                 sender_id: friendRequests[i].sender_id,
                                 username: res.data.username,
                                 avatar: res.data.avatar,
-                            }
+                            };
                         });
                 }
                 setFriendRequestList(friendRequests);
             }
-        }
+        };
 
         const fetchFriendsList = async () => {
             if (userData?.id) {
-                await axios
-                    .get(`/users/${userData.id}`)
-                    .then((res) => {
-                        setFriendIDList(res.data.friendList);
-                    });
+                await axios.get(`/users/${userData.id}`).then((res) => {
+                    setFriendIDList(res.data.friendList);
+                });
             }
-        }
+        };
 
         const fetchFriends = async () => {
             await fetchFriendsList();
@@ -141,15 +137,13 @@ function Profile(props) {
             if (friends) {
                 var i;
                 setFriendList([]);
-                for (i=0; i<friends.length; i++) {
-                    await axios
-                        .get(`/profile/${friends[i]}`)
-                        .then((res) => {
-                            setFriendList(oldArray => [...oldArray, res.data]);
-                        });
+                for (i = 0; i < friends.length; i++) {
+                    await axios.get(`/profile/${friends[i]}`).then((res) => {
+                        setFriendList((oldArray) => [...oldArray, res.data]);
+                    });
                 }
             }
-        }
+        };
 
         const fetchWordbanks = async () => {
             if (userData.id) {
@@ -195,90 +189,93 @@ function Profile(props) {
 
     return (
         <>
-        {editAvatar? (
-            <EditAvatar 
-                setEditAvatar = {setEditAvatar}
-                userData = {userData}
-            />
-        ) : (
-            <ProfileContainer isDesktop={isDesktop}>
-                <ProfileInfo
-                    userData={userData}
-                    profileData={profileData}
-                    loggedInAsGuest={loggedInAsGuest}
-                    setEditAvatar={setEditAvatar}
-                />
-                {!loggedInAsGuest && (
-                    <>
-                        <NavBar>
-                            <StyledNavLink
-                                isDesktop={isDesktop}
-                                className="selected"
-                                onClick={(e) => {
-                                    openTab(e, "recentActivity");
-                                }}
-                            >
-                                RECENT ACTIVITY
-                            </StyledNavLink>
-                            <StyledNavLink
-                                isDesktop={isDesktop}
-                                onClick={(e) => {
-                                    openTab(e, "friends");
-                                }}
-                            >
-                                FRIENDS
-                            </StyledNavLink>
-                            <StyledNavLink
-                                isDesktop={isDesktop}
-                                onClick={(e) => {
-                                    openTab(e, "games");
-                                }}
-                            >
-                                GAMES
-                            </StyledNavLink>
-                            <StyledNavLink
-                                isDesktop={isDesktop}
-                                onClick={(e) => {
-                                    openTab(e, "customWordbanks");
-                                }}
-                            >
-                                CUSTOM WORDBANKS
-                            </StyledNavLink>
-                        </NavBar>
-                        <ProfileNavContainer>
-                            <div id="recentActivity" className="tabcontent">
-                                <Games gameHistory={gameHistory} />
-                            </div>
-                            <div
-                                id="friends"
-                                className="tabcontent"
-                                style={{ display: "none" }}
-                            >
-                                <Friends 
-                                    friendList={friendList}
-                                    friendRequestList={friendRequestList}
-                                    forceUpdate={forceUpdate}
-                                />
-                            </div>
-                            <div
-                                id="games"
-                                className="tabcontent"
-                                style={{ display: "none" }}
-                            >
-                                <Games gameHistory={gameHistory} />
-                            </div>
-                            <div
-                                id="customWordbanks"
-                                className="tabcontent"
-                                style={{ display: "none" }}
-                            >
-                                <CustomWordbanks userData={userData} wordbanks={wordbanks} />
-                            </div>
-                        </ProfileNavContainer>
-                    </>
-                )}
-            </ProfileContainer>
-        )}
+            {editAvatar ? (
+                <EditAvatar setEditAvatar={setEditAvatar} userData={userData} />
+            ) : (
+                <ProfileContainer isDesktop={isDesktop}>
+                    <ProfileInfo
+                        viewingOwnProfile={viewingOwnProfile}
+                        userData={userData}
+                        profileData={profileData}
+                        loggedInAsGuest={loggedInAsGuest}
+                        setEditAvatar={setEditAvatar}
+                    />
+                    {!loggedInAsGuest && (
+                        <>
+                            <NavBar>
+                                <StyledNavLink
+                                    isDesktop={isDesktop}
+                                    className="selected"
+                                    onClick={(e) => {
+                                        openTab(e, "recentActivity");
+                                    }}
+                                >
+                                    RECENT ACTIVITY
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    isDesktop={isDesktop}
+                                    onClick={(e) => {
+                                        openTab(e, "friends");
+                                    }}
+                                >
+                                    FRIENDS
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    isDesktop={isDesktop}
+                                    onClick={(e) => {
+                                        openTab(e, "games");
+                                    }}
+                                >
+                                    GAMES
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    isDesktop={isDesktop}
+                                    onClick={(e) => {
+                                        openTab(e, "customWordbanks");
+                                    }}
+                                >
+                                    CUSTOM WORDBANKS
+                                </StyledNavLink>
+                            </NavBar>
+                            <ProfileNavContainer>
+                                <div id="recentActivity" className="tabcontent">
+                                    <Games gameHistory={gameHistory} />
+                                </div>
+                                <div
+                                    id="friends"
+                                    className="tabcontent"
+                                    style={{ display: "none" }}
+                                >
+                                    <Friends
+                                        viewingOwnProfile={viewingOwnProfile}
+                                        friendList={friendList}
+                                        friendRequestList={friendRequestList}
+                                        forceUpdate={forceUpdate}
+                                    />
+                                </div>
+                                <div
+                                    id="games"
+                                    className="tabcontent"
+                                    style={{ display: "none" }}
+                                >
+                                    <Games gameHistory={gameHistory} />
+                                </div>
+                                <div
+                                    id="customWordbanks"
+                                    className="tabcontent"
+                                    style={{ display: "none" }}
+                                >
+                                    <CustomWordbanks
+                                        viewingOwnProfile={viewingOwnProfile}
+                                        userData={userData}
+                                        wordbanks={wordbanks}
+                                    />
+                                </div>
+                            </ProfileNavContainer>
+                        </>
+                    )}
+                </ProfileContainer>
+            )}
         </>
     );
 }

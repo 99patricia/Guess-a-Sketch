@@ -154,10 +154,14 @@ const ErrorMessage = styled.div`
     margin-top: -3rem;
 `;
 
-
 function ProfileInfo(props) {
-
-    const { userData, profileData, loggedInAsGuest, setEditAvatar } = { ...props };
+    const {
+        viewingOwnProfile,
+        userData,
+        profileData,
+        loggedInAsGuest,
+        setEditAvatar,
+    } = { ...props };
 
     const addFriendButtonRef = useRef();
     const [addFriend, setAddFriend] = useState(false);
@@ -172,7 +176,10 @@ function ProfileInfo(props) {
     }
 
     function hideAddFriend(event) {
-        if (!containerElement.contains(event.target) && !buttonElement.contains(event.target)) {
+        if (
+            !containerElement.contains(event.target) &&
+            !buttonElement.contains(event.target)
+        ) {
             setAddFriend(false);
             setErrorMessage("");
         }
@@ -190,7 +197,7 @@ function ProfileInfo(props) {
             recipient_username: addFriendName,
             direction: "outgoing",
             status: "pending",
-        }
+        };
         const options = {
             withCredentials: true,
             headers: { "Content-Type": "application/json" },
@@ -198,16 +205,15 @@ function ProfileInfo(props) {
 
         axios
             .post("/friend_request", body, options)
-            .then((res) =>  {
+            .then((res) => {
                 setErrorMessage("Friend request sent");
             })
             .catch((err) => {
                 setErrorMessage(err.response.data.error);
             });
-    }
+    };
 
     useEffect(() => {
-
         if (!loggedInAsGuest && addFriend) {
             document.addEventListener("click", hideAddFriend);
             // document.addEventListener("click", hideAddFriend);
@@ -223,28 +229,37 @@ function ProfileInfo(props) {
 
     return (
         <>
-            <EditButton>
-                <i className="bi-pencil-fill" onClick={handleEditAvatar}/>
-            </EditButton>
+            {viewingOwnProfile && (
+                <EditButton>
+                    <i className="bi-pencil-fill" onClick={handleEditAvatar} />
+                </EditButton>
+            )}
             <UserInfoContainer>
                 <UserImage src={userData.avatar} />
                 <div>
                     <UserInfoText>
                         {loggedInAsGuest ? (
                             <>
-                            Guest user: {userData.username} <br/><br/>
-                            Create an account to see your profile...
+                                Guest user: {userData.username} <br />
+                                <br />
+                                Create an account to see your profile...
                             </>
                         ) : (
                             <>
-                            {userData.username} <br/>
-                            WINS: {profileData.win} <br/> 
-                            POINTS: {profileData.currency} <br/>
-                            <AddFriendButton id="addFriendButton" ref={addFriendButtonRef} onClick={showAddFriend}>
-                                ADD FRIEND
-                            </AddFriendButton>
+                                {userData.username} <br />
+                                WINS: {profileData.win} <br />
+                                POINTS: {profileData.currency} <br />
+                                {viewingOwnProfile && (
+                                    <AddFriendButton
+                                        id="addFriendButton"
+                                        ref={addFriendButtonRef}
+                                        onClick={showAddFriend}
+                                    >
+                                        ADD FRIEND
+                                    </AddFriendButton>
+                                )}
                             </>
-                        ) }
+                        )}
                     </UserInfoText>
                     {addFriend ? (
                         <StyledInputContainer id="addFriendContainer">
@@ -252,26 +267,28 @@ function ProfileInfo(props) {
                                 <ErrorMessage>{errorMessage}</ErrorMessage>
                             )}
                             <AddFriendForm onSubmit={handleAddFriend}>
-                                <StyledInput 
-                                type="text" 
-                                placeholder="username"
-                                onChange={(e) => setAddFriendName(e.target.value)}
+                                <StyledInput
+                                    type="text"
+                                    placeholder="username"
+                                    onChange={(e) =>
+                                        setAddFriendName(e.target.value)
+                                    }
                                 />
-                                <StyledFormButton 
-                                type="submit">
+                                <StyledFormButton type="submit">
                                     ADD
-                                </StyledFormButton> 
+                                </StyledFormButton>
                             </AddFriendForm>
                         </StyledInputContainer>
                     ) : (
-                    <StyledInputContainer id="addFriendContainer" style={{display:"none"}}>
-
-                    </StyledInputContainer>
+                        <StyledInputContainer
+                            id="addFriendContainer"
+                            style={{ display: "none" }}
+                        ></StyledInputContainer>
                     )}
                 </div>
             </UserInfoContainer>
         </>
-    )
+    );
 }
 
-export default ProfileInfo
+export default ProfileInfo;
