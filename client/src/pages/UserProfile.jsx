@@ -15,17 +15,19 @@ function UserProfile(props) {
     const [viewingOwnProfile, setViewingOwnProfile] = useState(false);
 
     useEffect(() => {
-        if (!loggedInAsGuest && userId) {
-            axios.get(`/users/${userId}`).then((res) => {
-                setProfileUserData(res.data);
-            });
+        if (userId) {
+            if (userId === userData.id) {
+                setViewingOwnProfile(true);
+                setProfileUserData(userData);
+            } else if (!loggedInAsGuest) {
+                axios.get(`/users/${userId}`).then((res) => {
+                    setProfileUserData(res.data);
+                });
+            }
+
             axios.get(`/profile/${userId}`).then((res) => {
                 setProfileData(res.data);
             });
-        }
-        if (userId && userId === userData.id) {
-            setViewingOwnProfile(true);
-            setProfileUserData(userData);
         }
     }, [userId, loggedInAsGuest, userData.id]);
 

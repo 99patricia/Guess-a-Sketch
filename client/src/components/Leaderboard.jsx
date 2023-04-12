@@ -105,7 +105,20 @@ function Leaderboard(props) {
                                     >
                                         <TD>{index + 1}</TD>
                                         <TD>
-                                            <Link to={`/profile/${id}`}>
+                                            <Link
+                                                style={
+                                                    userData.username ===
+                                                        username &&
+                                                    !loggedInAsGuest
+                                                        ? {
+                                                              color: "var(--secondary)",
+                                                          }
+                                                        : {
+                                                              color: "var(--primary)",
+                                                          }
+                                                }
+                                                to={`/profile/${id}`}
+                                            >
                                                 {username}
                                             </Link>
                                         </TD>

@@ -65,7 +65,7 @@ function EditAvatar(props) {
         localStorage.setItem("userData", JSON.stringify(userData));
 
 
-        window.location.reload(false);
+        window.location.reload(true);
     };
 
     const handleBack = (e) => {
