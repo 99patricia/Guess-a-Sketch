@@ -1,3 +1,8 @@
+/**
+ * Satisfies:
+ * FR5 - Request.Guest-Log-in
+ * FR6 - Draw.Guest.Avatar
+ */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
