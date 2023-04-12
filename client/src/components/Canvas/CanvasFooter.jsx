@@ -1,3 +1,11 @@
+/**
+ * FR2 - Draw.User.Avatar
+ * FR6 - Draw.Guest.Avatar
+ * FR12 - Draw.Canvas
+ * FR13 - Request.Tool
+ * FR14 - Clean.Canvas
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";

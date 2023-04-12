@@ -1,3 +1,9 @@
+/**
+ * FR17 - Create.Lobby
+ * FR18 - Chat.Lobby
+ * FR19 - Permission.Host
+ */
+
 import React from "react";
 import styled from "styled-components";
 import { socket } from "service/socket";

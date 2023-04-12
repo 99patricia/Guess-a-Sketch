@@ -1,3 +1,7 @@
+/**
+ * FR11 - Request.Profile
+ */
+
 import React, { useEffect } from "react";
 import styled from "styled-components";
 
@@ -24,25 +28,25 @@ const GameCard = styled.div`
 `;
 
 function Games(props) {
-
     const { gameHistory } = { ...props };
 
     return (
         <>
-        <GamesContainer>
-            {gameHistory.map(({ room, winner, players }, index) => (
-                <GameCard key={index}>
-                    <p>
-                        Played a game with {players.length} players in room ({room ? (<>{room.toUpperCase()}</>): (<>temp</>)})
-                    </p>
-                    <p style={{color:"var(--secondary)"}}>
-                        winner: {winner}
-                    </p>
-                </GameCard>
-            ))}
-        </GamesContainer>
+            <GamesContainer>
+                {gameHistory.map(({ room, winner, players }, index) => (
+                    <GameCard key={index}>
+                        <p>
+                            Played a game with {players.length} players in room
+                            ({room ? <>{room.toUpperCase()}</> : <>temp</>})
+                        </p>
+                        <p style={{ color: "var(--secondary)" }}>
+                            winner: {winner}
+                        </p>
+                    </GameCard>
+                ))}
+            </GamesContainer>
         </>
-    )
+    );
 }
 
 export default Games;

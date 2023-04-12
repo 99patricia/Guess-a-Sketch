@@ -1,3 +1,10 @@
+/**
+ * FR11 - Request.Profile
+ * FR20 - Request.SendFriendRequest
+ * FR21 - Request.AcceptFriendRequest
+ * FR22 - Request.DeclineFriendRequest
+ */
+
 import React from "react";
 import styled from "styled-components";
 import axios from "axios";

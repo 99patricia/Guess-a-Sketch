@@ -1,3 +1,8 @@
+/**
+ * FR2 - Draw.User.Avatar
+ * FR6 - Draw.Guest.Avatar
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
