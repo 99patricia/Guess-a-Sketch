@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import axios from "axios";
 
@@ -46,7 +46,7 @@ const RequestButton = styled.button`
     color: var(--white);
     cursor: pointer;
     width: auto;
-    
+
     margin: 0rem 0.25rem;
     padding: 0.5rem 0rem;
     display: block;
@@ -80,8 +80,9 @@ const UserImage = styled.img`
 `;
 
 function Friends(props) {
-
-    const { friendRequestList, friendList, forceUpdate } = { ...props };
+    const { viewingOwnProfile, friendRequestList, friendList, forceUpdate } = {
+        ...props,
+    };
 
     async function accept(id, sender_id, recipient_id) {
         const body = {
@@ -95,11 +96,9 @@ function Friends(props) {
             headers: { "Content-Type": "application/json" },
         };
 
-        axios
-            .post("/friend_request/accept", body, options)
-            .then((res) => {
-                forceUpdate();
-            });
+        axios.post("/friend_request/accept", body, options).then((res) => {
+            forceUpdate();
+        });
     }
 
     async function decline(id) {
@@ -111,57 +110,72 @@ function Friends(props) {
             headers: { "Content-Type": "application/json" },
         };
 
-        axios
-            .post("/friend_request/reject", body, options)
-            .then((res) => {
-                forceUpdate();
-            });
+        axios.post("/friend_request/reject", body, options).then((res) => {
+            forceUpdate();
+        });
     }
 
     return (
         <>
-        <FriendsGrid>
-            {friendRequestList.map(({ request_id, sender_id, recipient_id, direction, status }) => (
-                <>
-                {(direction == "outgoing") && (status == "pending") && (
-                    <FriendRequestCard key={request_id}>
-                        <UserImageDiv>
-                            <UserImage src={sender_id.avatar} />
-                        </UserImageDiv>
-                        <p>
-                            {sender_id.username}
-                        </p>
-                        <RequestButton 
-                            onClick={() => accept(request_id, sender_id.sender_id, recipient_id)}
-                        >
-                            yes
-                        </RequestButton>
-                        <RequestButton
-                            secondary
-                            onClick={() => decline(request_id)}
-                        >
-                            no
-                        </RequestButton>
-                    </FriendRequestCard>
-                )}
-                </>
-            ))}
-            {friendList.map(({ id, username, avatar }) => (
-                    <FriendCard
-                        key={id}
-                    >
+            <FriendsGrid>
+                {viewingOwnProfile &&
+                    friendRequestList.map(
+                        ({
+                            request_id,
+                            sender_id,
+                            recipient_id,
+                            direction,
+                            status,
+                        }) => (
+                            <>
+                                {direction === "outgoing" &&
+                                    status === "pending" && (
+                                        <FriendRequestCard key={request_id}>
+                                            <UserImageDiv>
+                                                <UserImage
+                                                    src={sender_id.avatar}
+                                                />
+                                            </UserImageDiv>
+                                            <a
+                                                href={`/profile/${sender_id.sender_id}`}
+                                            >
+                                                {sender_id.username}
+                                            </a>
+                                            <RequestButton
+                                                onClick={() =>
+                                                    accept(
+                                                        request_id,
+                                                        sender_id.sender_id,
+                                                        recipient_id
+                                                    )
+                                                }
+                                            >
+                                                <i className="bi bi-check-lg" />
+                                            </RequestButton>
+                                            <RequestButton
+                                                secondary
+                                                onClick={() =>
+                                                    decline(request_id)
+                                                }
+                                            >
+                                                <i className="bi bi-x-lg" />
+                                            </RequestButton>
+                                        </FriendRequestCard>
+                                    )}
+                            </>
+                        )
+                    )}
+                {friendList.map(({ id, username, avatar }) => (
+                    <FriendCard key={id}>
                         <UserImageDiv>
                             <UserImage src={avatar} />
                         </UserImageDiv>
-                        <p>
-                            {username}<br/>
-                        </p>
+                        <a href={`/profile/${id}`}>{username}</a>
                     </FriendCard>
-                )
-            )}
-        </FriendsGrid>
+                ))}
+            </FriendsGrid>
         </>
-    )
+    );
 }
 
 export default Friends;

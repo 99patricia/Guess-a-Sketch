@@ -89,7 +89,7 @@ async function register(app) {
                             currency: 0,
                             avatar,
                             inventory: [],
-                            gamehistory:[],
+                            gamehistory: [],
                         };
 
                         await setDoc(
@@ -266,6 +266,47 @@ async function getUserById(app) {
     });
 }
 
+async function getFriends(app) {
+    app.get("/users/friends/:id", async (req, res) => {
+        try {
+            const userId = req.params.id;
+            const docRef = doc(db, "users", userId);
+
+            await getDoc(docRef)
+                .then(async (docsnap) => {
+                    if (docsnap.exists()) {
+                        const userData = docsnap.data();
+                        const friendsIdsList = userData.friendList;
+
+                        // Fetch data for user's friends
+                        const friendsList = [];
+                        for (let i = 0; i < friendsIdsList.length; i++) {
+                            const friendId = friendsIdsList[i];
+                            await getDoc(doc(db, "users", friendId)).then(
+                                (docsnap) => {
+                                    const friendData = docsnap.data();
+                                    friendsList.push(friendData);
+                                }
+                            );
+                        }
+                        // Send response to client with user data
+
+                        res.status(200).json({ friends: friendsList });
+                    } else {
+                        res.status(404).json({ error: "No data found" });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    res.status(404).json({ error: "No data found" });
+                });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Server error" });
+        }
+    });
+}
+
 async function deleteFriend(app) {
     app.delete("/deletefriends/:user_id/:friend_id", async (req, res) => {
         try {
@@ -300,5 +341,6 @@ export function init(app) {
     logout(app);
     changePassword(app);
     getUserById(app);
+    getFriends(app);
     deleteFriend(app);
 }

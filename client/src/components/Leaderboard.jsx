@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const LeaderboardContainer = styled.div`
@@ -92,7 +93,7 @@ function Leaderboard(props) {
                         </THead>
                         <tbody>
                             {leaderboardData.map(
-                                ({ username, wins, losses }, index) => (
+                                ({ id, username, wins, losses }, index) => (
                                     <TR
                                         key={username}
                                         style={
@@ -103,7 +104,24 @@ function Leaderboard(props) {
                                         }
                                     >
                                         <TD>{index + 1}</TD>
-                                        <TD>{username}</TD>
+                                        <TD>
+                                            <Link
+                                                style={
+                                                    userData.username ===
+                                                        username &&
+                                                    !loggedInAsGuest
+                                                        ? {
+                                                              color: "var(--secondary)",
+                                                          }
+                                                        : {
+                                                              color: "var(--primary)",
+                                                          }
+                                                }
+                                                to={`/profile/${id}`}
+                                            >
+                                                {username}
+                                            </Link>
+                                        </TD>
                                         <TD>{wins}</TD>
                                         <TD>{losses}</TD>
                                         <TD>

@@ -1,45 +1,50 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import { useUserData } from "hooks";
 
-import {
-    Container,
-    FlexContainer,
-    Header,
-    Profile,
-} from "components";
+import { Container, FlexContainer, Header, Profile } from "components";
+import { useParams } from "react-router-dom";
 
 function UserProfile(props) {
-    
-    const { userData, loggedInAsGuest } = useUserData();
+    const { userId } = useParams();
+    const { userData } = useUserData();
 
-    const [ profileData, setProfileData ] = useState({});
+    const [profileData, setProfileData] = useState({});
+    const [profileUserData, setProfileUserData] = useState({});
+    const [viewingOwnProfile, setViewingOwnProfile] = useState(false);
 
     useEffect(() => {
-        if (!loggedInAsGuest && userData.id) {
-            axios
-                .get(`/profile/${userData.id}`)
-                .then((res) => {
-                    setProfileData(res.data);
+        if (userId) {
+            if (userId === userData.id) {
+                setViewingOwnProfile(true);
+                setProfileUserData(userData);
+            } else {
+                axios.get(`/users/${userId}`).then((res) => {
+                    setProfileUserData(res.data);
                 });
+            }
+
+            axios.get(`/profile/${userId}`).then((res) => {
+                setProfileData(res.data);
+            });
         }
-    }, [userData]);
+    }, [userId, userData.id]);
 
     return (
         <>
             <Header />
             <Container>
                 <FlexContainer>
-                    <Profile 
-                        userData={userData}
+                    <Profile
+                        viewingOwnProfile={viewingOwnProfile}
+                        userData={profileUserData}
                         profileData={profileData}
-                        loggedInAsGuest={loggedInAsGuest}
                     />
                 </FlexContainer>
             </Container>
         </>
-    )
+    );
 }
 
 export default UserProfile;

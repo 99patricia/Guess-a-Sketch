@@ -105,7 +105,9 @@ function SideDrawer(props) {
                 )}
                 <div className="flex column">
                     {isLoggedIn && (
-                        <StyledNavLink to="/profile">Profile</StyledNavLink>
+                        <StyledNavLink to={`/profile/${userData.id}`}>
+                            Profile
+                        </StyledNavLink>
                     )}
                     {isLoggedIn && (
                         <StyledNavLink to="/shop">Marketplace</StyledNavLink>

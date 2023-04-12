@@ -37,7 +37,7 @@ const StyledMessage = styled.div`
 `;
 
 function CustomWordbanks(props) {
-    const { userData } = { ...props };
+    const { viewingOwnProfile, userData } = { ...props };
 
     const [wordbanks, setWordbanks] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -127,13 +127,15 @@ function CustomWordbanks(props) {
                 </>
             ) : (
                 <>
-                    <Button
-                        column
-                        type="button"
-                        onClick={() => setShowCreate(true)}
-                    >
-                        Create New Wordbank
-                    </Button>
+                    {viewingOwnProfile && (
+                        <Button
+                            column
+                            type="button"
+                            onClick={() => setShowCreate(true)}
+                        >
+                            Create New Wordbank
+                        </Button>
+                    )}
                     {wordbanks?.map((wordbank) => (
                         <div key={wordbank.name}>
                             <WordbankName
