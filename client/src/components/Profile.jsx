@@ -85,7 +85,7 @@ function Profile(props) {
 
     useEffect(() => {
         const fetchGames = async () => {
-            if (gameHistory.length > 0) {
+            if (gameHistory?.length > 0) {
                 return;
             }
             await axios.get(`/profile/games/${userData.id}`).then((res) => {
