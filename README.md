@@ -8,6 +8,8 @@ Zihan Wang : 1574685
 
 ### To start the development environment:
 
+Double check that there is a `serviceAccount.js` file in your `server/secrets` directory!
+
 Server:
 ```
 // install dependencies
@@ -27,3 +29,5 @@ npm install
 // start the server
 npm start
 ```
+
+The client will be running on `http://localhost:3000/`.
