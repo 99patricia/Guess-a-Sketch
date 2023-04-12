@@ -1,3 +1,9 @@
+/*
+* API file for the Functional Requirments
+* FR11 - Request.Profile
+* FR15 - Save.PlayerData
+*/
+
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../service/firebase.js";
 

@@ -1,3 +1,10 @@
+/*
+* API file for the Functional Requirments
+* FR20 - Request.SendFriendRequest
+* FR21 - Request.AcceptFriendRequest 
+* FR22 - Request.DeclineFriendRequest
+*/
+
 import {
     doc,
     collection,

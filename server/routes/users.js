@@ -1,9 +1,19 @@
+/*
+* API file for the Functional Requirments
+* FR1 - Request.Registration 
+* FR3 - Request.Log-in 
+* FR4 - Change.Password
+*/
+
+
 import {
     doc,
     getDoc,
     setDoc,
     updateDoc,
     arrayRemove,
+    collection,
+    getDocs,
 } from "firebase/firestore";
 import {
     createUserWithEmailAndPassword,
@@ -12,7 +22,11 @@ import {
     sendPasswordResetEmail,
 } from "firebase/auth";
 
-import { auth, adminAuth, db } from "../service/firebase.js";
+import {
+    auth,
+    adminAuth,
+    db
+} from "../service/firebase.js";
 
 ///////////////////////////// register new user /////////////////////////////
 async function register(app) {
@@ -102,11 +116,15 @@ async function register(app) {
                 }
             } catch (error) {
                 console.error(error);
-                res.status(409).json({ error: "Failed to create new user" });
+                res.status(409).json({
+                    error: "Failed to create new user"
+                });
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Wrong user input or exist email" });
+            res.status(500).json({
+                error: "Wrong user input or exist email"
+            });
         }
     });
 }
@@ -149,9 +167,7 @@ async function login(app) {
                                         // Fetch the perk data from user's inventory
                                         const userPerks = [];
                                         for (
-                                            let i = 0;
-                                            i < inventory.length;
-                                            i++
+                                            let i = 0; i < inventory.length; i++
                                         ) {
                                             const perkId = inventory[i];
                                             await getDoc(
@@ -186,7 +202,9 @@ async function login(app) {
                 });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Wrong user input" });
+            res.status(500).json({
+                error: "Wrong user input"
+            });
         }
     });
 }
@@ -198,7 +216,7 @@ async function logout(app) {
         // in other api calls that require authenticated users
         const token = req.cookies.token || "";
         adminAuth
-            .verifyIdToken(token, true /** checkRevoked */)
+            .verifyIdToken(token, true /** checkRevoked */ )
             .then((decodedToken) => {
                 const uid = decodedToken.uid;
                 console.log(uid);
@@ -232,7 +250,9 @@ async function changePassword(app) {
                 });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Wrong user input" });
+            res.status(500).json({
+                error: "Wrong user input"
+            });
         }
     });
 }
@@ -253,15 +273,21 @@ async function getUserById(app) {
 
                         res.status(200).json(userData);
                     } else {
-                        res.status(404).json({ error: "No data found" });
+                        res.status(404).json({
+                            error: "No data found"
+                        });
                     }
                 })
                 .catch((error) => {
-                    res.status(404).json({ error: "No data found" });
+                    res.status(404).json({
+                        error: "No data found"
+                    });
                 });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Server error" });
+            res.status(500).json({
+                error: "Server error"
+            });
         }
     });
 }
@@ -291,18 +317,26 @@ async function getFriends(app) {
                         }
                         // Send response to client with user data
 
-                        res.status(200).json({ friends: friendsList });
+                        res.status(200).json({
+                            friends: friendsList
+                        });
                     } else {
-                        res.status(404).json({ error: "No data found" });
+                        res.status(404).json({
+                            error: "No data found"
+                        });
                     }
                 })
                 .catch((error) => {
                     console.error(error);
-                    res.status(404).json({ error: "No data found" });
+                    res.status(404).json({
+                        error: "No data found"
+                    });
                 });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Server error" });
+            res.status(500).json({
+                error: "Server error"
+            });
         }
     });
 }
@@ -330,11 +364,40 @@ async function deleteFriend(app) {
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Failed to delete friend" });
+            res.status(500).json({
+                error: "Failed to delete friend"
+            });
         }
     });
 }
 
+async function getAllUserIds(app) {
+    app.get("/users/", async (req, res) => {
+        try {
+            const usersCollectionRef = collection(db, "users");
+
+            const querySnapshot = await getDocs(usersCollectionRef);
+
+            if (querySnapshot.empty) {
+                res.status(404).json({
+                    error: "No data found"
+                });
+            } else {
+                const userIds = [];
+                querySnapshot.forEach(doc => {
+                    userIds.push(doc.id);
+                });
+
+                res.status(200).json(userIds);
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                error: "Server error"
+            });
+        }
+    });
+}
 export function init(app) {
     register(app);
     login(app);
@@ -343,4 +406,5 @@ export function init(app) {
     getUserById(app);
     getFriends(app);
     deleteFriend(app);
+    getAllUserIds(app);
 }
