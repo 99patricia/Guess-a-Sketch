@@ -77,7 +77,6 @@ function Profile(props) {
     };
 
     const [gameHistory, setGameHistory] = useState([]);
-    const [friendIDList, setFriendIDList] = useState([]);
     const [friendList, setFriendList] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
     const [wordbanks, setWordbanks] = useState([]);
@@ -123,26 +122,10 @@ function Profile(props) {
             }
         };
 
-        const fetchFriendsList = async () => {
-            if (userData?.id) {
-                await axios.get(`/users/${userData.id}`).then((res) => {
-                    setFriendIDList(res.data.friendList);
-                });
-            }
-        };
-
         const fetchFriends = async () => {
-            await fetchFriendsList();
-            const friends = friendIDList;
-            if (friends) {
-                var i;
-                setFriendList([]);
-                for (i = 0; i < friends.length; i++) {
-                    await axios.get(`/profile/${friends[i]}`).then((res) => {
-                        setFriendList((oldArray) => [...oldArray, res.data]);
-                    });
-                }
-            }
+            await axios.get(`/users/friends/${userData.id}`).then((res) => {
+                setFriendList(res.data.friends);
+            });
         };
 
         const fetchWordbanks = async () => {
@@ -158,10 +141,12 @@ function Profile(props) {
             }
         };
 
-        fetchFriendRequests();
-        fetchGames().catch(console.error);
-        fetchWordbanks().catch((error) => console.error(error));
-        fetchFriends();
+        if (userData.id) {
+            fetchFriendRequests();
+            fetchGames().catch(console.error);
+            fetchWordbanks().catch((error) => console.error(error));
+            fetchFriends();
+        }
     }, [profileData, update, userData.id]);
 
     // https://www.w3schools.com/howto/howto_js_tabs.asp
