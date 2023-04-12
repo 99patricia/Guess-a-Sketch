@@ -85,19 +85,12 @@ function Profile(props) {
 
     useEffect(() => {
         const fetchGames = async () => {
-            const games = profileData.gamehistory;
-            if (games && gameHistory?.length === 0) {
-                // only grab game history on profile load
-                var i;
-                var gamehistory = [];
-                setGameHistory([]);
-                for (i = 0; i < games.length; i++) {
-                    await axios.get(`/games/${games[i]}`).then((res) => {
-                        gamehistory.push(res.data);
-                    });
-                }
-                setGameHistory(gamehistory);
+            if (gameHistory?.length > 0) {
+                return;
             }
+            await axios.get(`/profile/games/${userData.id}`).then((res) => {
+                setGameHistory(res.data.games);
+            });
         };
 
         const fetchFriendRequests = async () => {

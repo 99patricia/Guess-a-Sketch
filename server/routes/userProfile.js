@@ -106,8 +106,50 @@ async function UpdateProfileEndgame(app) {
     });
 }
 
+async function getGames(app) {
+    app.get("/profile/games/:id", async (req, res) => {
+        try {
+            const profileId = req.params.id;
+            const docRef = doc(db, "profiles", profileId);
+
+            await getDoc(docRef)
+                .then(async (docsnap) => {
+                    if (docsnap.exists()) {
+                        const userData = docsnap.data();
+                        const gamesIdsList = userData.gamehistory;
+
+                        // Fetch data for user's games
+                        const gamesList = [];
+                        for (let i = 0; i < gamesIdsList.length; i++) {
+                            const gameID = gamesIdsList[i];
+                            await getDoc(doc(db, "games", gameID)).then(
+                                (docsnap) => {
+                                    const gameData = docsnap.data();
+                                    gamesList.push(gameData);
+                                }
+                            );
+                        }
+                        // Send response to client with user data
+
+                        res.status(200).json({ games: gamesList });
+                    } else {
+                        res.status(404).json({ error: "No data found" });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    res.status(404).json({ error: "No data found" });
+                });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Server error" });
+        }
+    });
+}
+
 export function init(app) {
     getUserProfile(app),
         upsertUserProfile(app),
-        UpdateProfileEndgame(app);
+        UpdateProfileEndgame(app),
+        getGames(app);
 }
