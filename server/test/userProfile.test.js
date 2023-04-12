@@ -1,5 +1,5 @@
 /*
-* Test the game API and also the database 
+* Test the userProfile API and also the database 
 */
 
 import axios from "axios";
