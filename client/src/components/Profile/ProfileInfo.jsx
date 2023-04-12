@@ -157,7 +157,7 @@ const ErrorMessage = styled.div`
 
 function ProfileInfo(props) {
 
-    const { userData, profileData, loggedInAsGuest } = { ...props };
+    const { userData, profileData, loggedInAsGuest, setEditAvatar } = { ...props };
 
     const addFriendButtonRef = useRef();
     const [addFriend, setAddFriend] = useState(false);
@@ -176,6 +176,10 @@ function ProfileInfo(props) {
             setAddFriend(false);
             setErrorMessage("");
         }
+    }
+
+    function handleEditAvatar(event) {
+        setEditAvatar(true);
     }
 
     const handleAddFriend = (e) => {
@@ -220,7 +224,7 @@ function ProfileInfo(props) {
     return (
         <>
             <EditButton>
-                <i className="bi-pencil-fill"/>
+                <i className="bi-pencil-fill" onClick={handleEditAvatar}/>
             </EditButton>
             <UserInfoContainer>
                 <UserImage src={userData.avatar} />

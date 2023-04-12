@@ -14,3 +14,4 @@ export { default as SideDrawer } from "./SideDrawer";
 export { default as GameOver } from "./GameOver";
 export { default as Leaderboard } from "./Leaderboard";
 export { default as Profile } from "./Profile";
+export { default as EditAvatar } from "./EditAvatar";
