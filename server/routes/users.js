@@ -102,7 +102,7 @@ async function register(app) {
                 }
             } catch (error) {
                 console.error(error);
-                res.status(500).json({ error: "Failed to create new user" });
+                res.status(409).json({ error: "Failed to create new user" });
             }
         } catch (error) {
             console.error(error);

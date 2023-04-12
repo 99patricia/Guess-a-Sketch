@@ -53,6 +53,30 @@ describe('Test - Get wordbank Content', function () {
 	});
 });
 
+describe('Test - Get wordbank Content with wrong name', function () {
+	it('should not get wordbank content', function (done) {
+
+		let data = '';
+
+		let config = {
+			method: 'get',
+			maxBodyLength: Infinity,
+			url: 'http://localhost:3001/wordbankcontent/WrongName',
+			headers: {},
+			data: data
+		};
+
+		axios.request(config)
+			.then((response) => {
+				done();
+			})
+			.catch((error) => {
+				assert.ok(error.response.status == 404, 'Correct');
+				done();
+			});
+	});
+});
+
 
 
 describe('Test - create wordbank', function () {
