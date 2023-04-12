@@ -28,10 +28,12 @@ async function handleFriendRequest(app) {
             var recipient_id = "";
 
             {
+
                 const q = query(
                     collection(db, "profiles"),
                     where("username", "==", recipient_username)
                 );
+
                 const querySnapshot = await getDocs(q);
                 if (querySnapshot.empty) {
                     // player is a guest
@@ -61,6 +63,7 @@ async function handleFriendRequest(app) {
                 direction,
             };
 
+
             {
                 const friendRequestsRef = collection(db, "friendRequests");
                 const q = query(
@@ -77,6 +80,7 @@ async function handleFriendRequest(app) {
                     return;
                 }
             }
+            
 
             const senderDocRef = doc(db, "users", sender_id);
             const senderSnapshot = await getDoc(senderDocRef);

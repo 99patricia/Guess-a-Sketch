@@ -56,7 +56,7 @@ async function getPerk(app) {
             const perkSnapshot = await getDoc(perkDocRef);
 
             if (!perkSnapshot.exists()) {
-                res.status(400).json({ error: "Perk not found" });
+                res.status(404).json({ error: "Perk not found" });
                 return;
             }
 

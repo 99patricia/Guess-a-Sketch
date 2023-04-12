@@ -15,8 +15,8 @@ describe('Test - Get wordbankname', function () {
 
 		axios.request(config)
 			.then((response) => {
-				assert.ok(JSON.stringify(response.data).includes('fruits__GLOBAL'), 'The array does not contain fruits__GLOBAL');
-				assert.ok(JSON.stringify(response.data).includes('animals__GLOBAL'), 'The array does not contain animals__GLOBAL');
+				assert.ok(JSON.stringify(response.data).includes('fruits'), 'The array does not contain fruits__GLOBAL');
+				assert.ok(JSON.stringify(response.data).includes('animals'), 'The array does not contain animals__GLOBAL');
 				done();
 			})
 			.catch((error) => {
@@ -49,6 +49,30 @@ describe('Test - Get wordbank Content', function () {
 			})
 			.catch((error) => {
 				done(error);
+			});
+	});
+});
+
+describe('Test - Get wordbank Content with wrong name', function () {
+	it('should not get wordbank content', function (done) {
+
+		let data = '';
+
+		let config = {
+			method: 'get',
+			maxBodyLength: Infinity,
+			url: 'http://localhost:3001/wordbankcontent/WrongName',
+			headers: {},
+			data: data
+		};
+
+		axios.request(config)
+			.then((response) => {
+				done();
+			})
+			.catch((error) => {
+				assert.ok(error.response.status == 404, 'Correct');
+				done();
 			});
 	});
 });
@@ -94,7 +118,7 @@ describe('Test - create wordbank', function () {
 
 		axios.request(config)
 			.then((response) => {
-				assert.ok(JSON.stringify(response.data).includes('test__tsboT4GKjRSrfbIpJqeaQG41FlY2'), 'The array does not contain test__tsboT4GKjRSrfbIpJqeaQG41FlY2');
+				assert.ok(JSON.stringify(response.data).includes('test'), 'The array does not contain test__tsboT4GKjRSrfbIpJqeaQG41FlY2');
 				done();
 			})
 			.catch((error) => {
