@@ -1,3 +1,8 @@
+/**
+ * Satisfies:
+ * FR1 - Request.Registration
+ * FR2 - Draw.User.Avatar
+ */
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";

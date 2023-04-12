@@ -1,3 +1,8 @@
+/**
+ * Satisfies:
+ * FR7 - Select.Wordbank
+ * FR17 - Create.Lobby
+ */
 import React, { useEffect, useState } from "react";
 import { socket } from "service/socket";
 import { Desktop } from "service/mediaQueries";

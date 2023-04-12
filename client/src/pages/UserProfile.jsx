@@ -1,3 +1,7 @@
+/**
+ * Satisfies:
+ * FR11 - Request.Profile
+ */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 

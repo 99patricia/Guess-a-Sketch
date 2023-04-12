@@ -1,14 +1,14 @@
-/*
-*
-*
-*
-*
-*
-*
-*/
-
-
-
+/**
+ * Satisfies:
+ * FR9 - Award.Guesser.Points
+ * FR10 - Award.Drawer.Points
+ * FR12 - Draw.Canvas
+ * FR14 - Clean.Canvas
+ * FR15 - Save.PlayerData
+ * FR17 - Create.Lobby
+ * FR18 - Chat.Lobby
+ * FR19 - Permission.Host
+ */
 
 import express from "express";
 import http from "http";

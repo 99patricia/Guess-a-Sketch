@@ -1,3 +1,7 @@
+/**
+ * Satisfies:
+ * FR4 - Change.Password
+ */
 import React, { useState } from "react";
 import axios from "axios";
 
